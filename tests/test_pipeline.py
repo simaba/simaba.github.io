@@ -89,6 +89,9 @@ class PortfolioChecks(unittest.TestCase):
             self.assertIn(sha,workflow)
         self.assertIn("needs: [verify]",workflow)
         self.assertIn("python3 scripts/launch_gate.py",workflow)
+    def test_release_control_files_are_bound_to_approval(self):
+        for file in (".github/workflows/review.yml","scripts/launch_gate.py","scripts/verify.py","scripts/compare_visual.py","scripts/browser_review.py","scripts/sync.py","tests/test_pipeline.py","site/project.html","data/studies.json"):
+            self.assertIn(file,launch_gate.DESIGN_FILES)
     def test_release_blocks_without_editorial_signoff(self):
         with patch.object(launch_gate.json,"loads",return_value={"schema_version":2,"approved":True,"editorial_approved":False}):
             with self.assertRaisesRegex(RuntimeError,"missing human editorial approval"):

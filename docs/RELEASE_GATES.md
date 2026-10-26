@@ -44,3 +44,8 @@ No automatic CI can certify that design is beautiful, WCAG-conformant or free of
 - Homepage links to verified published essays; editorial copy stays human-maintained.
 - Removed the former daily schedule: refreshes occur only on trusted-main pushes or manual dispatch to avoid repeated browser installation and artifact storage for minor push dates.
 - Migrated the remaining older checkout and upload-artifact pins to immutable Node 24-compatible commits.
+
+## Protecting release machinery (reviewed scope)
+- The approval digest also binds the workflow, release gate, screenshot comparator, source checks and their tests. Altering those files invalidates previously accepted source fingerprints.
+- A repository administrator can still rewrite the workflow, approval record and approval rules before execution. **This is not independently cryptographically signed attestation.** Rulesets/branch protection and an actual human review are required for meaningful assurance.
+- The first publication and its live HTTP/assets behavior must still be verified; a test-only pull request is not proof of a production deployment.
