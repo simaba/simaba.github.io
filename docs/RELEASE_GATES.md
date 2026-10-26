@@ -37,3 +37,10 @@ No automatic CI can certify that design is beautiful, WCAG-conformant or free of
 - The site distinguishes actual working code, bounded prototypes, practitioner methods and reference lists. Release maturity and capabilities are not inferred from stars or recent commits.
 - Human editorial approval is separate from human visual approval. Deployment requires `editorial_approved: true` and `approved: true`; neither is asserted by CI.
 - The editorial standard and claim register are bound into the reviewed source digest. A subsequent edit invalidates the previous release approval.
+
+## Portfolio depth and proportional CI
+- Four featured projects cover operations, program management, automotive evaluation and AI release governance; the full public index remains twelve curated projects.
+- Five generated project pages state documented artifacts, examples and limitations. They are *project analyses*, not fabricated production case studies or claimed business results.
+- Homepage links to verified published essays; editorial copy stays human-maintained.
+- Removed the former daily schedule: refreshes occur only on trusted-main pushes or manual dispatch to avoid repeated browser installation and artifact storage for minor push dates.
+- Migrated the remaining older checkout and upload-artifact pins to immutable Node 24-compatible commits.

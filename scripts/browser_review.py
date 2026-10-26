@@ -72,6 +72,12 @@ with sync_playwright() as playwright:
                 detail=page.context.new_page()
                 detail.goto((ROOT/"dist/projects"/slug/"index.html").as_uri(),wait_until="domcontentloaded")
                 assert detail.get_by_role("heading",name="How it works").count()==1
+                if width<=590:
+                    open_menu=detail.get_by_role("button",name="Open navigation")
+                    open_menu.click()
+                    assert detail.locator(".primary-nav").is_visible()
+                    detail.keyboard.press("Escape")
+                    assert open_menu.get_attribute("aria-expanded")=="false"
                 assert detail.get_by_role("heading",name="What it does not establish").count()==1
                 assert detail.evaluate("document.documentElement.scrollWidth<=document.documentElement.clientWidth+1"),f"{slug} overflow at {width}"
                 if label in ("desktop","mobile"):

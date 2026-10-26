@@ -17,7 +17,7 @@
         "A public browser explainer showing the workflow without invoking the Python engine"
       ],
       "example_label": "Run the working application",
-      "example": "git clone https://github.com/simaba/lean-ai-ops.git\ncd lean-ai-ops\n# Follow the environment setup in the README before running the app",
+      "example": "git clone https://github.com/simaba/lean-ai-ops.git\ncd lean-ai-ops\npython -m pip install -r requirements.txt\npython -m streamlit run app.py",
       "limits": [
         "The GitHub Pages interface does not call the model, persist project work or run statistical calculations.",
         "The project helps structure improvement work; it cannot validate a root cause or replace the quality practitioner's review."

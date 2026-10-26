@@ -21,7 +21,9 @@ python3 scripts/compare_visual.py
 python3 scripts/launch_gate.py
 ```
 
-The CI verification job runs on PRs without write credentials. On trusted main only, metadata is refreshed on push, scheduled runs and manual dispatch. If the GitHub metadata refresh fails, CI fails without publishing changes; the currently published site is retained. Scheduled refreshes do not commit fetched data back to `main` and do not retain a cross-run cache.
+The CI verification job runs on PRs without write credentials. On trusted main only, metadata is refreshed on pushes and manually dispatched runs. No scheduled jobs. If the GitHub metadata refresh fails, CI fails without publishing changes; the currently published site is retained. Metadata refreshes do not commit fetched data back to `main` and do not retain a cross-run cache.
+
+Five authored project pages are generated at `dist/projects/<repository>/index.html` from source-backed `data/studies.json` and `site/project.html`. The selected essays are verified external links; no article content is copied into this repository. Case pages reuse the approved visual tokens and include specific examples, limitations and repository source links.
 
 The publish job is *conditionally defined* for trusted main; it requires successful browser review, six screenshot baselines and a human-signed-off design digest before uploading the **same tested artifact** to GitHub Pages. All approval fields remain unset. Do not merge until design review and branch-protection settings are complete.
 

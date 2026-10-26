@@ -30,7 +30,7 @@ def verify():
     a=Audit();a.feed(HTML)
     assert a.lang and a.headings.count("h1")==1, "Missing lang or single H1"
     assert len(a.ids)==len(set(a.ids)), "Duplicate DOM IDs"
-    assert all(x and (x.startswith("https://") or x.startswith("#")) for x in a.links), "Unsafe link protocol"
+    assert all(x and (x.startswith("https://") or x.startswith("#") or re.fullmatch(r"projects/[a-z0-9._-]+/",x)) for x in a.links), "Unsafe link protocol"
     assert all(x[1:] in set(a.ids) for x in a.links if x.startswith("#")), "Broken anchor"
     assert HTML.count('class="project-row"')==12, "Catalog changed"
     assert HTML.count('class="feature ')==4, "Featured selection changed"
