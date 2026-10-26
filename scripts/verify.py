@@ -23,6 +23,55 @@ class Audit(HTMLParser):
         if tag in ("h1","h2","h3"): self.headings.append(tag)
         if tag=="a": self.links.append(a.get("href"))
 
+
+def audit_built_site():
+    """Check every generated page, local route, stylesheet and script without network access."""
+    from urllib.parse import urlsplit, unquote
+    root=(ROOT/"dist").resolve()
+    pages=sorted(root.rglob("*.html"))
+    expected={root/"index.html"} | {root/"projects"/p["repo"]/"index.html" for p in json.loads((ROOT/"data/projects.json").read_text("utf-8"))["projects"] if p.get("study")}
+    assert set(pages)==expected, "Unexpected or missing generated HTML page"
+    class PageAudit(HTMLParser):
+        def __init__(self):
+            super().__init__();self.ids=[];self.hrefs=[];self.resources=[];self.headings=[];self.alt_missing=0;self.lang=False
+        def handle_starttag(self,tag,attrs):
+            a=dict(attrs)
+            if tag=="html":self.lang=a.get("lang")=="en"
+            if "id" in a:self.ids.append(a["id"])
+            if tag in ("h1","h2","h3"):self.headings.append(tag)
+            if tag=="a":self.hrefs.append(a.get("href"))
+            if tag=="script" and a.get("src"):self.resources.append(a["src"])
+            if tag=="link" and a.get("rel")=="stylesheet":self.resources.append(a.get("href"))
+            if tag=="img" and a.get("alt") is None:self.alt_missing+=1
+    for page in pages:
+        audit=PageAudit();audit.feed(page.read_text("utf-8"))
+        assert audit.lang and audit.headings.count("h1")==1,(str(page),"language or h1 missing")
+        assert len(audit.ids)==len(set(audit.ids)),(str(page),"duplicate ID")
+        assert audit.alt_missing==0,(str(page),"image missing alt")
+        for href in audit.hrefs+audit.resources:
+            assert isinstance(href,str) and href,(str(page),"empty link/resource")
+            parts=urlsplit(href)
+            assert not parts.scheme or parts.scheme=="https",(str(page),"unsafe scheme",href)
+            if parts.scheme:
+                assert parts.netloc,(str(page),"invalid external URL",href)
+                continue
+            assert not parts.netloc,(str(page),"protocol-relative link",href)
+            path=unquote(parts.path)
+            if path:
+                target=(page.parent/path).resolve()
+                assert target.is_relative_to(root),(str(page),"link escapes site",href)
+                if target.is_dir():target=target/"index.html"
+                assert target.is_file(),(str(page),"broken local link or asset",href)
+            else:
+                target=page
+            if href in audit.hrefs and parts.fragment:
+                if target==page:
+                    assert unquote(parts.fragment) in audit.ids,(str(page),"missing anchor",href)
+                elif target.suffix==".html":
+                    dest=PageAudit();dest.feed(target.read_text("utf-8"))
+                    assert unquote(parts.fragment) in dest.ids,(str(page),"cross-page anchor missing",href)
+    print(f"PASS: {len(pages)} generated HTML pages, local links, anchors, accessible images and resources")
+
 def verify():
     assert "<style>" not in HTML and "<script>" not in HTML
     assert '<link rel="stylesheet" href="assets/styles.css"' in HTML
@@ -76,6 +125,7 @@ def verify():
     snapshot=json.loads((ROOT/"data/public-metadata.json").read_text())
     assert snapshot["schema_version"]==1 and set(snapshot["repositories"]).issubset(repos)
     assert all(set(m).issubset({"updated_at","stars","forks","language","archived"}) for m in snapshot["repositories"].values())
+    audit_built_site()
     print("PASS: deterministic generated site, curated manifest, design tokens, anchors, privacy and approval schema")
 
 if __name__=="__main__":

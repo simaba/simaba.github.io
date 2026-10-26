@@ -71,6 +71,9 @@ with sync_playwright() as playwright:
             for slug in ("lean-ai-ops","everything-program-management","automotive-llm-eval-harness","release-checklist","agent-eval"):
                 detail=page.context.new_page()
                 detail.goto((ROOT/"dist/projects"/slug/"index.html").as_uri(),wait_until="domcontentloaded")
+                accent=detail.evaluate("getComputedStyle(document.documentElement).getPropertyValue('--accent').trim().toUpperCase()")
+                assert accent in ("#5F69D9","#8A98FA"),f"{slug}: stylesheet not loaded: {accent!r}"
+                assert detail.locator('link[rel=stylesheet]').get_attribute("href")=="../../assets/styles.css"
                 assert detail.get_by_role("heading",name="How it works").count()==1
                 if width<=590:
                     open_menu=detail.get_by_role("button",name="Open navigation")

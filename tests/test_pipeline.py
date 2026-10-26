@@ -8,6 +8,7 @@ from unittest.mock import patch
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/"scripts"))
 from build import featured_card,catalog_row,build
+from verify import audit_built_site
 from sync import extract
 import launch_gate
 ROOT=Path(__file__).resolve().parents[1]
@@ -130,6 +131,9 @@ class PortfolioChecks(unittest.TestCase):
             self.assertIs(type(item["forks"]),int,repo)
             self.assertIs(type(item["archived"]),bool,repo)
             self.assertIsInstance(item["language"],str,repo)
+    def test_generated_local_navigation_is_complete(self):
+        build()
+        audit_built_site()
     def test_approved_palette_is_locked(self):
         css=(ROOT/"assets/styles.css").read_text()
         for token in ("--bg:#F5F4F0","--bg:#111722","--accent:#5F69D9","--accent:#8A98FA","--accent-secondary:#6BBEAC"):
