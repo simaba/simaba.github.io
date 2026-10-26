@@ -12,3 +12,10 @@ Check:
 7. Actual hosted performance and link behavior before launch; screenshots cannot establish Core Web Vitals.
 
 Record reviewer, reviewed PR, date and accepted screenshots in a later explicit approval step. The source PR and workflow cannot publish itself. Any materially changed visual must be re-reviewed.
+
+## Editorial sign-off required (separate from the visual review)
+Inspect the visible homepage, generated cards, project names, search labels, page title, About section and footer. Compare each project summary and maturity label against its README and `docs/CLAIM_AUDIT.md`. Do not infer professional deployment from a sample, framework from a tool, or runtime execution from a browser-only demonstration.
+
+Test each sentence for specificity: would it fit nearly any AI consultancy? If so, rewrite it around an identifiable artifact, action or limitation. Reject invented performance metrics, clients and recognitions; promotional superlatives; vague noun clusters; and repeating the same abstract promise in successive headings.
+
+The content release gate must be explicitly signed off by the human reviewer with `editorial_approved: true`. Passing a regex, automated rewrite or repository-excerpt comparison does **not** substitute for editorial judgment. The approval remains false until the reviewer actually accepts the content.

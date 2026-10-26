@@ -55,7 +55,10 @@ def verify():
     assert len(repos)==len(set(repos)) and all(p["repo"]!="Tipira" and p["repo"]!="Skill-builder" for p in data["projects"])
     assert all(re.fullmatch(r"[A-Za-z0-9._-]+",n) and n not in (".","..") for n in repos), "Invalid repository slug"
     assert all(p["kind"] in ("tool","prototype","method","resource") for p in data["projects"])
-    assert all(isinstance(p["description"],str) and len(p["description"])>35 for p in data["projects"])
+    assert all(isinstance(p["description"],str) and len(p["description"])>=75 for p in data["projects"])
+    assert all(p.get("editorial_source")=="README.md" for p in data["projects"])
+    assert "BUILT WITH INTENTION" not in HTML
+    assert "Each project addresses a different part" not in HTML
     snapshot=json.loads((ROOT/"data/public-metadata.json").read_text())
     assert snapshot["schema_version"]==1 and set(snapshot["repositories"]).issubset(repos)
     assert all(set(m).issubset({"updated_at","stars","forks","language","archived"}) for m in snapshot["repositories"].values())

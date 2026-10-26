@@ -55,7 +55,7 @@ class PortfolioChecks(unittest.TestCase):
             for name in launch_gate.REQUIRED:
                 (baseline/name).write_bytes(b"approved visual evidence"*70)
             with patch.object(launch_gate,"ROOT",root),patch.object(launch_gate,"BASE",baseline):
-                approval={"schema_version":2,"approved":True,"reviewer":"Human reviewer",
+                approval={"schema_version":2,"approved":True,"editorial_approved":True,"reviewer":"Human reviewer",
                     "approved_at":datetime.now(timezone.utc).isoformat(),
                     "evidence":"https://github.com/simaba/simaba.github.io/pull/1",
                     "design_sha256":launch_gate.design_digest(),
@@ -89,6 +89,20 @@ class PortfolioChecks(unittest.TestCase):
             self.assertIn(sha,workflow)
         self.assertIn("needs: [verify]",workflow)
         self.assertIn("python3 scripts/launch_gate.py",workflow)
+    def test_release_blocks_without_editorial_signoff(self):
+        with patch.object(launch_gate.json,"loads",return_value={"schema_version":2,"approved":True,"editorial_approved":False}):
+            with self.assertRaisesRegex(RuntimeError,"missing human editorial approval"):
+                launch_gate.check()
+    def test_catalog_copy_has_source_and_specificity(self):
+        projects=self.data["projects"]
+        self.assertTrue(all(p.get("editorial_source")=="README.md" for p in projects))
+        self.assertEqual(len({p["description"] for p in projects}),len(projects))
+        for p in projects:
+            self.assertGreaterEqual(len(p["description"]),75,p["repo"])
+            self.assertLessEqual(len(p["description"]),240,p["repo"])
+            for phrase in ("seamless","revolutionary","game-changing","cutting-edge","state-of-the-art","unlock potential"):
+                self.assertNotIn(phrase,p["description"].lower(),p["repo"])
+        self.assertEqual(next(p for p in projects if p["repo"]=="prompt-harness-translator")["kind"],"tool")
     def test_public_snapshot_is_complete_and_bounded(self):
         projects={p["repo"] for p in self.data["projects"]}
         snapshot=json.loads((ROOT/"data/public-metadata.json").read_text())

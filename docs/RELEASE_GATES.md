@@ -31,3 +31,9 @@ No automatic CI can certify that design is beautiful, WCAG-conformant or free of
 
 - A verified full public metadata snapshot is now committed for initial review. Trusted-main runs replace it in memory with a live complete public refresh; no hidden private metadata is used.
 - A separate Chromium smoke test blocks external font services to verify graceful fallback at small-mobile width.
+
+## Editorial safeguards (added 2026-10-26)
+- Every selected repository has an explicit README source for its manually curated description and scope. Only public metadata updates automatically.
+- The site distinguishes actual working code, bounded prototypes, practitioner methods and reference lists. Release maturity and capabilities are not inferred from stars or recent commits.
+- Human editorial approval is separate from human visual approval. Deployment requires `editorial_approved: true` and `approved: true`; neither is asserted by CI.
+- The editorial standard and claim register are bound into the reviewed source digest. A subsequent edit invalidates the previous release approval.

@@ -7,7 +7,7 @@ from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1]
 BASE=ROOT/"tests/visual-baseline"
 REQUIRED=("desktop.png","desktop-dark.png","tablet.png","mobile.png","mobile-dark.png","small-mobile.png")
-DESIGN_FILES=("site/template.html","assets/styles.css","assets/app.js","assets/favicon.svg","scripts/build.py","data/projects.json","docs/DESIGN_CONTRACT.md")
+DESIGN_FILES=("site/template.html","assets/styles.css","assets/app.js","assets/favicon.svg","scripts/build.py","data/projects.json","docs/DESIGN_CONTRACT.md","docs/EDITORIAL_STANDARD.md","docs/CLAIM_AUDIT.md")
 def sha(p): return hashlib.sha256(p.read_bytes()).hexdigest()
 def design_digest():
     h=hashlib.sha256()
@@ -21,6 +21,7 @@ def visual_hashes():
 def check():
     state=json.loads((ROOT/"data/launch-approval.json").read_text(encoding="utf-8"))
     if state.get("schema_version")!=2 or state.get("approved") is not True: raise RuntimeError("Publication blocked: no human design approval")
+    if state.get("editorial_approved") is not True: raise RuntimeError("Publication blocked: missing human editorial approval")
     reviewer=state.get("reviewer")
     if not isinstance(reviewer,str) or len(reviewer.strip())<3: raise RuntimeError("Publication blocked: missing reviewer")
     evidence=state.get("evidence")
