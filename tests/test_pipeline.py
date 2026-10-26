@@ -40,8 +40,36 @@ class PortfolioChecks(unittest.TestCase):
         self.assertNotIn("{{FEATURED}}",h)
         self.assertNotIn("{{CATALOG}}",h)
     def test_launch_refuses_missing_design_approval(self):
-        with self.assertRaisesRegex(RuntimeError,"no human design approval"):
-            launch_gate.check()
+        # Always test an unapproved fixture, even after the actual site is approved.
+        with patch.object(launch_gate.json,"loads",return_value={"schema_version":2,"approved":False}):
+            with self.assertRaisesRegex(RuntimeError,"no human design approval"):
+                launch_gate.check()
+    def test_launch_approval_binds_both_source_and_baselines(self):
+        from datetime import datetime,timezone
+        with tempfile.TemporaryDirectory() as temp:
+            root=Path(temp); baseline=root/"tests/visual-baseline"
+            baseline.mkdir(parents=True)
+            for name in launch_gate.DESIGN_FILES:
+                f=root/name;f.parent.mkdir(parents=True,exist_ok=True)
+                f.write_text("approved source",encoding="utf-8")
+            for name in launch_gate.REQUIRED:
+                (baseline/name).write_bytes(b"approved visual evidence"*70)
+            with patch.object(launch_gate,"ROOT",root),patch.object(launch_gate,"BASE",baseline):
+                approval={"schema_version":2,"approved":True,"reviewer":"Human reviewer",
+                    "approved_at":datetime.now(timezone.utc).isoformat(),
+                    "evidence":"https://github.com/simaba/simaba.github.io/pull/1",
+                    "design_sha256":launch_gate.design_digest(),
+                    "baseline_sha256":launch_gate.visual_hashes()}
+                (root/"data").mkdir()
+                (root/"data/launch-approval.json").write_text(json.dumps(approval))
+                launch_gate.check()
+                (root/launch_gate.DESIGN_FILES[0]).write_text("unreviewed drift")
+                with self.assertRaisesRegex(RuntimeError,"design or content changed"):
+                    launch_gate.check()
+                (root/launch_gate.DESIGN_FILES[0]).write_text("approved source")
+                (baseline/launch_gate.REQUIRED[0]).write_bytes(b"mutated screenshot"*75)
+                with self.assertRaisesRegex(RuntimeError,"screenshot baseline"):
+                    launch_gate.check()
     def test_approved_palette_is_locked(self):
         css=(ROOT/"assets/styles.css").read_text()
         for token in ("--bg:#F5F4F0","--bg:#111722","--accent:#5F69D9","--accent:#8A98FA","--accent-secondary:#6BBEAC"):
