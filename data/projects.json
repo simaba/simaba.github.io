@@ -22,22 +22,22 @@
       "editorial_source": "README.md"
     },
     {
-      "repo": "release-checklist",
-      "title": "AI Release Validator",
-      "kind": "tool",
-      "status": "Working CLI",
+      "repo": "everything-program-management",
+      "title": "Everything Program Management",
+      "kind": "method",
+      "status": "Foundation release",
       "featured": true,
-      "feature_layout": "narrow",
-      "visual": "gates",
       "category": "Governance & delivery",
-      "description": "A Python CLI that validates the structure and internal consistency of AI release-decision records, including hard gates, conditions and evidence references.",
-      "detail": "Checks the supplied record. It does not verify the evidence, determine applicable controls or certify release readiness.",
+      "description": "Program-management skills, templates and fictional examples for charters, risk reviews and decisions, plus a CLI validating RAID records and decision-memo structure.",
       "capabilities": [
-        "Release readiness",
-        "Decision records",
-        "Hard gates"
+        "Program management",
+        "Templates",
+        "Validation"
       ],
-      "editorial_source": "README.md"
+      "detail": "The CLI validates selected artifact fields, not the quality of a real-world program decision.",
+      "editorial_source": "README.md",
+      "feature_layout": "narrow",
+      "visual": "program"
     },
     {
       "repo": "automotive-llm-eval-harness",
@@ -58,13 +58,29 @@
       "editorial_source": "README.md"
     },
     {
+      "repo": "release-checklist",
+      "title": "AI Release Validator",
+      "kind": "tool",
+      "status": "Working CLI",
+      "featured": true,
+      "feature_layout": "wide",
+      "visual": "gates",
+      "category": "Governance & delivery",
+      "description": "A Python CLI that validates the structure and internal consistency of AI release-decision records, including hard gates, conditions and evidence references.",
+      "detail": "Checks the supplied record. It does not verify the evidence, determine applicable controls or certify release readiness.",
+      "capabilities": [
+        "Release readiness",
+        "Decision records",
+        "Hard gates"
+      ],
+      "editorial_source": "README.md"
+    },
+    {
       "repo": "agent-eval",
       "title": "Agent Evaluation Framework",
       "kind": "method",
       "status": "Practitioner framework",
-      "featured": true,
-      "feature_layout": "wide",
-      "visual": "matrix",
+      "featured": false,
       "category": "Evaluation",
       "description": "An evaluation-report schema, semantic validator and methodology for defining test coverage, measurement validity and release-decision rules.",
       "detail": "A practitioner framework with fictional examples, not a benchmark or a claim of production evaluation coverage.",
@@ -73,22 +89,6 @@
         "Measurement validity",
         "Decision semantics"
       ],
-      "editorial_source": "README.md"
-    },
-    {
-      "repo": "everything-program-management",
-      "title": "Everything Program Management",
-      "kind": "method",
-      "status": "Foundation release",
-      "featured": false,
-      "category": "Governance & delivery",
-      "description": "Program-management skills, templates and fictional examples for charters, risk reviews and decisions, plus a CLI validating RAID records and decision-memo structure.",
-      "capabilities": [
-        "Program management",
-        "Templates",
-        "Validation"
-      ],
-      "detail": "The CLI validates selected artifact fields, not the quality of a real-world program decision.",
       "editorial_source": "README.md"
     },
     {

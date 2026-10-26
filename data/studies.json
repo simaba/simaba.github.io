@@ -1,0 +1,181 @@
+{
+  "schema_version": 1,
+  "studies": [
+    {
+      "repo": "lean-ai-ops",
+      "question": "How do you turn an ambiguous process problem into reviewable improvement work?",
+      "orientation": "OPERATIONS / SOFTWARE",
+      "summary": "Lean AI Ops combines an AI-assisted DMAIC project wizard with a Python analytics workbench. The public web page illustrates the method; the Streamlit application is the runtime.",
+      "method": [
+        "The wizard begins with a process description and separates stated facts, inferred hypotheses and missing evidence.",
+        "It structures a problem statement, CTQs, SIPOC, DMAIC phases, action ownership, metrics and controls into a project package.",
+        "The analytics workbench includes process-capability, measurement-system, SPC, statistical-testing and risk-analysis tools; outputs still require domain judgment."
+      ],
+      "artifacts": [
+        "A Streamlit application for project intake and generated packages",
+        "Analytics workbench with named process-improvement methods",
+        "A public browser explainer showing the workflow without invoking the Python engine"
+      ],
+      "example_label": "Run the working application",
+      "example": "git clone https://github.com/simaba/lean-ai-ops.git\ncd lean-ai-ops\n# Follow the environment setup in the README before running the app",
+      "limits": [
+        "The GitHub Pages interface does not call the model, persist project work or run statistical calculations.",
+        "The project helps structure improvement work; it cannot validate a root cause or replace the quality practitioner's review."
+      ],
+      "links": [
+        [
+          "Open public interface",
+          "https://simaba.github.io/lean-ai-ops/"
+        ],
+        [
+          "Read the repository",
+          "https://github.com/simaba/lean-ai-ops"
+        ],
+        [
+          "Review project documentation",
+          "https://github.com/simaba/lean-ai-ops/blob/main/README.md"
+        ]
+      ]
+    },
+    {
+      "repo": "everything-program-management",
+      "question": "What does a useful program artifact need to make decisions easier to inspect?",
+      "orientation": "PROGRAM MANAGEMENT / METHODS + VALIDATOR",
+      "summary": "A practitioner toolkit spanning charters, RAID logs, decision memos, stakeholder analysis and executive briefs, with fictional examples and a narrow validation CLI.",
+      "method": [
+        "Separates observations, estimates, assumptions and unknowns instead of presenting one confident narrative.",
+        "Sets out explicit decision rights, constraints, alternatives, dissent, ownership and follow-through for different artifact types.",
+        "Connects a fictional research-library scenario across planning, risk, decisions and briefings, demonstrating how the artifacts relate without pretending to be a real client case."
+      ],
+      "artifacts": [
+        "Authored skills and templates for different program decisions",
+        "Connected, clearly fictional examples illustrating handoffs",
+        "A packaged pmkit CLI validating JSON RAID rows and decision-memo frontmatter"
+      ],
+      "example_label": "Validate an example program artifact",
+      "example": "python -m pip install -e .\npmkit validate raid examples/data/raid-row.json\npmkit validate decision-memo examples/data/decision-memo.md",
+      "limits": [
+        "Schemas check bounded structure and selected semantics, not whether a program manager's judgment or evidence is sound.",
+        "The examples are invented. This is not a program-management system of record or autonomous chief of staff."
+      ],
+      "links": [
+        [
+          "Read the repository",
+          "https://github.com/simaba/everything-program-management"
+        ],
+        [
+          "Inspect the skills",
+          "https://github.com/simaba/everything-program-management/tree/main/skills"
+        ],
+        [
+          "Review the examples",
+          "https://github.com/simaba/everything-program-management/tree/main/examples"
+        ]
+      ]
+    },
+    {
+      "repo": "automotive-llm-eval-harness",
+      "question": "What does a score say about an in-cabin assistant when the test cases are supplied?",
+      "orientation": "AUTOMOTIVE / EVALUATION PROTOTYPE",
+      "summary": "A Python scoring prototype for synthetic automotive assistant cases, with an explicit run manifest and separate quality and safety/privacy decisions.",
+      "method": [
+        "Validates supplied JSONL cases and rejects malformed or empty input and duplicate case identifiers.",
+        "Scores stated dimensions such as intent, language quality, privacy and safety, using illustrative risk-tiered gates and weighted thresholds.",
+        "Records dataset digest and run context so the score can be linked to the cases, rubric, evaluator, harness and exclusions used."
+      ],
+      "artifacts": [
+        "Scoring CLI and public-safe example case files",
+        "Dataset card, methodology and reproducibility documentation",
+        "Structured JSON output distinguishing hard-gate status from aggregate quality"
+      ],
+      "example_label": "Score the supplied synthetic cases",
+      "example": "python -m pip install -e .\nautomotive-eval run datasets/sample_cases.jsonl \\\n  --manifest datasets/sample_run_manifest.json \\\n  --json-out out.json",
+      "limits": [
+        "The program scores values in input artifacts. It does not generate model responses, run model judges or independently measure a deployed assistant.",
+        "Illustrative thresholds are not vehicle safety criteria, homologation evidence or a production release decision."
+      ],
+      "links": [
+        [
+          "Read the repository",
+          "https://github.com/simaba/automotive-llm-eval-harness"
+        ],
+        [
+          "Review the methodology",
+          "https://github.com/simaba/automotive-llm-eval-harness/blob/main/METHODOLOGY.md"
+        ],
+        [
+          "Inspect the dataset card",
+          "https://github.com/simaba/automotive-llm-eval-harness/blob/main/DATASET_CARD.md"
+        ]
+      ]
+    },
+    {
+      "repo": "release-checklist",
+      "question": "How can a release decision record be checked without pretending the tool makes the decision?",
+      "orientation": "RELEASE GOVERNANCE / WORKING CLI",
+      "summary": "The AI Release Decision Validator checks a supplied release record's structure and decision semantics. It does not prescribe the controls or independently substantiate them.",
+      "method": [
+        "Requires owners, version, evidence cutoff, scope, explicit gate identifiers and evidence references.",
+        "Distinguishes non-compensable hard gates from supporting checks and tests release, conditional release, hold, defer and do-not-release outcomes.",
+        "Produces text, Markdown and JSON reports and uses exit codes to distinguish supported release outcomes from held or invalid decisions."
+      ],
+      "artifacts": [
+        "Python CLI and validator package",
+        "Fictional release-decision YAML examples and reporting formats",
+        "Automated tests of conditional release, blocker and hard-gate consistency"
+      ],
+      "example_label": "Inspect a fictional decision record",
+      "example": "python -m pip install -e .\nrelease-checklist validate configs/medium-risk-example.yaml\nrelease-checklist report configs/high-risk-example.yaml --format markdown",
+      "limits": [
+        "A logically coherent release record does not prove that its evidence is authentic or sufficient.",
+        "The tool cannot establish legal applicability, certify safety, or authorize any real release."
+      ],
+      "links": [
+        [
+          "Read the repository",
+          "https://github.com/simaba/release-checklist"
+        ],
+        [
+          "Inspect the validator contract",
+          "https://github.com/simaba/release-checklist/blob/main/README.md"
+        ],
+        [
+          "Review example records",
+          "https://github.com/simaba/release-checklist/tree/main/configs"
+        ]
+      ]
+    },
+    {
+      "repo": "agent-eval",
+      "question": "How should an agent evaluation record its scope and validity before anyone uses a result to make a decision?",
+      "orientation": "AGENT SYSTEMS / EVALUATION METHODS",
+      "summary": "A schema, semantic validator, report template and practitioner framework for separating evaluation coverage, measurement validity, hard gates and decision authority.",
+      "method": [
+        "Starts from the operational decision an evaluation is intended to inform, not only a metric.",
+        "Documents operating population, tasks, tools, languages, evaluator instruments, exclusions and uncertainty.",
+        "Applies explicit decision semantics and encourages human review where independent validation is not established."
+      ],
+      "artifacts": [
+        "Human-readable evaluation-report template and machine-readable schema",
+        "Semantic validation utilities and fictional worked examples",
+        "Methods for evaluating coverage, independence, release judgment and limitations"
+      ],
+      "example_label": "Read the framework before using its schema",
+      "example": "git clone https://github.com/simaba/agent-eval.git\ncd agent-eval\n# Start with the README and the report/schema examples",
+      "limits": [
+        "A valid report structure does not prove that the evaluation instrument is valid or the tested agent is safe.",
+        "This is not a benchmark leaderboard or a claim that fixed thresholds work across systems."
+      ],
+      "links": [
+        [
+          "Read the repository",
+          "https://github.com/simaba/agent-eval"
+        ],
+        [
+          "Read the evaluation contract",
+          "https://github.com/simaba/agent-eval/blob/main/README.md"
+        ]
+      ]
+    }
+  ]
+}
