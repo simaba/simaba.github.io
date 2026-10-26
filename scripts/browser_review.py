@@ -22,7 +22,7 @@ with sync_playwright() as playwright:
             page.on("pageerror",lambda e:errors.append(str(e)))
             page.goto((ROOT/"dist/index.html").as_uri(),wait_until="domcontentloaded")
             page.evaluate("document.fonts.ready")
-            accent=page.evaluate("getComputedStyle(document.documentElement).getPropertyValue('--accent').trim().upper()")
+            accent=page.evaluate("getComputedStyle(document.documentElement).getPropertyValue('--accent').trim().toUpperCase()")
             assert accent=="#5F69D9",f"{label}: approved LIGHT indigo not loaded: {accent!r}"
             assert page.evaluate("getComputedStyle(document.querySelector('.hero-right')).height") != "auto"
             assert page.evaluate("document.querySelectorAll('link[rel=stylesheet]').length")==1
@@ -59,7 +59,7 @@ with sync_playwright() as playwright:
             assert page.locator("#project-search").evaluate("(e)=>getComputedStyle(e).outlineStyle")!="none"
             page.locator("#theme-toggle").click()
             assert page.locator("html").get_attribute("data-theme")=="dark"
-            dark_accent=page.evaluate("getComputedStyle(document.documentElement).getPropertyValue('--accent').trim().upper()")
+            dark_accent=page.evaluate("getComputedStyle(document.documentElement).getPropertyValue('--accent').trim().toUpperCase()")
             assert dark_accent=="#8A98FA",f"{label}: approved DARK lavender missing: {dark_accent!r}"
             if label in ("desktop","mobile"):
                 page.evaluate("window.scrollTo(0,0)")
