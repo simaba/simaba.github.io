@@ -21,3 +21,6 @@ html[data-theme='dark']{color-scheme:dark;--bg:#111722;--paper:#1C2432;--ink:#EC
 
 /* Approved-direction readability correction: technical labels remain readable on smaller phones. */
 @media(max-width:590px){.diagram-node .node-index{font-size:9px}.diagram-node>span:not(.node-index){font-size:10px}.diagram-node a{font-size:10px}.filter{min-height:40px}}
+
+/* Surface editorial maturity declarations on mobile as well as desktop. */
+@media(max-width:590px){.project-type{display:block;grid-column:2;grid-row:3;text-align:left;margin-top:2px;font-size:10px;letter-spacing:.045em}.project-description{font-size:13px}}
