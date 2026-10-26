@@ -70,6 +70,12 @@ class PortfolioChecks(unittest.TestCase):
                 (baseline/launch_gate.REQUIRED[0]).write_bytes(b"mutated screenshot"*75)
                 with self.assertRaisesRegex(RuntimeError,"screenshot baseline"):
                     launch_gate.check()
+    def test_visual_evidence_upload_cannot_succeed_without_artifact(self):
+        workflow=(ROOT/".github/workflows/review.yml").read_text()
+        screenshot_block=workflow.split("name: portfolio-visual-review-")[1].split("- name: Preserve exact verified site")[0]
+        self.assertIn("if-no-files-found: error",screenshot_block)
+        self.assertIn("include-hidden-files: true",screenshot_block)
+        self.assertIn("path: .qa/",screenshot_block)
     def test_approved_palette_is_locked(self):
         css=(ROOT/"assets/styles.css").read_text()
         for token in ("--bg:#F5F4F0","--bg:#111722","--accent:#5F69D9","--accent:#8A98FA","--accent-secondary:#6BBEAC"):
