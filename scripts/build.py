@@ -29,7 +29,7 @@ def featured_card(p,i):
 def catalog_row(p,i,meta):
     searchable=" ".join(str(x) for x in [p["title"],p["repo"],p["description"],p["category"],*p["capabilities"]]).lower()
     stamped=(meta or {}).get("updated_at") or ""
-    updated=(" · Updated "+esc(stamped[:7])) if len(stamped)>=7 and stamped[4]=="-" else ""
+    updated=(" · Last push "+esc(stamped[:7])) if len(stamped)>=7 and stamped[4]=="-" else ""
     return ('<a class="project-row" data-kind="'+esc(p["kind"])+'" data-search="'+esc(searchable)+'" href="https://github.com/simaba/'+esc(p["repo"])+'" target="_blank" rel="noopener noreferrer">'
         '<span class="project-num">'+f"{i:02d}"+'</span><span class="project-name">'+esc(p["title"])+'</span><span class="project-description">'+esc(p["description"])+'</span>'
         '<span class="project-type">'+esc(p["kind"].upper())+' / '+esc(p["status"])+updated+'</span><span class="project-arrow" aria-hidden="true">↗</span></a>')

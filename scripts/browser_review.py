@@ -56,7 +56,7 @@ with sync_playwright() as playwright:
             assert page.locator("#empty-results").is_visible()
             page.locator("#project-search").fill("")
             page.locator('[data-filter="tool"]').click()
-            assert page.locator(".project-row:visible").count()==2
+            assert page.locator(".project-row:visible").count()==3
             page.locator('[data-filter="all"]').click()
             page.locator("#project-search").focus()
             assert page.locator("#project-search").evaluate("(e)=>getComputedStyle(e).outlineStyle")!="none"

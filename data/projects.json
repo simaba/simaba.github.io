@@ -11,14 +11,15 @@
       "feature_layout": "wide",
       "visual": "dmaic",
       "category": "Systems & operations",
-      "description": "Turn operational friction into structured improvement work, with a DMAIC workspace, evidence discipline and an analytics workbench.",
-      "detail": "Python and Streamlit power the working application. The public browser interface is a deterministic demonstration, not the assessment engine.",
+      "description": "A Python/Streamlit DMAIC project wizard and analytics workbench. Its public web interface explains the workflow but does not run the assessment engine.",
+      "detail": "The browser interface is deterministic; assessment generation, calculations and saved projects require the Python application.",
       "capabilities": [
         "Process improvement",
         "Analytics",
         "Evidence discipline"
       ],
-      "live": "https://simaba.github.io/lean-ai-ops/"
+      "live": "https://simaba.github.io/lean-ai-ops/",
+      "editorial_source": "README.md"
     },
     {
       "repo": "release-checklist",
@@ -29,13 +30,14 @@
       "feature_layout": "narrow",
       "visual": "gates",
       "category": "Governance & delivery",
-      "description": "Validate the structure and logical consistency of evidence-bearing AI release-decision records, including non-compensable gates.",
-      "detail": "Checks the provided decision record. It does not determine regulatory obligations, certify safety or authenticate underlying evidence.",
+      "description": "A Python CLI that validates the structure and internal consistency of AI release-decision records, including hard gates, conditions and evidence references.",
+      "detail": "Checks the supplied record. It does not verify the evidence, determine applicable controls or certify release readiness.",
       "capabilities": [
         "Release readiness",
         "Decision records",
         "Hard gates"
-      ]
+      ],
+      "editorial_source": "README.md"
     },
     {
       "repo": "automotive-llm-eval-harness",
@@ -46,13 +48,14 @@
       "feature_layout": "narrow",
       "visual": "evaluation",
       "category": "Evaluation",
-      "description": "Explore transparent scoring, reproducibility and illustrative safety/privacy gates for synthetic in-cabin assistant scenarios.",
-      "detail": "Scores supplied case artifacts; it does not generate model responses or independently measure an LLM.",
+      "description": "A prototype scorer for supplied synthetic in-cabin assistant cases, with reproducibility manifests and illustrative safety and privacy gates.",
+      "detail": "Scores supplied case files; it neither generates model responses nor independently evaluates a deployed assistant.",
       "capabilities": [
         "LLM evaluation",
         "Automotive",
         "Safety & privacy"
-      ]
+      ],
+      "editorial_source": "README.md"
     },
     {
       "repo": "agent-eval",
@@ -63,13 +66,14 @@
       "feature_layout": "wide",
       "visual": "matrix",
       "category": "Evaluation",
-      "description": "Design evaluations that separate measurement validity, coverage, hard gates and release judgment instead of collapsing them into one score.",
-      "detail": "Includes guidance, a semantic validator, templates and fictional worked examples. It is not a leaderboard.",
+      "description": "An evaluation-report schema, semantic validator and methodology for defining test coverage, measurement validity and release-decision rules.",
+      "detail": "A practitioner framework with fictional examples, not a benchmark or a claim of production evaluation coverage.",
       "capabilities": [
         "Agent evaluation",
         "Measurement validity",
         "Decision semantics"
-      ]
+      ],
+      "editorial_source": "README.md"
     },
     {
       "repo": "everything-program-management",
@@ -78,12 +82,14 @@
       "status": "Foundation release",
       "featured": false,
       "category": "Governance & delivery",
-      "description": "Reusable program-management artifacts, structured templates, examples and validation utilities.",
+      "description": "Program-management skills, templates and fictional examples for charters, risk reviews and decisions, plus a CLI validating RAID records and decision-memo structure.",
       "capabilities": [
         "Program management",
         "Templates",
         "Validation"
-      ]
+      ],
+      "detail": "The CLI validates selected artifact fields, not the quality of a real-world program decision.",
+      "editorial_source": "README.md"
     },
     {
       "repo": "governance-playbook",
@@ -92,24 +98,28 @@
       "status": "Practitioner playbook",
       "featured": false,
       "category": "Governance & delivery",
-      "description": "Practical operating-model patterns for oversight, ownership, accountability and enterprise AI delivery.",
+      "description": "An operating-model playbook for AI decision rights, proportional review, evidence requirements, exceptions and lifecycle oversight.",
       "capabilities": [
         "AI governance",
         "Operating models"
-      ]
+      ],
+      "detail": "Practitioner guidance for designing governance; not a compliance certificate or ready-made organizational policy.",
+      "editorial_source": "README.md"
     },
     {
       "repo": "agent-simulator",
-      "title": "Agent Simulator",
+      "title": "Agent System Simulator",
       "kind": "prototype",
       "status": "Runnable demo",
       "featured": false,
       "category": "Agent systems",
-      "description": "Demonstrate bounded multi-agent behavior using reviewable scenarios and explicit system constraints.",
+      "description": "Runnable Python scenarios showing bounded retries, evidence-based acceptance, fallback contracts and human escalation.",
       "capabilities": [
         "Multi-agent systems",
         "Simulation"
-      ]
+      ],
+      "detail": "Deterministic fixtures demonstrate control flow; they are not measurements of deployed multi-agent systems.",
+      "editorial_source": "README.md"
     },
     {
       "repo": "multi-agent-governance",
@@ -118,11 +128,13 @@
       "status": "Practitioner framework",
       "featured": false,
       "category": "Agent systems",
-      "description": "Control and accountability patterns for coordinating multiple agents and their tools.",
+      "description": "A framework for defining agent and tool authority, instruction propagation controls, containment and recovery across delegated workflows.",
       "capabilities": [
         "Multi-agent systems",
         "Controls"
-      ]
+      ],
+      "detail": "Practitioner patterns; they do not enforce permissions or provide a running security boundary.",
+      "editorial_source": "README.md"
     },
     {
       "repo": "ai-prism",
@@ -131,24 +143,28 @@
       "status": "Curated resource hub",
       "featured": false,
       "category": "Research & references",
-      "description": "Curated practical references for AI governance, evaluation, risk, release readiness and incident response.",
+      "description": "A curated index of AI governance sources, risk frameworks, evaluation tools, incident-response references and related research.",
       "capabilities": [
         "Research",
         "Resource curation"
-      ]
+      ],
+      "detail": "A reference hub with inclusion standards and review notes; it does not endorse or validate every linked tool.",
+      "editorial_source": "README.md"
     },
     {
       "repo": "prompt-harness-translator",
       "title": "Prompt Harness Translator",
-      "kind": "prototype",
-      "status": "Engineering experiment",
+      "kind": "tool",
+      "status": "Starter utility",
       "featured": false,
       "category": "Agent systems",
-      "description": "Explore prompt portability across different agent and execution harnesses.",
+      "description": "A CLI that translates supported Markdown/YAML prompt assets into Codex, Cursor and generic formats, flagging metadata that cannot map cleanly.",
       "capabilities": [
-        "Prompt portability",
-        "Developer tooling"
-      ]
+        "Format conversion",
+        "Prompt assets"
+      ],
+      "detail": "Limited format translation, not cross-runtime behavioral equivalence. Generated assets require human review.",
+      "editorial_source": "README.md"
     },
     {
       "repo": "mcp-agent-risk-checklist",
@@ -157,11 +173,13 @@
       "status": "Initial review toolkit",
       "featured": false,
       "category": "Governance & delivery",
-      "description": "Review risks and proposed controls before integrating agent tools or MCP servers.",
+      "description": "A review toolkit for MCP servers and agent integrations covering authority, data reach, tool invocation, containment and recovery.",
       "capabilities": [
         "Agent security",
         "Risk review"
-      ]
+      ],
+      "detail": "A structured review aid, not a server scanner or declaration that an integration is secure.",
+      "editorial_source": "README.md"
     },
     {
       "repo": "nist-rmf-guide",
@@ -170,11 +188,13 @@
       "status": "Practitioner guide",
       "featured": false,
       "category": "Research & references",
-      "description": "Practical guidance and cross-references for working with the NIST AI Risk Management Framework.",
+      "description": "An unofficial NIST AI RMF practitioner guide with scoped review questions, gap-assessment templates and evidence-status distinctions.",
       "capabilities": [
         "NIST AI RMF",
         "Risk management"
-      ]
+      ],
+      "detail": "Not official NIST guidance; completing its templates does not establish implementation or compliance.",
+      "editorial_source": "README.md"
     }
   ]
 }
