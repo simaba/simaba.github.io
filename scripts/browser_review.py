@@ -30,6 +30,9 @@ with sync_playwright() as playwright:
             assert page.get_by_role("heading",name="Complex systems. Clearer decisions.").count()==1
             assert page.locator(".feature:visible").count()==4
             assert page.locator(".project-row:visible").count()==12
+            if width<=590:
+                assert page.locator(".project-type:visible").count()==12, "Mobile maturity labels should remain visible"
+                assert float(page.locator(".project-description").first.evaluate("(e)=>parseFloat(getComputedStyle(e).fontSize)"))>=13
             assert page.evaluate("document.documentElement.scrollWidth <= document.documentElement.clientWidth + 1")
             if width<=590:
                 menu=page.get_by_role("button",name="Open navigation")
