@@ -19,7 +19,8 @@
         "Evidence discipline"
       ],
       "live": "https://simaba.github.io/lean-ai-ops/",
-      "editorial_source": "README.md"
+      "editorial_source": "README.md",
+      "study": true
     },
     {
       "repo": "everything-program-management",
@@ -37,7 +38,8 @@
       "detail": "The CLI validates selected artifact fields, not the quality of a real-world program decision.",
       "editorial_source": "README.md",
       "feature_layout": "narrow",
-      "visual": "program"
+      "visual": "program",
+      "study": true
     },
     {
       "repo": "automotive-llm-eval-harness",
@@ -55,7 +57,8 @@
         "Automotive",
         "Safety & privacy"
       ],
-      "editorial_source": "README.md"
+      "editorial_source": "README.md",
+      "study": true
     },
     {
       "repo": "release-checklist",
@@ -73,7 +76,8 @@
         "Decision records",
         "Hard gates"
       ],
-      "editorial_source": "README.md"
+      "editorial_source": "README.md",
+      "study": true
     },
     {
       "repo": "agent-eval",
@@ -89,7 +93,8 @@
         "Measurement validity",
         "Decision semantics"
       ],
-      "editorial_source": "README.md"
+      "editorial_source": "README.md",
+      "study": true
     },
     {
       "repo": "governance-playbook",
@@ -104,7 +109,8 @@
         "Operating models"
       ],
       "detail": "Practitioner guidance for designing governance; not a compliance certificate or ready-made organizational policy.",
-      "editorial_source": "README.md"
+      "editorial_source": "README.md",
+      "study": false
     },
     {
       "repo": "agent-simulator",
@@ -119,7 +125,8 @@
         "Simulation"
       ],
       "detail": "Deterministic fixtures demonstrate control flow; they are not measurements of deployed multi-agent systems.",
-      "editorial_source": "README.md"
+      "editorial_source": "README.md",
+      "study": false
     },
     {
       "repo": "multi-agent-governance",
@@ -134,7 +141,8 @@
         "Controls"
       ],
       "detail": "Practitioner patterns; they do not enforce permissions or provide a running security boundary.",
-      "editorial_source": "README.md"
+      "editorial_source": "README.md",
+      "study": false
     },
     {
       "repo": "ai-prism",
@@ -149,7 +157,8 @@
         "Resource curation"
       ],
       "detail": "A reference hub with inclusion standards and review notes; it does not endorse or validate every linked tool.",
-      "editorial_source": "README.md"
+      "editorial_source": "README.md",
+      "study": false
     },
     {
       "repo": "prompt-harness-translator",
@@ -164,7 +173,8 @@
         "Prompt assets"
       ],
       "detail": "Limited format translation, not cross-runtime behavioral equivalence. Generated assets require human review.",
-      "editorial_source": "README.md"
+      "editorial_source": "README.md",
+      "study": false
     },
     {
       "repo": "mcp-agent-risk-checklist",
@@ -179,7 +189,8 @@
         "Risk review"
       ],
       "detail": "A structured review aid, not a server scanner or declaration that an integration is secure.",
-      "editorial_source": "README.md"
+      "editorial_source": "README.md",
+      "study": false
     },
     {
       "repo": "nist-rmf-guide",
@@ -194,7 +205,8 @@
         "Risk management"
       ],
       "detail": "Not official NIST guidance; completing its templates does not establish implementation or compliance.",
-      "editorial_source": "README.md"
+      "editorial_source": "README.md",
+      "study": false
     }
   ]
 }

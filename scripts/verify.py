@@ -57,8 +57,22 @@ def verify():
     assert all(p["kind"] in ("tool","prototype","method","resource") for p in data["projects"])
     assert all(isinstance(p["description"],str) and len(p["description"])>=75 for p in data["projects"])
     assert all(p.get("editorial_source")=="README.md" for p in data["projects"])
+    studies=json.loads((ROOT/"data/studies.json").read_text())
+    assert studies["schema_version"]==1 and len(studies["studies"])==5
+    assert {s["repo"] for s in studies["studies"]}=={p["repo"] for p in data["projects"] if p.get("study")}
+    assert {p["repo"] for p in data["projects"] if p["featured"]}=={"lean-ai-ops","everything-program-management","automotive-llm-eval-harness","release-checklist"}
+    for s in studies["studies"]:
+        page=ROOT/"dist"/"projects"/s["repo"]/"index.html"
+        assert page.is_file() and page.stat().st_size>1500, "Missing project page"
+        content=page.read_text(encoding="utf-8")
+        assert "{{" not in content and "What it does not establish" in content
+        assert "../../assets/styles.css" in content and "../../assets/detail.js" in content
+    assert (ROOT/"dist/assets/detail.js").is_file()
     assert "BUILT WITH INTENTION" not in HTML
     assert "Each project addresses a different part" not in HTML
+    assert "A score isn’t a release decision" not in HTML
+    assert "Systems, tools," in HTML
+    assert "The Hidden Failure Mode in AI Systems" in HTML
     snapshot=json.loads((ROOT/"data/public-metadata.json").read_text())
     assert snapshot["schema_version"]==1 and set(snapshot["repositories"]).issubset(repos)
     assert all(set(m).issubset({"updated_at","stars","forks","language","archived"}) for m in snapshot["repositories"].values())

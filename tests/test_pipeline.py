@@ -103,6 +103,20 @@ class PortfolioChecks(unittest.TestCase):
             for phrase in ("seamless","revolutionary","game-changing","cutting-edge","state-of-the-art","unlock potential"):
                 self.assertNotIn(phrase,p["description"].lower(),p["repo"])
         self.assertEqual(next(p for p in projects if p["repo"]=="prompt-harness-translator")["kind"],"tool")
+    def test_study_routes_and_scope(self):
+        build()
+        case_studies=json.loads((ROOT/"data/studies.json").read_text("utf-8"))["studies"]
+        self.assertEqual(len(case_studies),5)
+        self.assertEqual({p["repo"] for p in self.data["projects"] if p.get("study")},{x["repo"] for x in case_studies})
+        for entry in case_studies:
+            page=ROOT/"dist/projects"/entry["repo"]/"index.html"
+            self.assertTrue(page.is_file())
+            html=page.read_text()
+            self.assertIn("What it does not establish",html)
+            self.assertNotIn("{{",html)
+    def test_featured_areas_are_diverse(self):
+        featured={p["repo"] for p in self.data["projects"] if p["featured"]}
+        self.assertEqual(featured,{"lean-ai-ops","everything-program-management","automotive-llm-eval-harness","release-checklist"})
     def test_public_snapshot_is_complete_and_bounded(self):
         projects={p["repo"] for p in self.data["projects"]}
         snapshot=json.loads((ROOT/"data/public-metadata.json").read_text())

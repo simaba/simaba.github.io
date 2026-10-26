@@ -27,7 +27,7 @@ with sync_playwright() as playwright:
             assert page.evaluate("getComputedStyle(document.querySelector('.hero-right')).height") != "auto"
             assert page.evaluate("document.querySelectorAll('link[rel=stylesheet]').length")==1
             assert page.locator('link[rel=stylesheet]').get_attribute('href')=="assets/styles.css"
-            assert page.get_by_role("heading",name="A score isn’t a release decision.").count()==1
+            assert page.get_by_role("heading",name="Systems, tools, and delivery.").count()==1
             assert page.locator(".feature:visible").count()==4
             assert page.locator(".project-row:visible").count()==12
             if width<=590:
@@ -68,6 +68,15 @@ with sync_playwright() as playwright:
                 page.evaluate("window.scrollTo(0,0)")
                 page.screenshot(path=str(OUT/(label+"-dark.png")),full_page=True,animations="disabled")
                 page.screenshot(path=str(OUT/(label+"-dark-first-fold.png")),animations="disabled")
+            for slug in ("lean-ai-ops","everything-program-management","automotive-llm-eval-harness","release-checklist","agent-eval"):
+                detail=page.context.new_page()
+                detail.goto((ROOT/"dist/projects"/slug/"index.html").as_uri(),wait_until="domcontentloaded")
+                assert detail.get_by_role("heading",name="How it works").count()==1
+                assert detail.get_by_role("heading",name="What it does not establish").count()==1
+                assert detail.evaluate("document.documentElement.scrollWidth<=document.documentElement.clientWidth+1"),f"{slug} overflow at {width}"
+                if label in ("desktop","mobile"):
+                    detail.screenshot(path=str(OUT/(slug+"-"+label+".png")),full_page=True,animations="disabled")
+                detail.close()
             assert not errors,str(errors)
             results[label]="passed";context.close()
             print("PASS",label,width,height)
