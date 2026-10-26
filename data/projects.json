@@ -1,0 +1,180 @@
+{
+  "schema_version": 1,
+  "owner": "simaba",
+  "projects": [
+    {
+      "repo": "lean-ai-ops",
+      "title": "Lean AI Ops",
+      "kind": "tool",
+      "status": "Working app + browser explainer",
+      "featured": true,
+      "feature_layout": "wide",
+      "visual": "dmaic",
+      "category": "Systems & operations",
+      "description": "Turn operational friction into structured improvement work, with a DMAIC workspace, evidence discipline and an analytics workbench.",
+      "detail": "Python and Streamlit power the working application. The public browser interface is a deterministic demonstration, not the assessment engine.",
+      "capabilities": [
+        "Process improvement",
+        "Analytics",
+        "Evidence discipline"
+      ],
+      "live": "https://simaba.github.io/lean-ai-ops/"
+    },
+    {
+      "repo": "release-checklist",
+      "title": "AI Release Validator",
+      "kind": "tool",
+      "status": "Working CLI",
+      "featured": true,
+      "feature_layout": "narrow",
+      "visual": "gates",
+      "category": "Governance & delivery",
+      "description": "Validate the structure and logical consistency of evidence-bearing AI release-decision records, including non-compensable gates.",
+      "detail": "Checks the provided decision record. It does not determine regulatory obligations, certify safety or authenticate underlying evidence.",
+      "capabilities": [
+        "Release readiness",
+        "Decision records",
+        "Hard gates"
+      ]
+    },
+    {
+      "repo": "automotive-llm-eval-harness",
+      "title": "Automotive LLM Eval Harness",
+      "kind": "prototype",
+      "status": "Working prototype",
+      "featured": true,
+      "feature_layout": "narrow",
+      "visual": "evaluation",
+      "category": "Evaluation",
+      "description": "Explore transparent scoring, reproducibility and illustrative safety/privacy gates for synthetic in-cabin assistant scenarios.",
+      "detail": "Scores supplied case artifacts; it does not generate model responses or independently measure an LLM.",
+      "capabilities": [
+        "LLM evaluation",
+        "Automotive",
+        "Safety & privacy"
+      ]
+    },
+    {
+      "repo": "agent-eval",
+      "title": "Agent Evaluation Framework",
+      "kind": "method",
+      "status": "Practitioner framework",
+      "featured": true,
+      "feature_layout": "wide",
+      "visual": "matrix",
+      "category": "Evaluation",
+      "description": "Design evaluations that separate measurement validity, coverage, hard gates and release judgment instead of collapsing them into one score.",
+      "detail": "Includes guidance, a semantic validator, templates and fictional worked examples. It is not a leaderboard.",
+      "capabilities": [
+        "Agent evaluation",
+        "Measurement validity",
+        "Decision semantics"
+      ]
+    },
+    {
+      "repo": "everything-program-management",
+      "title": "Everything Program Management",
+      "kind": "method",
+      "status": "Foundation release",
+      "featured": false,
+      "category": "Governance & delivery",
+      "description": "Reusable program-management artifacts, structured templates, examples and validation utilities.",
+      "capabilities": [
+        "Program management",
+        "Templates",
+        "Validation"
+      ]
+    },
+    {
+      "repo": "governance-playbook",
+      "title": "AI Governance Playbook",
+      "kind": "method",
+      "status": "Practitioner playbook",
+      "featured": false,
+      "category": "Governance & delivery",
+      "description": "Practical operating-model patterns for oversight, ownership, accountability and enterprise AI delivery.",
+      "capabilities": [
+        "AI governance",
+        "Operating models"
+      ]
+    },
+    {
+      "repo": "agent-simulator",
+      "title": "Agent Simulator",
+      "kind": "prototype",
+      "status": "Runnable demo",
+      "featured": false,
+      "category": "Agent systems",
+      "description": "Demonstrate bounded multi-agent behavior using reviewable scenarios and explicit system constraints.",
+      "capabilities": [
+        "Multi-agent systems",
+        "Simulation"
+      ]
+    },
+    {
+      "repo": "multi-agent-governance",
+      "title": "Multi-Agent Governance",
+      "kind": "method",
+      "status": "Practitioner framework",
+      "featured": false,
+      "category": "Agent systems",
+      "description": "Control and accountability patterns for coordinating multiple agents and their tools.",
+      "capabilities": [
+        "Multi-agent systems",
+        "Controls"
+      ]
+    },
+    {
+      "repo": "ai-prism",
+      "title": "AI Prism",
+      "kind": "resource",
+      "status": "Curated resource hub",
+      "featured": false,
+      "category": "Research & references",
+      "description": "Curated practical references for AI governance, evaluation, risk, release readiness and incident response.",
+      "capabilities": [
+        "Research",
+        "Resource curation"
+      ]
+    },
+    {
+      "repo": "prompt-harness-translator",
+      "title": "Prompt Harness Translator",
+      "kind": "prototype",
+      "status": "Engineering experiment",
+      "featured": false,
+      "category": "Agent systems",
+      "description": "Explore prompt portability across different agent and execution harnesses.",
+      "capabilities": [
+        "Prompt portability",
+        "Developer tooling"
+      ]
+    },
+    {
+      "repo": "mcp-agent-risk-checklist",
+      "title": "MCP & Agent Risk Checklist",
+      "kind": "method",
+      "status": "Initial review toolkit",
+      "featured": false,
+      "category": "Governance & delivery",
+      "description": "Review risks and proposed controls before integrating agent tools or MCP servers.",
+      "capabilities": [
+        "Agent security",
+        "Risk review"
+      ]
+    },
+    {
+      "repo": "nist-rmf-guide",
+      "title": "NIST AI RMF Guide",
+      "kind": "resource",
+      "status": "Practitioner guide",
+      "featured": false,
+      "category": "Research & references",
+      "description": "Practical guidance and cross-references for working with the NIST AI Risk Management Framework.",
+      "capabilities": [
+        "NIST AI RMF",
+        "Risk management"
+      ]
+    }
+  ]
+}
