@@ -6,6 +6,8 @@ from pathlib import Path
 from playwright.sync_api import sync_playwright
 
 ROOT=Path(__file__).resolve().parents[1]
+from build import build
+build()
 OUT=ROOT/".qa"
 OUT.mkdir(exist_ok=True)
 VIEWPORTS=[("desktop",1440,900),("tablet",820,1180),("mobile",390,844),("small-mobile",320,740)]
@@ -18,7 +20,7 @@ with sync_playwright() as playwright:
                                         device_scale_factor=1,reduced_motion="reduce")
             page=context.new_page(); errors=[]
             page.on("pageerror",lambda e:errors.append(str(e)))
-            page.goto((ROOT/"index.html").as_uri(),wait_until="domcontentloaded")
+            page.goto((ROOT/"dist/index.html").as_uri(),wait_until="domcontentloaded")
             page.evaluate("document.fonts.ready")
             assert page.get_by_role("heading",name="Complex systems. Clearer decisions.").count()==1
             assert page.locator(".feature:visible").count()==4

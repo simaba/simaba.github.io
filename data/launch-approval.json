@@ -1,8 +1,9 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "approved": false,
-  "reviewer": null,
-  "reviewed_pr": null,
+  "reviewer": "",
   "approved_at": null,
-  "baseline_hashes": {}
+  "evidence": "",
+  "design_sha256": "",
+  "baseline_sha256": {}
 }

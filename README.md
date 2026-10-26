@@ -1,18 +1,28 @@
 # Sima Bagheri | Technical Editorial portfolio
 
-**STAGING / DRAFT. Design candidate v0.4, NOT approved for publication.**
+**Draft PR: not approved for publishing.** This branch contains the v0.4 visual candidate and a first implementation of its read-only public metadata and automated build architecture.
 
-This branch contains the functioning v0.4 website, split into readable HTML, CSS, and JavaScript source, with a narrow quality-review workflow. It preserves the selected off-white/graphite/indigo/lavender/teal design direction and twelve curated public projects.
+## Content architecture
+- `data/projects.json`: human-curated public project allowlist, names, descriptions, maturity, categories, selected projects and visuals.
+- `data/public-metadata.json`: last checked-in minimal public snapshot (empty until an approved update).
+- `scripts/sync.py`: GitHub API refresh; only explicitly curated public repositories, ownership/visibility checks, atomic writes; on failure, no deployment.
+- `site/template.html`, `assets/*`, `scripts/build.py`: reproducible static HTML/CSS/JS site, no visitor-side GitHub API key or service.
+- `dist/`: build output, ignored by Git; source content remains in `site/` and `data/`.
 
-Run local static checks with:
-    python3 scripts/verify.py
-    node --check assets/app.js
+## Local verification
+```bash
+python3 scripts/verify.py
+python3 -m unittest discover -s tests -v
+node --check assets/app.js
+# Requires Playwright + Chromium and Pillow:
+python3 scripts/browser_review.py
+python3 scripts/compare_visual.py
+# Expected to fail until actual human design approval:
+python3 scripts/launch_gate.py
+```
 
-Browser QA requires Python Playwright and Chromium; execute:
-    python3 scripts/browser_review.py
+The CI verification job runs on PRs without write credentials. On trusted main only, metadata is refreshed on push, scheduled runs and manual dispatch. If the GitHub metadata refresh fails, CI fails without publishing changes; the currently published site is retained. Scheduled refreshes do not commit fetched data back to `main` and do not retain a cross-run cache.
 
-GitHub CI generates twelve screenshots at desktop/tablet/mobile dimensions, checks search, filters, navigation and theme switching, and uploads short-lived visual evidence. See docs/DESIGN_CONTRACT.md and docs/REVIEW_RUBRIC.md.
+The publish job is *conditionally defined* for trusted main; it requires successful browser review, six screenshot baselines and a human-signed-off design digest before uploading the **same tested artifact** to GitHub Pages. All approval fields remain unset. Do not merge until design review and branch-protection settings are complete.
 
-**Deployment is deliberately absent** until hosted CI, visual approval and proper release gates are complete. Do not select a Pages publishing source or merge this draft PR yet.
-
-**Scope:** The visual design and public catalog are represented in this repository. The larger original v0.4 metadata generator, repository sync, source-layout template and baseline/publish pipeline are not yet migrated here. The portfolio does not currently claim live GitHub statistics or automatic metadata freshness. The existing simaba/simaba profile README remains untouched.
+See `docs/DESIGN_CONTRACT.md` and `docs/RELEASE_GATES.md`. The reviewed project is independent of employment and does not certify compliance, operational readiness or measured AI performance.

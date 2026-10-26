@@ -5,7 +5,9 @@ from html.parser import HTMLParser
 from pathlib import Path
 
 ROOT=Path(__file__).resolve().parents[1]
-HTML=(ROOT/"index.html").read_text(encoding="utf-8")
+from build import build
+build()
+HTML=(ROOT/"dist/index.html").read_text(encoding="utf-8")
 CSS=(ROOT/"assets/styles.css").read_text(encoding="utf-8")
 JS=(ROOT/"assets/app.js").read_text(encoding="utf-8")
 
@@ -41,8 +43,17 @@ def verify():
         assert name in HTML
     assert (ROOT/"data/launch-approval.json").is_file()
     state=json.loads((ROOT/"data/launch-approval.json").read_text())
-    assert state["approved"] is False, "Source draft must not claim prior approval"
-    print("PASS: 4 featured, 12 curated, design identity, anchors, basic privacy and release lock")
+    assert state.get("schema_version")==2, "Approval schema must be v2"
+    assert state.get("approved") in (True,False), "Unknown approval value"
+    data=json.loads((ROOT/"data/projects.json").read_text())
+    assert data["owner"]=="simaba" and data["schema_version"]==1
+    assert len(data["projects"])==12 and sum(p["featured"] for p in data["projects"])==4
+    repos=[p["repo"] for p in data["projects"]]
+    assert len(repos)==len(set(repos)) and all(p["repo"]!="Tipira" and p["repo"]!="Skill-builder" for p in data["projects"])
+    snapshot=json.loads((ROOT/"data/public-metadata.json").read_text())
+    assert snapshot["schema_version"]==1 and set(snapshot["repositories"]).issubset(repos)
+    assert all(set(m).issubset({"updated_at","stars","forks","language","archived"}) for m in snapshot["repositories"].values())
+    print("PASS: deterministic generated site, curated manifest, design tokens, anchors, privacy and approval schema")
 
 if __name__=="__main__":
     verify()
