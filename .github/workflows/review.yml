@@ -1,0 +1,38 @@
+name: Portfolio quality review
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  review:
+    name: static-and-chromium-review
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout (no persisted credentials)
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Validate content, privacy and binding design tokens
+        run: |
+          python3 scripts/verify.py
+          node --check assets/app.js
+      - name: Install Playwright and Chromium
+        run: |
+          python3 -m venv .venv
+          .venv/bin/pip install playwright==1.57.0
+          .venv/bin/python -m playwright install --with-deps chromium
+      - name: Exercise browser and capture screenshots
+        run: .venv/bin/python scripts/browser_review.py
+      - name: Preserve one-day review evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: portfolio-visual-review
+          path: .qa/
+          if-no-files-found: ignore
+          retention-days: 1
+# No Pages or publish job: design has not been approved.

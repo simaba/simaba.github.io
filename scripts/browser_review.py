@@ -1,0 +1,62 @@
+#!/usr/bin/env python3
+"""Browser evidence for human review; screenshots do not grant approval."""
+import hashlib
+import json
+from pathlib import Path
+from playwright.sync_api import sync_playwright
+
+ROOT=Path(__file__).resolve().parents[1]
+OUT=ROOT/".qa"
+OUT.mkdir(exist_ok=True)
+VIEWPORTS=[("desktop",1440,900),("tablet",820,1180),("mobile",390,844),("small-mobile",320,740)]
+results={}
+with sync_playwright() as playwright:
+    browser=playwright.chromium.launch(headless=True,args=["--no-sandbox"])
+    try:
+        for label,width,height in VIEWPORTS:
+            context=browser.new_context(viewport={"width":width,"height":height},
+                                        device_scale_factor=1,reduced_motion="reduce")
+            page=context.new_page(); errors=[]
+            page.on("pageerror",lambda e:errors.append(str(e)))
+            page.goto((ROOT/"index.html").as_uri(),wait_until="domcontentloaded")
+            page.evaluate("document.fonts.ready")
+            assert page.get_by_role("heading",name="Complex systems. Clearer decisions.").count()==1
+            assert page.locator(".feature:visible").count()==4
+            assert page.locator(".project-row:visible").count()==12
+            assert page.evaluate("document.documentElement.scrollWidth <= document.documentElement.clientWidth + 1")
+            if width<=590:
+                menu=page.get_by_role("button",name="Open navigation")
+                menu.click()
+                assert page.locator(".primary-nav").is_visible()
+                page.get_by_role("link",name="Systems map").click()
+                assert menu.get_attribute("aria-expanded")=="false"
+            else:
+                assert page.get_by_role("navigation",name="Primary navigation").is_visible()
+            page.evaluate("window.scrollTo(0,0)")
+            page.screenshot(path=str(OUT/(label+"-first-fold.png")),animations="disabled")
+            page.screenshot(path=str(OUT/(label+".png")),full_page=True,animations="disabled")
+            page.locator("#project-search").fill("privacy")
+            assert page.locator(".project-row:visible").count()>=1
+            page.locator("#project-search").fill("zz-no-matches-736")
+            assert page.locator(".project-row:visible").count()==0
+            assert page.locator("#empty-results").is_visible()
+            page.locator("#project-search").fill("")
+            page.locator('[data-filter="tool"]').click()
+            assert page.locator(".project-row:visible").count()==2
+            page.locator('[data-filter="all"]').click()
+            page.locator("#project-search").focus()
+            assert page.locator("#project-search").evaluate("(e)=>getComputedStyle(e).outlineStyle")!="none"
+            page.locator("#theme-toggle").click()
+            assert page.locator("html").get_attribute("data-theme")=="dark"
+            if label in ("desktop","mobile"):
+                page.evaluate("window.scrollTo(0,0)")
+                page.screenshot(path=str(OUT/(label+"-dark.png")),full_page=True,animations="disabled")
+                page.screenshot(path=str(OUT/(label+"-dark-first-fold.png")),animations="disabled")
+            assert not errors,str(errors)
+            results[label]="passed";context.close()
+            print("PASS",label,width,height)
+    finally:
+        browser.close()
+hashes={p.name:hashlib.sha256(p.read_bytes()).hexdigest() for p in OUT.glob("*.png")}
+(OUT/"review-manifest.json").write_text(json.dumps({"viewports":results,"sha256":hashes},indent=2)+"\n")
+print("Screenshots:",len(hashes),"human design approval pending")
