@@ -60,7 +60,7 @@ class PortfolioChecks(unittest.TestCase):
                     "evidence":"https://github.com/simaba/simaba.github.io/pull/1",
                     "design_sha256":launch_gate.design_digest(),
                     "baseline_sha256":launch_gate.visual_hashes()}
-                (root/"data").mkdir()
+                (root/"data").mkdir(exist_ok=True)
                 (root/"data/launch-approval.json").write_text(json.dumps(approval))
                 launch_gate.check()
                 (root/launch_gate.DESIGN_FILES[0]).write_text("unreviewed drift")
