@@ -27,12 +27,21 @@ jobs:
           .venv/bin/python -m playwright install --with-deps chromium
       - name: Exercise browser and capture screenshots
         run: .venv/bin/python scripts/browser_review.py
+      - name: Require all review screenshots
+        run: |
+          for name in desktop tablet mobile small-mobile; do
+            test -s ".qa/$name.png"
+            test -s ".qa/$name-first-fold.png"
+          done
+          test -s .qa/desktop-dark.png
+          test -s .qa/mobile-dark.png
+          test -s .qa/review-manifest.json
       - name: Preserve one-day review evidence
-        if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
           name: portfolio-visual-review
           path: .qa/
-          if-no-files-found: ignore
+          if-no-files-found: error
+          include-hidden-files: true
           retention-days: 1
 # No Pages or publish job: design has not been approved.
