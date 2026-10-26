@@ -27,7 +27,7 @@ with sync_playwright() as playwright:
             assert page.evaluate("getComputedStyle(document.querySelector('.hero-right')).height") != "auto"
             assert page.evaluate("document.querySelectorAll('link[rel=stylesheet]').length")==1
             assert page.locator('link[rel=stylesheet]').get_attribute('href')=="assets/styles.css"
-            assert page.get_by_role("heading",name="Complex systems. Clearer decisions.").count()==1
+            assert page.get_by_role("heading",name="A score isn’t a release decision.").count()==1
             assert page.locator(".feature:visible").count()==4
             assert page.locator(".project-row:visible").count()==12
             if width<=590:

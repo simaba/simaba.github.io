@@ -26,3 +26,6 @@ Review every changed visible sentence on desktop and mobile, then compare the pr
 ## Maintenance rule
 
 Automatic Github API refreshes can change only verified public metadata (last push, language, star/fork counts). They cannot generate project descriptions, decide which projects to feature or declare maturity. Material editorial revisions require a PR and explicit acceptance. Passing CI's deterministic checks cannot certify literary or professional quality.
+
+## Hero thesis
+The line “A score isn’t a release decision” follows the project's evaluation and release-governance work: measurement, risk gates, coverage, accountable authority and decision context cannot be replaced by one aggregate number. This is an editorial thesis, not a claim of deployment impact. Revisit it if the portfolio's primary subject changes.
