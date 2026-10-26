@@ -63,7 +63,8 @@ jobs:
         with:
           name: portfolio-visual-review-${{ github.run_id }}
           path: .qa/
-          if-no-files-found: ignore
+          if-no-files-found: error
+          include-hidden-files: true
           retention-days: 1
       - name: Preserve exact verified site (trusted main only)
         if: success() && github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
