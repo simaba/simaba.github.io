@@ -9,3 +9,10 @@ Use meaningful project-specific system sketches. Never invent measured statistic
 Visually review desktop and mobile, first viewport and full page, both themes, before approving any source, diagram, design-token or content change. Passing literal color-token checks cannot substitute for assessing the composition and illustrations.
 
 No "AI slop": avoid generic glow blobs, ornamental dashboards, fake numerical performance graphs, repeated template panels, vague marketing superlatives, and unverified descriptions.
+
+## Launch-readability amendments (no change to approved palette)
+- CSS must render the actual off-white / graphite / indigo / lavender / teal tokens, verified through Chromium computed styles, including after theme changes.
+- DM Sans and DM Mono remain the preferred typefaces. If external font services are inaccessible, fall back to locally available Segoe UI / Arial / monospace without hiding content or navigation.
+- Small diagram labels on mobile must remain legible; font declarations must not use undefined design tokens.
+- Keep the original editorial composition and project-specific schematic meaning. Do not replace them with decorative SaaS art or fabricated performance graphs.
+- The source of the published page is only the deterministic `dist/` build from `site/template.html`; do not maintain a second root HTML copy.

@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Static content, design, privacy and link checks for review-only portfolio."""
 import json
+import re
 from html.parser import HTMLParser
 from pathlib import Path
 
@@ -38,6 +39,8 @@ def verify():
     for token in ("--bg:#F5F4F0","--bg:#111722","--accent:#5F69D9","--accent:#8A98FA","--accent-secondary:#6BBEAC"):
         assert token in CSS, "Visual identity mismatch: "+token
     assert "Georgia" not in CSS and "font:italic 1em" not in CSS, "Unapproved serif design"
+    assert "var(--font-editorial)" not in CSS, "Unresolved font token"
+    assert not (ROOT/"index.html").exists(), "Stale root HTML could bypass generated site"
     assert ":focus-visible" in CSS and "prefers-reduced-motion" in CSS
     for name in ("project-search","theme-toggle","menu-toggle","empty-results"):
         assert name in HTML
@@ -50,6 +53,9 @@ def verify():
     assert len(data["projects"])==12 and sum(p["featured"] for p in data["projects"])==4
     repos=[p["repo"] for p in data["projects"]]
     assert len(repos)==len(set(repos)) and all(p["repo"]!="Tipira" and p["repo"]!="Skill-builder" for p in data["projects"])
+    assert all(re.fullmatch(r"[A-Za-z0-9._-]+",n) and n not in (".","..") for n in repos), "Invalid repository slug"
+    assert all(p["kind"] in ("tool","prototype","method","resource") for p in data["projects"])
+    assert all(isinstance(p["description"],str) and len(p["description"])>35 for p in data["projects"])
     snapshot=json.loads((ROOT/"data/public-metadata.json").read_text())
     assert snapshot["schema_version"]==1 and set(snapshot["repositories"]).issubset(repos)
     assert all(set(m).issubset({"updated_at","stars","forks","language","archived"}) for m in snapshot["repositories"].values())

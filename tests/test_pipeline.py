@@ -76,6 +76,19 @@ class PortfolioChecks(unittest.TestCase):
         self.assertIn("if-no-files-found: error",screenshot_block)
         self.assertIn("include-hidden-files: true",screenshot_block)
         self.assertIn("path: .qa/",screenshot_block)
+    def test_generated_site_single_source_of_truth(self):
+        self.assertFalse((ROOT/"index.html").exists(), "Stale root HTML bypasses renderer")
+        self.assertTrue((ROOT/"site/template.html").exists())
+        css=(ROOT/"assets/styles.css").read_text()
+        self.assertNotIn("var(--font-editorial)",css)
+    def test_ci_uses_modern_pinned_node24_actions(self):
+        workflow=(ROOT/".github/workflows/review.yml").read_text()
+        for sha in ("3d3c42e5aac5ba805825da76410c181273ba90b1",
+                    "cf430e030ddbb5b0abf93d22962f4752f3646cd9",
+                    "9000827ccba6bdab643e8b6fd33ac0654aef8333"):
+            self.assertIn(sha,workflow)
+        self.assertIn("needs: [verify]",workflow)
+        self.assertIn("python3 scripts/launch_gate.py",workflow)
     def test_approved_palette_is_locked(self):
         css=(ROOT/"assets/styles.css").read_text()
         for token in ("--bg:#F5F4F0","--bg:#111722","--accent:#5F69D9","--accent:#8A98FA","--accent-secondary:#6BBEAC"):

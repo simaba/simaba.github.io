@@ -22,6 +22,11 @@ with sync_playwright() as playwright:
             page.on("pageerror",lambda e:errors.append(str(e)))
             page.goto((ROOT/"dist/index.html").as_uri(),wait_until="domcontentloaded")
             page.evaluate("document.fonts.ready")
+            accent=page.evaluate("getComputedStyle(document.documentElement).getPropertyValue('--accent').trim().upper()")
+            assert accent=="#5F69D9",f"{label}: approved LIGHT indigo not loaded: {accent!r}"
+            assert page.evaluate("getComputedStyle(document.querySelector('.hero-right')).height") != "auto"
+            assert page.evaluate("document.querySelectorAll('link[rel=stylesheet]').length")==1
+            assert page.locator('link[rel=stylesheet]').get_attribute('href')=="assets/styles.css"
             assert page.get_by_role("heading",name="Complex systems. Clearer decisions.").count()==1
             assert page.locator(".feature:visible").count()==4
             assert page.locator(".project-row:visible").count()==12
@@ -30,6 +35,10 @@ with sync_playwright() as playwright:
                 menu=page.get_by_role("button",name="Open navigation")
                 menu.click()
                 assert page.locator(".primary-nav").is_visible()
+                page.keyboard.press("Escape")
+                assert menu.get_attribute("aria-expanded")=="false"
+                assert page.evaluate("document.activeElement.id")=="menu-toggle"
+                menu.click()
                 page.get_by_role("link",name="Systems map").click()
                 assert menu.get_attribute("aria-expanded")=="false"
             else:
@@ -50,6 +59,8 @@ with sync_playwright() as playwright:
             assert page.locator("#project-search").evaluate("(e)=>getComputedStyle(e).outlineStyle")!="none"
             page.locator("#theme-toggle").click()
             assert page.locator("html").get_attribute("data-theme")=="dark"
+            dark_accent=page.evaluate("getComputedStyle(document.documentElement).getPropertyValue('--accent').trim().upper()")
+            assert dark_accent=="#8A98FA",f"{label}: approved DARK lavender missing: {dark_accent!r}"
             if label in ("desktop","mobile"):
                 page.evaluate("window.scrollTo(0,0)")
                 page.screenshot(path=str(OUT/(label+"-dark.png")),full_page=True,animations="disabled")

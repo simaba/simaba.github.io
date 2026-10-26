@@ -24,7 +24,7 @@
     menuButton.querySelector('span').textContent = open ? '×' : '☰';
   });
   for (const link of nav.querySelectorAll('a')) link.addEventListener('click', closeMenu);
-  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeMenu(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && nav.classList.contains('open')) { closeMenu(); menuButton.focus(); } });
   const filters = [...document.querySelectorAll('[data-filter]')];
   const rows = [...document.querySelectorAll('.project-row')];
   const search = document.getElementById('project-search');

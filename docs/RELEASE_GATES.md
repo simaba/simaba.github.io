@@ -21,3 +21,10 @@ The approval record is a provenance check, **not a cryptographic reviewer signat
 
 ## Known validation limits
 No automatic CI can certify that design is beautiful, WCAG-conformant or free of invented claims. The currently pinned hosted browser suite checks basic layout, keyboard focus, search/filter/navigation and JS runtime. Professional human inspection remains required.
+
+## Final prelaunch audit record
+- All twelve curated URLs were verified through the connected GitHub account as public, non-archived repositories under `simaba` on 2026-10-26.
+- Hosted CI additionally checks computed theme tokens, CSS loading, mobile escape-key navigation, and short-lived screenshot upload.
+- Workflow actions updated from Node 20-era pins to immutable Node 24-compatible release commits.
+- Removed stale root HTML. Only `dist/` is authorized for Pages deployment.
+- GitHub repository rulesets were empty during finalization; the integration cannot configure protected branch rules. The owner must configure review/status-check rules before merge. A JSON record alone cannot attest human approval.
