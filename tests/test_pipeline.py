@@ -89,6 +89,16 @@ class PortfolioChecks(unittest.TestCase):
             self.assertIn(sha,workflow)
         self.assertIn("needs: [verify]",workflow)
         self.assertIn("python3 scripts/launch_gate.py",workflow)
+    def test_public_snapshot_is_complete_and_bounded(self):
+        projects={p["repo"] for p in self.data["projects"]}
+        snapshot=json.loads((ROOT/"data/public-metadata.json").read_text())
+        self.assertEqual(set(snapshot["repositories"]),projects)
+        self.assertTrue(snapshot["fetched_at"] and snapshot["fetched_at"].startswith("2026-"))
+        for repo,item in snapshot["repositories"].items():
+            self.assertIs(type(item["stars"]),int,repo)
+            self.assertIs(type(item["forks"]),int,repo)
+            self.assertIs(type(item["archived"]),bool,repo)
+            self.assertIsInstance(item["language"],str,repo)
     def test_approved_palette_is_locked(self):
         css=(ROOT/"assets/styles.css").read_text()
         for token in ("--bg:#F5F4F0","--bg:#111722","--accent:#5F69D9","--accent:#8A98FA","--accent-secondary:#6BBEAC"):

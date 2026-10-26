@@ -28,3 +28,6 @@ No automatic CI can certify that design is beautiful, WCAG-conformant or free of
 - Workflow actions updated from Node 20-era pins to immutable Node 24-compatible release commits.
 - Removed stale root HTML. Only `dist/` is authorized for Pages deployment.
 - GitHub repository rulesets were empty during finalization; the integration cannot configure protected branch rules. The owner must configure review/status-check rules before merge. A JSON record alone cannot attest human approval.
+
+- A verified full public metadata snapshot is now committed for initial review. Trusted-main runs replace it in memory with a live complete public refresh; no hidden private metadata is used.
+- A separate Chromium smoke test blocks external font services to verify graceful fallback at small-mobile width.

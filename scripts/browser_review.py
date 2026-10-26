@@ -71,6 +71,19 @@ with sync_playwright() as playwright:
             assert not errors,str(errors)
             results[label]="passed";context.close()
             print("PASS",label,width,height)
+        # An independent smoke check with remote font requests blocked. The public
+        # site must remain readable and navigable in regions where Google Fonts fail.
+        fallback=browser.new_context(viewport={"width":320,"height":740},device_scale_factor=1)
+        fallback.route("https://fonts.googleapis.com/**",lambda route:route.abort())
+        fallback.route("https://fonts.gstatic.com/**",lambda route:route.abort())
+        testpage=fallback.new_page()
+        testpage.goto((ROOT/"dist/index.html").as_uri(),wait_until="domcontentloaded")
+        testpage.evaluate("document.fonts.ready")
+        assert testpage.locator("h1").is_visible()
+        assert testpage.evaluate("document.documentElement.scrollWidth<=document.documentElement.clientWidth+1"),"Fallback font layout overflow"
+        assert testpage.locator(".project-row:visible").count()==12
+        fallback.close()
+        print("PASS fallback fonts at 320px")
     finally:
         browser.close()
 hashes={p.name:hashlib.sha256(p.read_bytes()).hexdigest() for p in OUT.glob("*.png")}

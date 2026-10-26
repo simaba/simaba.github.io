@@ -4,7 +4,7 @@
 
 ## Content architecture
 - `data/projects.json`: human-curated public project allowlist, names, descriptions, maturity, categories, selected projects and visuals.
-- `data/public-metadata.json`: last checked-in minimal public snapshot (empty until an approved update).
+- `data/public-metadata.json`: last checked-in minimal public snapshot (seeded with an allowlisted, validated public-only snapshot).
 - `scripts/sync.py`: GitHub API refresh; only explicitly curated public repositories, ownership/visibility checks, atomic writes; on failure, no deployment.
 - `site/template.html`, `assets/*`, `scripts/build.py`: reproducible static HTML/CSS/JS site, no visitor-side GitHub API key or service.
 - `dist/`: build output, ignored by Git; source content remains in `site/` and `data/`.
