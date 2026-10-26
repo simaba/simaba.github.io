@@ -19,3 +19,6 @@ Inspect the visible homepage, generated cards, project names, search labels, pag
 Test each sentence for specificity: would it fit nearly any AI consultancy? If so, rewrite it around an identifiable artifact, action or limitation. Reject invented performance metrics, clients and recognitions; promotional superlatives; vague noun clusters; and repeating the same abstract promise in successive headings.
 
 The content release gate must be explicitly signed off by the human reviewer with `editorial_approved: true`. Passing a regex, automated rewrite or repository-excerpt comparison does **not** substitute for editorial judgment. The approval remains false until the reviewer actually accepts the content.
+
+## Portfolio depth checks
+Inspect the five generated project pages in desktop and mobile layouts. Verify each code sample against the linked README, distinguish working executables from static explainers, and confirm the source references and limitations. Verify each of the three selected Medium article destinations is a published work by the portfolio owner. Do not mistake the project notes for client engagements, tested production outcomes or case studies reporting real business impact.

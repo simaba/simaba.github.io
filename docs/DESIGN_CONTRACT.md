@@ -16,3 +16,8 @@ No "AI slop": avoid generic glow blobs, ornamental dashboards, fake numerical pe
 - Small diagram labels on mobile must remain legible; font declarations must not use undefined design tokens.
 - Keep the original editorial composition and project-specific schematic meaning. Do not replace them with decorative SaaS art or fabricated performance graphs.
 - The source of the published page is only the deterministic `dist/` build from `site/template.html`; do not maintain a second root HTML copy.
+
+## Portfolio breadth / preservation of the initial intent
+The website represents technical program management, engineering quality, systems methods, operations, working utilities and AI evaluation/governance. It is not exclusively an AI research, safety or release-readiness site. Featured work spans the four distinct areas of process improvement, program management, automotive evaluation and release decision tools. The four authored technical drawings retain their role as meaningful representations, not performance evidence.
+
+Project-detail pages are additions *inside* the approved design system. Their content must remain traceable to public repositories, with real artifacts, correctly scoped commands and explicit limits. The homepage must not imply these independent projects constitute one integrated product.

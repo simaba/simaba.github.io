@@ -28,3 +28,6 @@ Five authored project pages are generated at `dist/projects/<repository>/index.h
 The publish job is *conditionally defined* for trusted main; it requires successful browser review, six screenshot baselines and a human-signed-off design digest before uploading the **same tested artifact** to GitHub Pages. All approval fields remain unset. Do not merge until design review and branch-protection settings are complete.
 
 See `docs/DESIGN_CONTRACT.md` and `docs/RELEASE_GATES.md`. The reviewed project is independent of employment and does not certify compliance, operational readiness or measured AI performance.
+
+## Current visual/editorial review
+The original Technical Editorial palette and typography remain unchanged. Featured work now represents process improvement, program management, automotive evaluation and release governance, rather than suggesting the whole portfolio is an AI evaluation product. Five source-backed study pages and three verified Medium article links have been added; this is a draft for final visual and editorial acceptance, not proof of production operation or customer outcomes.
