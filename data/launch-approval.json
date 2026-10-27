@@ -1,10 +1,17 @@
 {
   "schema_version": 2,
-  "approved": false,
-  "reviewer": "",
-  "approved_at": null,
-  "evidence": "",
-  "design_sha256": "",
-  "baseline_sha256": {},
-  "editorial_approved": false
+  "approved": true,
+  "reviewer": "Sima Bagheri",
+  "approved_at": "2026-10-27T03:43:41.064Z",
+  "evidence": "https://github.com/simaba/simaba.github.io/pull/1",
+  "design_sha256": "ff2d4f898355e7c113f62b9b2dad47636bbafb41c323f5cd56201cd11ac7d620",
+  "baseline_sha256": {
+    "desktop.png": "311e1a64b4d846aebc52762796d00b9249219c4f1d01191543b96a0648d7f785",
+    "desktop-dark.png": "f355f8e8ed5621c429ae14d281427e8712484f0583248860654cfc9c9bf27e46",
+    "tablet.png": "f3f0aa0c98a0c99d0b039d2941ec1001c3a10509e40169167464b2056833c2ee",
+    "mobile.png": "26bb5b19044579ce7b6436fe05f98cd147ea8283ac4c4884710d8634fbb3ead6",
+    "mobile-dark.png": "64779c0759525c11ab1670ea5946477a326180b3202702eeddea0d286eda2a2d",
+    "small-mobile.png": "b4941a4c69b3cbe740cfac8728d606c29a6f9605add553c778494cac352e25ae"
+  },
+  "editorial_approved": true
 }
