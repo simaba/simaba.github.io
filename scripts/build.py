@@ -49,7 +49,29 @@ def render_study(page, study, p):
         if not (href.startswith("https://github.com/simaba/") or href=="https://simaba.github.io/lean-ai-ops/"):
             raise ValueError("Unexpected project link destination")
         links.append('<a href="'+esc(href)+'" target="_blank" rel="noopener noreferrer">'+esc(label)+' ↗</a>')
+    lab_info={
+        "lean-ai-ops":("PROCESS CAPABILITY","Capability from ordered measurements",
+            "Edit observations and engineering specification limits. Explore Cp/Cpk and Pp/Ppk using the same selected formulas as the Python analytics module.",
+            "A narrow calculation from analytics/capability.py, without Shapiro-Wilk normality testing, DPMO estimation or full project generation."),
+        "everything-program-management":("RAID VALIDATOR","A risk record you can actually validate",
+            "Edit the fictional risk owner, probability, impact, score and lifecycle. The checks follow the repository's published RAID schema and risk-score semantics for this record type.",
+            "This workbench checks a single risk-row subset, not every RAID/decision-memo schema or the full pmkit CLI."),
+        "automotive-llm-eval-harness":("SCORING PROTOTYPE","When a high score still fails",
+            "Change the values of three real synthetic case artifacts from the repository and watch the weighted score and non-compensable safety/privacy gates recompute.",
+            "Scores are supplied inputs, not measured model responses. Thresholds are illustrative and are not safety or release criteria."),
+        "release-checklist":("DECISION SEMANTICS","Can the declared decision stand?",
+            "Change a fictional pilot's gates, conditions, blockers and declared release outcome to explore the release-validator's real decision rules.",
+            "This bounded exercise checks decision semantics, not YAML syntax, evidence authenticity, industry requirements or the full Python validation contract."),
+        "agent-eval":("EVALUATION VALIDITY","Test a report's decision coherence",
+            "Change the recommendation, approval status, finding severity and accepted actions from a fictional agent-evaluation record.",
+            "This reproduces the validator's cross-field decision checks, not the complete JSON Schema or an evaluation of a deployed agent.")
+    }
+    mode,lab_title,lab_description,lab_boundary=lab_info[p["repo"]]
+    live=(' <a class="lab-live-link" href="https://simaba.github.io/lean-ai-ops/" target="_blank" rel="noopener noreferrer">Explore the separate interactive DMAIC walkthrough ↗</a>' if p["repo"]=="lean-ai-ops" else "")
     substitutions={
+        "{{LAB_MODE}}":esc(mode),"{{LAB_TITLE}}":esc(lab_title),
+        "{{LAB_DESCRIPTION}}":esc(lab_description),"{{LAB_BOUNDARY}}":esc(lab_boundary),
+        "{{LAB_LIVE}}":live,"{{REPO}}":esc(p["repo"]),
         "{{META_TITLE}}":name,"{{META_DESCRIPTION}}":esc(study["summary"]),
         "{{CANONICAL}}":esc("https://simaba.github.io/projects/"+p["repo"]+"/"),
         "{{SOURCE_URL}}":esc(url),"{{ORIENTATION}}":esc(study["orientation"]),
