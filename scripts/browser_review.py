@@ -73,7 +73,7 @@ with sync_playwright() as playwright:
                 detail.goto((ROOT/"dist/projects"/slug/"index.html").as_uri(),wait_until="domcontentloaded")
                 accent=detail.evaluate("getComputedStyle(document.documentElement).getPropertyValue('--accent').trim().toUpperCase()")
                 assert accent in ("#5F69D9","#8A98FA"),f"{slug}: stylesheet not loaded: {accent!r}"
-                assert detail.locator('link[rel=stylesheet]').get_attribute("href")=="../../assets/styles.css"
+                assert detail.locator('link[rel=stylesheet][href="../../assets/styles.css"]').count()==1
                 assert detail.get_by_role("heading",name="How it works").count()==1
                 assert detail.locator("[data-project-lab]").count()==1
                 assert detail.locator('link[href="../../assets/labs.css"]').count()==1
