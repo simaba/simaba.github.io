@@ -116,9 +116,14 @@ def verify():
         content=page.read_text(encoding="utf-8")
         assert "{{" not in content and "What it does not establish" in content
         assert "../../assets/styles.css" in content and "../../assets/detail.js" in content
+        assert "../../assets/labs.css" in content and "../../assets/project-labs.js" in content
+        assert 'data-project-lab="'+s["repo"]+'"' in content
         assert 'href="../../assets/favicon.svg"' in content
         assert 'property="og:title"' in content and 'property="og:description"' in content
     assert (ROOT/"dist/assets/detail.js").is_file()
+    assert (ROOT/"dist/assets/project-labs.js").is_file()
+    assert (ROOT/"dist/assets/labs.css").is_file()
+    assert not json.loads((ROOT/"data/launch-approval.json").read_text()).get("approved"),"Feature branch must await renewed release approval"
     assert "BUILT WITH INTENTION" not in HTML
     assert "Each project addresses a different part" not in HTML
     assert "A score isn’t a release decision" not in HTML

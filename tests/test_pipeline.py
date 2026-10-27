@@ -118,6 +118,19 @@ class PortfolioChecks(unittest.TestCase):
             html=page.read_text()
             self.assertIn("What it does not establish",html)
             self.assertNotIn("{{",html)
+    def test_every_detail_has_a_real_browser_workbench(self):
+        build()
+        for p in self.data["projects"]:
+            if p.get("study"):
+                page=(ROOT/"dist/projects"/p["repo"]/"index.html").read_text()
+                self.assertIn('data-project-lab="'+p["repo"]+'"',page)
+                self.assertIn('id="workbench"',page)
+                self.assertIn('src="../../assets/project-labs.js"',page)
+        js=(ROOT/"assets/project-labs.js").read_text()
+        self.assertNotIn("fetch(",js)
+        self.assertNotIn("XMLHttpRequest",js)
+        self.assertIn("WEIGHTED SCORE",js)
+        self.assertIn("CAPABILITY ESTIMATES COMPUTED",js)
     def test_featured_areas_are_diverse(self):
         featured={p["repo"] for p in self.data["projects"] if p["featured"]}
         self.assertEqual(featured,{"lean-ai-ops","everything-program-management","automotive-llm-eval-harness","release-checklist"})

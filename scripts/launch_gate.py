@@ -7,7 +7,7 @@ from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1]
 BASE=ROOT/"tests/visual-baseline"
 REQUIRED=("desktop.png","desktop-dark.png","tablet.png","mobile.png","mobile-dark.png","small-mobile.png")
-DESIGN_FILES=("site/template.html","assets/styles.css","assets/app.js","assets/favicon.svg","scripts/build.py","data/projects.json","docs/DESIGN_CONTRACT.md","docs/EDITORIAL_STANDARD.md","docs/CLAIM_AUDIT.md","site/project.html","assets/detail.js","data/studies.json",".github/workflows/review.yml","scripts/launch_gate.py","scripts/compare_visual.py","scripts/verify.py","scripts/sync.py","scripts/browser_review.py","tests/test_pipeline.py")
+DESIGN_FILES=("site/template.html","assets/styles.css","assets/app.js","assets/favicon.svg","scripts/build.py","data/projects.json","docs/DESIGN_CONTRACT.md","docs/EDITORIAL_STANDARD.md","docs/CLAIM_AUDIT.md","site/project.html","assets/detail.js","assets/labs.css","assets/project-labs.js","data/studies.json",".github/workflows/review.yml","scripts/launch_gate.py","scripts/compare_visual.py","scripts/verify.py","scripts/sync.py","scripts/browser_review.py","tests/test_pipeline.py")
 def sha(p): return hashlib.sha256(p.read_bytes()).hexdigest()
 def design_digest():
     h=hashlib.sha256()

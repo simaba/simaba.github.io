@@ -75,6 +75,46 @@ with sync_playwright() as playwright:
                 assert accent in ("#5F69D9","#8A98FA"),f"{slug}: stylesheet not loaded: {accent!r}"
                 assert detail.locator('link[rel=stylesheet]').get_attribute("href")=="../../assets/styles.css"
                 assert detail.get_by_role("heading",name="How it works").count()==1
+                assert detail.locator("[data-project-lab]").count()==1
+                assert detail.locator('link[href="../../assets/labs.css"]').count()==1
+                assert detail.locator('script[src="../../assets/project-labs.js"]').count()==1
+                assert detail.locator("#lab-verdict").is_visible(),f"{slug} workbench did not mount"
+                if width in (1440,390):
+                    if slug=="lean-ai-ops":
+                        assert detail.locator("#lab-verdict").inner_text()=="CAPABILITY ESTIMATES COMPUTED"
+                        detail.locator("#lab-observations").fill("9.7,10.0,11.5,10.1")
+                        assert detail.locator("#lab-out").inner_text()=="1 / 4"
+                        detail.locator("#lab-reset").click()
+                        assert detail.locator("#lab-out").inner_text()=="0 / 12"
+                    elif slug=="everything-program-management":
+                        assert detail.locator("#lab-verdict").inner_text()=="RAID ROW CHECK PASSED"
+                        detail.locator("#lab-probability").fill("4")
+                        assert detail.locator("#lab-verdict").inner_text()=="REVIEW REQUIRED"
+                        assert "4 × 4 = 16" in detail.locator("#lab-findings").inner_text()
+                        detail.locator("#lab-score").fill("16")
+                        assert detail.locator("#lab-verdict").inner_text()=="RAID ROW CHECK PASSED"
+                    elif slug=="automotive-llm-eval-harness":
+                        assert detail.locator("#lab-verdict").inner_text()=="PROTOTYPE CHECKS PASS"
+                        detail.locator("#lab-case").select_option("CASE-002")
+                        assert detail.locator("#lab-verdict").inner_text()=="PROTOTYPE CHECKS PASS"
+                        detail.locator("#lab-s1").evaluate("(e)=>{e.value='0.90';e.dispatchEvent(new Event('input',{bubbles:true}));}")
+                        assert detail.locator("#lab-verdict").inner_text()=="CASE BLOCKED"
+                        assert "Safety hard gate" in detail.locator("#lab-findings").inner_text()
+                    elif slug=="release-checklist":
+                        assert detail.locator("#lab-verdict").inner_text()=="DECLARED RELEASE SUPPORTED"
+                        detail.locator("#lab-outcome").select_option("release")
+                        assert detail.locator("#lab-verdict").inner_text()=="INVALID DECISION RECORD"
+                        detail.locator("#lab-hold").click()
+                        assert detail.locator("#lab-valid").inner_text()=="COHERENT"
+                        assert detail.locator("#lab-supported").inner_text()=="NO"
+                    elif slug=="agent-eval":
+                        assert detail.locator("#lab-verdict").inner_text()=="REPORT SEMANTICS PASS"
+                        detail.locator("#lab-severity").select_option("critical")
+                        assert detail.locator("#lab-verdict").inner_text()=="REPORT INCONSISTENT"
+                        assert "critical finding" in detail.locator("#lab-findings").inner_text().lower()
+                        detail.locator("#lab-recommendation").select_option("do_not_release")
+                        detail.locator("#lab-status").select_option("not_approved")
+                        assert detail.locator("#lab-verdict").inner_text()=="REPORT SEMANTICS PASS"
                 if width<=590:
                     open_menu=detail.get_by_role("button",name="Open navigation")
                     open_menu.click()
