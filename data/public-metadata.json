@@ -1,0 +1,90 @@
+{
+  "schema_version": 1,
+  "fetched_at": "2026-10-26T05:47:06.437Z",
+  "repositories": {
+    "lean-ai-ops": {
+      "updated_at": "2026-09-01T13:26:57Z",
+      "stars": 2,
+      "forks": 0,
+      "language": "Python",
+      "archived": false
+    },
+    "release-checklist": {
+      "updated_at": "2026-07-18T06:22:25Z",
+      "stars": 0,
+      "forks": 0,
+      "language": "Python",
+      "archived": false
+    },
+    "automotive-llm-eval-harness": {
+      "updated_at": "2026-08-12T04:36:50Z",
+      "stars": 0,
+      "forks": 0,
+      "language": "Python",
+      "archived": false
+    },
+    "agent-eval": {
+      "updated_at": "2026-08-01T09:09:49Z",
+      "stars": 0,
+      "forks": 0,
+      "language": "Python",
+      "archived": false
+    },
+    "everything-program-management": {
+      "updated_at": "2026-08-01T18:16:28Z",
+      "stars": 0,
+      "forks": 0,
+      "language": "Python",
+      "archived": false
+    },
+    "governance-playbook": {
+      "updated_at": "2026-07-16T04:50:53Z",
+      "stars": 3,
+      "forks": 0,
+      "language": "",
+      "archived": false
+    },
+    "agent-simulator": {
+      "updated_at": "2026-08-01T23:26:28Z",
+      "stars": 0,
+      "forks": 0,
+      "language": "Python",
+      "archived": false
+    },
+    "multi-agent-governance": {
+      "updated_at": "2026-07-16T04:45:27Z",
+      "stars": 0,
+      "forks": 0,
+      "language": "Mermaid",
+      "archived": false
+    },
+    "ai-prism": {
+      "updated_at": "2026-07-13T03:35:15Z",
+      "stars": 1,
+      "forks": 2,
+      "language": "Python",
+      "archived": false
+    },
+    "prompt-harness-translator": {
+      "updated_at": "2026-08-12T04:37:04Z",
+      "stars": 0,
+      "forks": 0,
+      "language": "Python",
+      "archived": false
+    },
+    "mcp-agent-risk-checklist": {
+      "updated_at": "2026-08-12T04:34:13Z",
+      "stars": 0,
+      "forks": 0,
+      "language": "Python",
+      "archived": false
+    },
+    "nist-rmf-guide": {
+      "updated_at": "2026-08-12T04:33:35Z",
+      "stars": 1,
+      "forks": 0,
+      "language": "",
+      "archived": false
+    }
+  }
+}

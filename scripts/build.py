@@ -1,0 +1,95 @@
+#!/usr/bin/env python3
+"""Deterministic dependency-free HTML generator from editorial data and verified public metadata."""
+from __future__ import annotations
+import html
+import json
+import shutil
+from pathlib import Path
+ROOT=Path(__file__).resolve().parents[1]
+OUT=ROOT/"dist"
+def esc(x): return html.escape(str(x), quote=True)
+def illustration(kind):
+    if kind=="dmaic": return '<div class="steps"><span>DEFINE</span><span>MEASURE</span><span>ANALYZE</span><span>IMPROVE</span><span>CONTROL</span></div><div class="dash-rule"></div><div class="proof"><span>Supported</span><span>Inferred</span><span>Missing</span></div>'
+    if kind=="gates": return '<div class="gate-board"><header><span>RELEASE DECISION</span><span>CONTROL REVIEW</span></header><div class="gate-row"><span>Declared evidence</span><b>REQUIRED</b></div><div class="gate-row"><span>Conditions &amp; exceptions</span><b>REVIEW</b></div><div class="gate-row"><span>Hard gate semantics</span><b>REQUIRED</b></div></div>'
+    if kind=="evaluation": return '<div class="eval-board"><div class="eval-heading"><span>MEASUREMENT DESIGN</span><span>RUBRIC / SCHEMATIC</span></div><div class="eval-row"><span>Intent correctness</span><span class="eval-criterion">Observable rule</span></div><div class="eval-row"><span>Safety behavior</span><span class="eval-criterion">Hard gate</span></div><div class="eval-row"><span>Privacy behavior</span><span class="eval-criterion">Exposure checks</span></div><div class="eval-row"><span>Language quality</span><span class="eval-criterion">Evaluation rubric</span></div><div class="eval-note">DEFINE CRITERIA → TEST COVERAGE → REVIEW EVIDENCE</div></div>'
+    if kind=="program":
+        return '<div class="program-sequence"><div><small>01 / FRAME</small><strong>Charter</strong></div><div><small>02 / TRACK</small><strong>RAID</strong></div><div><small>03 / DECIDE</small><strong>Decision memo</strong></div></div><div class="program-caption">Evidence classes · owners · alternatives · follow-through</div>'
+    if kind=="matrix":
+        rows=[("Validity",[1,0,0,1]),("Coverage",[1,1,0,1]),("Decision",[0,1,1,1])]
+        out='<div class="matrix-art">'+''.join('<span class="matrix-heading">'+esc(h)+'</span>' for h in ("","TASK","SAFETY","RELIABILITY","EVIDENCE"))
+        for name, marks in rows:
+            out+='<span class="matrix-name">'+esc(name)+'</span>'
+            out+=''.join('<span class="'+("mark" if x else "blank")+'" aria-label="'+("Relationship" if x else "No relationship shown")+'"></span>' for x in marks)
+        return out+'</div>'
+    raise ValueError("Unknown featured visual "+str(kind))
+def featured_card(p,i):
+    name=esc(p["title"])
+    url=("projects/"+p["repo"]+"/") if p.get("study") else (p.get("live") or "https://github.com/simaba/"+p["repo"])
+    attrs="" if p.get("study") else ' target="_blank" rel="noopener noreferrer"'
+    return ('<a class="feature '+esc(p["feature_layout"])+'" href="'+esc(url)+'"'+attrs+' aria-label="Explore '+name+' project details">'
+        '<div class="feature-topline"><span>'+f"{i:02d} / "+esc(p["category"].upper())+'</span><span>'+esc(p["status"].upper())+'</span></div>'
+        '<div class="feature-visual art-'+esc(p["visual"])+'" role="img" aria-label="Schematic illustration for '+name+', not measured project output">'+illustration(p["visual"])+'</div>'
+        '<div class="feature-bottom"><strong>'+name+'</strong><p>'+esc(p["description"])+'</p><div class="feature-meta"><span>'+esc(" · ".join(p["capabilities"][:2]))+'</span><span class="feature-arrow" aria-hidden="true">↗</span></div></div></a>')
+def catalog_row(p,i,meta):
+    searchable=" ".join(str(x) for x in [p["title"],p["repo"],p["description"],p["category"],*p["capabilities"]]).lower()
+    url=("projects/"+p["repo"]+"/") if p.get("study") else ("https://github.com/simaba/"+p["repo"])
+    attrs="" if p.get("study") else ' target="_blank" rel="noopener noreferrer"'
+    stamped=(meta or {}).get("updated_at") or ""
+    updated=(" · Last push "+esc(stamped[:7])) if len(stamped)>=7 and stamped[4]=="-" else ""
+    return ('<a class="project-row" data-kind="'+esc(p["kind"])+'" data-search="'+esc(searchable)+'" href="'+esc(url)+'"'+attrs+'>'
+        '<span class="project-num">'+f"{i:02d}"+'</span><span class="project-name">'+esc(p["title"])+'</span><span class="project-description">'+esc(p["description"])+'</span>'
+        '<span class="project-type">'+esc(p["kind"].upper())+' / '+esc(p["status"])+updated+'</span><span class="project-arrow" aria-hidden="true">↗</span></a>')
+def render_study(page, study, p):
+    name=esc(p["title"])
+    url="https://github.com/simaba/"+p["repo"]
+    def items(key):
+        return '<ul class="study-points">'+''.join('<li>'+esc(t)+'</li>' for t in study[key])+'</ul>'
+    links=[]
+    for label,href in study["links"]:
+        if not (href.startswith("https://github.com/simaba/") or href=="https://simaba.github.io/lean-ai-ops/"):
+            raise ValueError("Unexpected project link destination")
+        links.append('<a href="'+esc(href)+'" target="_blank" rel="noopener noreferrer">'+esc(label)+' ↗</a>')
+    substitutions={
+        "{{META_TITLE}}":name,"{{META_DESCRIPTION}}":esc(study["summary"]),
+        "{{CANONICAL}}":esc("https://simaba.github.io/projects/"+p["repo"]+"/"),
+        "{{SOURCE_URL}}":esc(url),"{{ORIENTATION}}":esc(study["orientation"]),
+        "{{STATUS}}":esc(p["status"]),"{{TITLE}}":name,"{{QUESTION}}":esc(study["question"]),
+        "{{SUMMARY}}":esc(study["summary"]),"{{METHOD}}":items("method"),
+        "{{ARTIFACTS}}":items("artifacts"),"{{EXAMPLE_LABEL}}":esc(study["example_label"]),
+        "{{EXAMPLE}}":esc(study["example"]),"{{LIMITS}}":items("limits"),
+        "{{LINKS}}":''.join(links)}
+    for key,value in substitutions.items():
+        if key not in page:raise RuntimeError("Missing project page placeholder "+key)
+        page=page.replace(key,value)
+    if "{{" in page:raise RuntimeError("Unrendered project page placeholder")
+    return page
+def build():
+    data=json.loads((ROOT/"data/projects.json").read_text("utf-8"))
+    snap=json.loads((ROOT/"data/public-metadata.json").read_text("utf-8"))
+    projects=data["projects"];meta=snap["repositories"];verified=snap.get("fetched_at")
+    study_data=json.loads((ROOT/"data/studies.json").read_text("utf-8"))
+    studies=study_data["studies"]
+    by_slug={s["repo"]:s for s in studies}
+    if len(by_slug)!=len(studies) or set(by_slug)!={p["repo"] for p in projects if p.get("study")}:
+        raise RuntimeError("Case-study route and catalog mismatch")
+    freshness="Public metadata refreshed "+verified[:10]+"." if verified else "Public activity data pending first verified refresh."
+    tpl=(ROOT/"site/template.html").read_text("utf-8")
+    mapping={"{{FEATURED}}":"\n".join(featured_card(p,i) for i,p in enumerate((x for x in projects if x["featured"]),1)),
+        "{{CATALOG}}":"\n".join(catalog_row(p,i,meta.get(p["repo"])) for i,p in enumerate(projects,1)),
+        "{{PROJECT_COUNT}}":str(len(projects)),"{{METADATA_NOTE}}":esc(freshness)}
+    for marker,value in mapping.items():
+        if marker not in tpl: raise RuntimeError("Missing template marker "+marker)
+        tpl=tpl.replace(marker,value)
+    if "{{" in tpl: raise RuntimeError("Unrendered token")
+    if OUT.exists(): shutil.rmtree(OUT)
+    OUT.mkdir()
+    shutil.copytree(ROOT/"assets",OUT/"assets")
+    study_template=(ROOT/"site/project.html").read_text("utf-8")
+    for p in projects:
+        if p["repo"] not in by_slug:continue
+        folder=OUT/"projects"/p["repo"];folder.mkdir(parents=True,exist_ok=True)
+        (folder/"index.html").write_text(render_study(study_template,by_slug[p["repo"]],p),encoding="utf-8")
+    (OUT/"index.html").write_text(tpl,encoding="utf-8")
+    (OUT/".nojekyll").write_text("",encoding="utf-8")
+    print(f"Built {len(projects)} curated entries, {sum(p['featured'] for p in projects)} featured, {len(studies)} case pages")
+if __name__=="__main__": build()
