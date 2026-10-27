@@ -124,7 +124,16 @@ with sync_playwright() as playwright:
                 assert detail.get_by_role("heading",name="What it does not establish").count()==1
                 assert detail.evaluate("document.documentElement.scrollWidth<=document.documentElement.clientWidth+1"),f"{slug} overflow at {width}"
                 if label in ("desktop","mobile"):
+                    # Capture the actual default experience, not whatever failure
+                    # state was deliberately induced during the behavior test.
+                    detail.locator("#"+("lab-pilot" if slug=="release-checklist" else "lab-reset")).click()
+                    if detail.locator("html").get_attribute("data-theme")=="dark":
+                        detail.locator("#theme-toggle").click()
+                    detail.evaluate("window.scrollTo(0,0)")
                     detail.screenshot(path=str(OUT/(slug+"-"+label+".png")),full_page=True,animations="disabled")
+                    detail.locator("#theme-toggle").click()
+                    detail.evaluate("window.scrollTo(0,0)")
+                    detail.screenshot(path=str(OUT/(slug+"-"+label+"-dark.png")),full_page=True,animations="disabled")
                 detail.close()
             assert not errors,str(errors)
             results[label]="passed";context.close()
