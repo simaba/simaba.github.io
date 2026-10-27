@@ -116,11 +116,19 @@ def verify():
         content=page.read_text(encoding="utf-8")
         assert "{{" not in content and "What it does not establish" in content
         assert "../../assets/styles.css" in content and "../../assets/detail.js" in content
+        assert 'href="../../assets/favicon.svg"' in content
+        assert 'property="og:title"' in content and 'property="og:description"' in content
     assert (ROOT/"dist/assets/detail.js").is_file()
     assert "BUILT WITH INTENTION" not in HTML
     assert "Each project addresses a different part" not in HTML
     assert "A score isn’t a release decision" not in HTML
     assert "Systems, tools," in HTML
+    assert "<title>Sima Bagheri | Technical Program Management, Engineering and AI</title>" in HTML
+    assert 'property="og:title" content="Sima Bagheri | Technical Program Management, Engineering and AI"' in HTML
+    assert 'href="assets/favicon.svg"' in HTML
+    assert "AI systems, made accountable" not in HTML
+    assert "AI Is Not Making Society Choices for Us" in HTML
+    assert "AI Is Not Making Society’s Choices for Us" not in HTML
     assert "The Hidden Failure Mode in AI Systems" in HTML
     snapshot=json.loads((ROOT/"data/public-metadata.json").read_text())
     assert snapshot["schema_version"]==1 and set(snapshot["repositories"]).issubset(repos)

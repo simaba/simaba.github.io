@@ -33,3 +33,6 @@ The homepage headline “Systems, tools, and delivery” is intentionally broad:
 The earlier “A score isn’t a release decision” is a defensible *project-level* observation, not the defining statement of this whole portfolio. Retain its distinction between measurements and authorization in the release-governance and evaluation material where it belongs. Do not flatten the work into AI research, safety, consulting, or one cross-repository suite.
 
 This is a candidate editorial direction to be approved by the portfolio owner, not a self-issued acceptance.
+
+## Page metadata and social snippets
+The visible homepage, browser tab, social preview, project-page metadata and footer should describe the same multidisciplinary practice. No narrower AI-governance claim should survive only because it is in the HTML head. Published essay titles are quoted as published, even when the heading's editorial phrasing differs from the article body.

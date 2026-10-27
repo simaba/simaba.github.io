@@ -134,6 +134,17 @@ class PortfolioChecks(unittest.TestCase):
     def test_generated_local_navigation_is_complete(self):
         build()
         audit_built_site()
+    def test_website_metadata_and_icon_align_with_professional_scope(self):
+        build()
+        homepage=(ROOT/"dist/index.html").read_text()
+        self.assertIn("<title>Sima Bagheri | Technical Program Management, Engineering and AI</title>",homepage)
+        self.assertIn('href="assets/favicon.svg"',homepage)
+        self.assertNotIn("AI systems, made accountable",homepage)
+        for p in self.data["projects"]:
+            if p.get("study"):
+                page=(ROOT/"dist/projects"/p["repo"]/"index.html").read_text()
+                self.assertIn('property="og:description"',page)
+                self.assertIn('href="../../assets/favicon.svg"',page)
     def test_approved_palette_is_locked(self):
         css=(ROOT/"assets/styles.css").read_text()
         for token in ("--bg:#F5F4F0","--bg:#111722","--accent:#5F69D9","--accent:#8A98FA","--accent-secondary:#6BBEAC"):
