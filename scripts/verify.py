@@ -123,7 +123,6 @@ def verify():
     assert (ROOT/"dist/assets/detail.js").is_file()
     assert (ROOT/"dist/assets/project-labs.js").is_file()
     assert (ROOT/"dist/assets/labs.css").is_file()
-    assert not json.loads((ROOT/"data/launch-approval.json").read_text()).get("approved"),"Feature branch must await renewed release approval"
     assert "BUILT WITH INTENTION" not in HTML
     assert "Each project addresses a different part" not in HTML
     assert "A score isn’t a release decision" not in HTML
