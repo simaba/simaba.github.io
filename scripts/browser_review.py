@@ -158,7 +158,8 @@ with sync_playwright() as playwright:
                     elif slug=="mcp-agent-risk-checklist":
                         assert detail.locator("#lab-verdict").inner_text()=="FICTIONAL REVIEW STRUCTURED"
                         detail.locator("#lab-likelihood").fill("7")
-                        assert detail.locator("#lab-verdict").inner_text()=="SCHEMA REVIEW REQUIRED"
+                        assert detail.locator("#lab-verdict").inner_text()=="REVIEW FIELDS INCOMPLETE"
+                        assert detail.locator("#lab-download").is_disabled()
                         detail.locator("#lab-likelihood").fill("4")
                         assert detail.locator("#lab-priority").inner_text()=="16"
                         with detail.expect_download() as captured:
