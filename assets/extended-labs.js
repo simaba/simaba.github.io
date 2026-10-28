@@ -17,7 +17,7 @@ const tick=(id,label,on=false)=>'<label class="lab-check"><input type="checkbox"
 const button=(id,label)=>'<button type="button" class="lab-action" id="'+id+'">'+safe(label)+'</button>';
 const metric=(id,label)=>'<div><small>'+safe(label)+'</small><strong id="'+id+'">—</strong></div>';
 const shell=(intro,controls,output="")=>{
-root.innerHTML='<div class="lab-main"><div class="lab-controls"><p class="lab-eyebrow">WORK WITH THE SOURCE MODEL</p><p class="lab-context">'+safe(intro)+'</p>'+controls+'</div><div class="lab-output" aria-live="polite">'+output+'<p class="lab-eyebrow">INSPECTED RESULT</p><h3 id="lab-verdict"></h3><ul class="lab-findings" id="lab-findings"></ul><p class="lab-privacy">This is an illustrative browser exercise; no data is sent, stored or executed outside this page.</p></div></div>';
+root.innerHTML='<div class="lab-main"><div class="lab-controls"><p class="lab-eyebrow">WORK WITH THE SOURCE MODEL</p><p class="lab-context">'+safe(intro)+'</p>'+controls+'</div><div class="lab-output" aria-live="polite">'+output+'<p class="lab-eyebrow">INSPECTED RESULT</p><h3 id="lab-verdict"></h3><ul class="lab-findings" id="lab-findings"></ul><p class="lab-privacy">This exercise processes your inputs locally; no scenario data is uploaded or used to operate an external system.</p></div></div>';
 };
 const set=(id,text)=>{$(id).textContent=String(text);};
 const findings=(state,headline,items)=>{

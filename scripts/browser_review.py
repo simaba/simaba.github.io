@@ -180,6 +180,8 @@ with sync_playwright() as playwright:
                         detail.locator("#lab-pilot").click()
                     elif slug=="ai-prism":
                         detail.locator("#lab-query").fill("")
+                    elif slug=="agent-simulator":
+                        detail.locator("#lab-scenario").select_option("normal_success")
                         detail.locator("#lab-topic").select_option("all")
                     else:
                         detail.locator("#lab-reset").click()
