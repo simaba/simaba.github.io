@@ -144,6 +144,14 @@ class PortfolioChecks(unittest.TestCase):
         self.assertIn('<pre class="study-code"><code>python run_demo.py',command)
         self.assertIn('<p class="study-example-text">',prose)
         self.assertNotIn('<pre class="study-code"><code>Read the fictional',prose)
+    def test_source_anchors_are_reviewed_and_pinned(self):
+        build()
+        mapping=json.loads((ROOT/"data/source-revisions.json").read_text())["references"]
+        self.assertEqual(set(mapping),{p["repo"] for p in self.data["projects"]})
+        for slug,ref in mapping.items():
+            page=(ROOT/"dist/projects"/slug/"index.html").read_text()
+            self.assertIn("/blob/"+ref["commit"]+"/"+ref["reference_path"],page)
+            self.assertIn("REVIEWED SOURCE SNAPSHOT",page)
     def test_featured_areas_are_diverse(self):
         featured={p["repo"] for p in self.data["projects"] if p["featured"]}
         self.assertEqual(featured,{"lean-ai-ops","everything-program-management","automotive-llm-eval-harness","release-checklist"})

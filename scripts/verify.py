@@ -107,6 +107,8 @@ def verify():
     assert all(isinstance(p["description"],str) and len(p["description"])>=75 for p in data["projects"])
     assert all(p.get("editorial_source")=="README.md" for p in data["projects"])
     studies=json.loads((ROOT/"data/studies.json").read_text())
+    sources=json.loads((ROOT/"data/source-revisions.json").read_text())
+    assert sources["schema_version"]==1 and len(sources["references"])==12
     assert studies["schema_version"]==1 and len(studies["studies"])==12
     assert {s["repo"] for s in studies["studies"]}=={p["repo"] for p in data["projects"] if p.get("study")}
     assert {p["repo"] for p in data["projects"] if p["featured"]}=={"lean-ai-ops","everything-program-management","automotive-llm-eval-harness","release-checklist"}
@@ -119,6 +121,9 @@ def verify():
         assert "../../assets/labs.css" in content and "../../assets/project-labs.js" in content
         assert "../../assets/extended-labs.js" in content
         assert 'data-project-lab="'+s["repo"]+'"' in content
+        source=sources["references"][s["repo"]]
+        assert ('/blob/'+source["commit"]+'/'+source["reference_path"]) in content
+        assert 'REVIEWED SOURCE SNAPSHOT' in content
         assert 'href="../../assets/favicon.svg"' in content
         assert 'property="og:title"' in content and 'property="og:description"' in content
     assert (ROOT/"dist/assets/detail.js").is_file()

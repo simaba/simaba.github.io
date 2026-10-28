@@ -77,3 +77,8 @@ html[data-theme="dark"] .lab-output h3[data-state="fail"]{color:#F29B8F}
 /* Examples are not all executable: distinguish prose from shell commands. */
 .study-example-text{font:400 16px/1.72 var(--font-sans);color:var(--ink-soft);border-left:3px solid var(--accent);padding:7px 0 7px 19px;white-space:pre-wrap;margin:0}
 @media(max-width:590px){.study-example-text{font-size:14px;line-height:1.65}}
+
+.lab-provenance{display:flex;gap:16px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin:17px 0 0;padding:12px 0;border-top:1px solid var(--line);font:500 10px/1.6 var(--font-mono);letter-spacing:.035em;color:var(--muted)}
+.lab-source{display:inline-flex;align-items:center;gap:7px;color:var(--accent);text-underline-offset:3px;text-decoration:underline;text-decoration-thickness:1px;letter-spacing:0;font:500 11px/1.5 var(--font-mono)}
+.lab-source code{font:inherit;color:var(--muted);background:var(--paper);padding:3px 5px}
+@media(max-width:590px){.lab-provenance{align-items:flex-start}.lab-source{flex-wrap:wrap;word-break:break-word}}

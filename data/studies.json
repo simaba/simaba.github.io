@@ -368,16 +368,16 @@
       "summary": "A bounded review toolkit for MCP integrations covering principal binding, action effect, data reach, untrusted content, containment, recovery and evidence ownership.",
       "method": [
         "Inventory tool effects, identities and data boundaries rather than treating a server name as a trust guarantee.",
-        "Record individual failure scenarios with likelihood, impact, mitigation, owner and remediation status.",
+        "Edit likelihood, impact, risk level, mitigation and ownership; the complete browser export follows the repository's review-envelope structure.",
         "Make the decision scope explicit; structure validation checks the review record, not actual permissions or server vulnerability."
       ],
       "artifacts": [
         "Machine-readable MCP risk-review JSON schema",
-        "Fictional example with three concrete findings",
+        "Fictional review example and source schema with one or more findings",
         "Authority, mitigation and scenario-based risk-scoring guidance"
       ],
-      "example_label": "Validate a fictional risk finding",
-      "example": "python scripts/validate_examples.py\n# Inspect the schema and sample record before using it on real integrations.",
+      "example_label": "Validate the exported review record",
+      "example": "python scripts/validate_examples.py\n# The browser export uses the same record structure, with one editable fictional finding.",
       "limits": [
         "The browser only checks the selected fields of a fictional review record; it does not connect to or scan MCP servers.",
         "Likelihood and impact are ordinal triage aids. A reviewer must independently substantiate the findings and control boundaries."

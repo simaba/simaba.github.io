@@ -79,6 +79,8 @@ with sync_playwright() as playwright:
                 assert detail.locator('link[href="../../assets/labs.css"]').count()==1
                 assert detail.locator('script[src="../../assets/project-labs.js"]').count()==1
                 assert detail.locator("#lab-verdict").is_visible(),f"{slug} workbench did not mount"
+                assert detail.locator("a.lab-source").count()==1
+                assert "/blob/" in detail.locator("a.lab-source").get_attribute("href")
                 assert detail.locator('script[src="../../assets/extended-labs.js"]').count()==1
                 if width in (1440,390):
                     if slug=="lean-ai-ops":
@@ -154,11 +156,19 @@ with sync_playwright() as playwright:
                         detail.locator("#lab-target").select_option("generic")
                         assert detail.locator("#lab-loss").inner_text()=="NONE"
                     elif slug=="mcp-agent-risk-checklist":
-                        assert detail.locator("#lab-verdict").inner_text()=="FICTIONAL FINDING STRUCTURED"
+                        assert detail.locator("#lab-verdict").inner_text()=="FICTIONAL REVIEW STRUCTURED"
                         detail.locator("#lab-likelihood").fill("7")
                         assert detail.locator("#lab-verdict").inner_text()=="SCHEMA REVIEW REQUIRED"
                         detail.locator("#lab-likelihood").fill("4")
                         assert detail.locator("#lab-priority").inner_text()=="16"
+                        with detail.expect_download() as captured:
+                            detail.locator("#lab-download").click()
+                        exported=json.loads(captured.value.path().read_text(encoding="utf-8"))
+                        assert set(exported)=={"review_id","system_name","scope","review_status","findings"}
+                        assert len(exported["findings"])==1
+                        assert exported["review_status"]=="draft"
+                        assert exported["findings"][0]["likelihood"]==4
+                        assert exported["findings"][0]["impact"]==4
                     elif slug=="nist-rmf-guide":
                         assert detail.locator("#lab-gaps").inner_text()=="8/8"
                         detail.locator("#lab-state0").select_option("not_applicable")

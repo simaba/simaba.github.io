@@ -39,11 +39,14 @@ def catalog_row(p,i,meta):
     return ('<a class="project-row" data-kind="'+esc(p["kind"])+'" data-search="'+esc(searchable)+'" href="'+esc(url)+'"'+attrs+'>'
         '<span class="project-num">'+f"{i:02d}"+'</span><span class="project-name">'+esc(p["title"])+'</span><span class="project-description">'+esc(p["description"])+'</span>'
         '<span class="project-type">'+esc(p["kind"].upper())+' / '+esc(p["status"])+updated+'</span><span class="project-arrow" aria-hidden="true">↗</span></a>')
-def render_study(page, study, p):
+def render_study(page, study, p, source):
     name=esc(p["title"])
     url="https://github.com/simaba/"+p["repo"]
     def items(key):
         return '<ul class="study-points">'+''.join('<li>'+esc(t)+'</li>' for t in study[key])+'</ul>'
+    # The snapshot is a review anchor, not a promise that the source has not changed.
+    source_url="https://github.com/simaba/"+p["repo"]+"/blob/"+source["commit"]+"/"+source["reference_path"]
+    source_markup='<a class="lab-source" href="'+esc(source_url)+'" target="_blank" rel="noopener noreferrer">Inspect referenced source <span aria-hidden="true">↗</span><code>'+esc(source["commit"][:9])+'</code></a>'
     links=[]
     for label,href in study["links"]:
         if not (href.startswith("https://github.com/simaba/") or href=="https://simaba.github.io/lean-ai-ops/" or href=="https://airc.nist.gov/home"):
@@ -95,17 +98,20 @@ def render_study(page, study, p):
     is_command=example.startswith(("git clone ","python ","python3 ","pip ","prompt-harness ","release-checklist ","automotive-eval "))
     example_html=('<pre class="study-code"><code>'+esc(example)+'</code></pre>' if is_command
                   else '<p class="study-example-text">'+esc(example)+'</p>')
+    example_note=("The command is from the linked repository; this website does not execute it."
+                  if is_command else
+                  "This is an explanatory example, not a shell command or a generated system result.")
     substitutions={
         "{{LAB_MODE}}":esc(mode),"{{LAB_TITLE}}":esc(lab_title),
         "{{LAB_DESCRIPTION}}":esc(lab_description),"{{LAB_BOUNDARY}}":esc(lab_boundary),
-        "{{LAB_LIVE}}":live,"{{REPO}}":esc(p["repo"]),
+        "{{LAB_LIVE}}":live,"{{LAB_SOURCE}}":source_markup,"{{REPO}}":esc(p["repo"]),
         "{{META_TITLE}}":name,"{{META_DESCRIPTION}}":esc(study["summary"]),
         "{{CANONICAL}}":esc("https://simaba.github.io/projects/"+p["repo"]+"/"),
         "{{SOURCE_URL}}":esc(url),"{{ORIENTATION}}":esc(study["orientation"]),
         "{{STATUS}}":esc(p["status"]),"{{TITLE}}":name,"{{QUESTION}}":esc(study["question"]),
         "{{SUMMARY}}":esc(study["summary"]),"{{METHOD}}":items("method"),
         "{{ARTIFACTS}}":items("artifacts"),"{{EXAMPLE_LABEL}}":esc(study["example_label"]),
-        "{{EXAMPLE_HTML}}":example_html,"{{LIMITS}}":items("limits"),
+        "{{EXAMPLE_HTML}}":example_html,"{{EXAMPLE_NOTE}}":esc(example_note),"{{LIMITS}}":items("limits"),
         "{{LINKS}}":''.join(links)}
     for key,value in substitutions.items():
         if key not in page:raise RuntimeError("Missing project page placeholder "+key)
@@ -117,10 +123,17 @@ def build():
     snap=json.loads((ROOT/"data/public-metadata.json").read_text("utf-8"))
     projects=data["projects"];meta=snap["repositories"];verified=snap.get("fetched_at")
     study_data=json.loads((ROOT/"data/studies.json").read_text("utf-8"))
+    sources=json.loads((ROOT/"data/source-revisions.json").read_text("utf-8"))
+    references=sources["references"]
     studies=study_data["studies"]
     by_slug={s["repo"]:s for s in studies}
     if len(by_slug)!=len(studies) or set(by_slug)!={p["repo"] for p in projects if p.get("study")}:
         raise RuntimeError("Case-study route and catalog mismatch")
+    if sources["schema_version"]!=1 or set(references)!=set(by_slug):
+        raise RuntimeError("Missing or surplus pinned source references")
+    for repo,entry in references.items():
+        if not re.fullmatch(r"[0-9a-f]{40}",entry["commit"]) or not re.fullmatch(r"[A-Za-z0-9_./-]+",entry["reference_path"]):
+            raise RuntimeError("Malformed source reference for "+repo)
     freshness="Public metadata refreshed "+verified[:10]+"." if verified else "Public activity data pending first verified refresh."
     tpl=(ROOT/"site/template.html").read_text("utf-8")
     mapping={"{{FEATURED}}":"\n".join(featured_card(p,i) for i,p in enumerate((x for x in projects if x["featured"]),1)),
@@ -137,7 +150,7 @@ def build():
     for p in projects:
         if p["repo"] not in by_slug:continue
         folder=OUT/"projects"/p["repo"];folder.mkdir(parents=True,exist_ok=True)
-        (folder/"index.html").write_text(render_study(study_template,by_slug[p["repo"]],p),encoding="utf-8")
+        (folder/"index.html").write_text(render_study(study_template,by_slug[p["repo"]],p,references[p["repo"]]),encoding="utf-8")
     (OUT/"index.html").write_text(tpl,encoding="utf-8")
     (OUT/".nojekyll").write_text("",encoding="utf-8")
     print(f"Built {len(projects)} curated entries, {sum(p['featured'] for p in projects)} featured, {len(studies)} case pages")
