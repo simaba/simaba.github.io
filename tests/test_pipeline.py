@@ -137,6 +137,13 @@ class PortfolioChecks(unittest.TestCase):
         self.assertIn("Lossy conversion warning",extended)
         self.assertIn("WEIGHTED SCORE",js)
         self.assertIn("CAPABILITY ESTIMATES COMPUTED",js)
+    def test_examples_are_typed_as_commands_or_prose(self):
+        build()
+        command=(ROOT/"dist/projects/agent-simulator/index.html").read_text()
+        prose=(ROOT/"dist/projects/governance-playbook/index.html").read_text()
+        self.assertIn('<pre class="study-code"><code>python run_demo.py',command)
+        self.assertIn('<p class="study-example-text">',prose)
+        self.assertNotIn('<pre class="study-code"><code>Read the fictional',prose)
     def test_featured_areas_are_diverse(self):
         featured={p["repo"] for p in self.data["projects"] if p["featured"]}
         self.assertEqual(featured,{"lean-ai-ops","everything-program-management","automotive-llm-eval-harness","release-checklist"})

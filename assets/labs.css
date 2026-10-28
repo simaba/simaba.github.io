@@ -73,3 +73,7 @@ html[data-theme="dark"] .lab-output h3[data-state="fail"]{color:#F29B8F}
 .lab-worksheet-row .lab-field:last-child{margin-bottom:0}
 .lab-output .lab-metrics strong{font-size:clamp(14px,1.6vw,19px)}
 @media(max-width:590px){.lab-resource-list{max-height:390px}.lab-preview{font-size:11px}.lab-worksheet-row{padding:12px}}
+
+/* Examples are not all executable: distinguish prose from shell commands. */
+.study-example-text{font:400 16px/1.72 var(--font-sans);color:var(--ink-soft);border-left:3px solid var(--accent);padding:7px 0 7px 19px;white-space:pre-wrap;margin:0}
+@media(max-width:590px){.study-example-text{font-size:14px;line-height:1.65}}

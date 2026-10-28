@@ -31,3 +31,7 @@ See `docs/DESIGN_CONTRACT.md` and `docs/RELEASE_GATES.md`. The reviewed project 
 
 ## Current visual/editorial review
 The original Technical Editorial palette and typography remain unchanged. Featured work now represents process improvement, program management, automotive evaluation and release governance, rather than suggesting the whole portfolio is an AI evaluation product. Five source-backed study pages and three verified Medium article links have been added; this is a draft for final visual and editorial acceptance, not proof of production operation or customer outcomes.
+
+## Functional project experiences (draft PR #2)
+
+Each of the twelve curated public projects has a source-backed detail page and its own bounded interactive component. Five reproduce selected working validation/scoring/calculation rules; the remaining seven range from an agent simulator trace and restricted prompt-format conversion to governance evidence worksheets and a searchable collection of sources. Interactive illustrations and runnable software are labeled separately. None of the static browser exercises calls a model, changes a real system, validates live security controls, or determines compliance. The work remains on the review branch until the revised site receives owner acceptance.

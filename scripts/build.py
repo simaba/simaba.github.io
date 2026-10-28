@@ -89,6 +89,12 @@ def render_study(page, study, p):
     }
     mode,lab_title,lab_description,lab_boundary=lab_info[p["repo"]]
     live=(' <a class="lab-live-link" href="https://simaba.github.io/lean-ai-ops/" target="_blank" rel="noopener noreferrer">Explore the separate interactive DMAIC walkthrough ↗</a>' if p["repo"]=="lean-ai-ops" else "")
+    # Runnable shell commands and explanatory examples are different artifact types.
+    # Do not format ordinary prose as a terminal command merely for visual effect.
+    example=study["example"].strip()
+    is_command=example.startswith(("git clone ","python ","python3 ","pip ","prompt-harness ","release-checklist ","automotive-eval "))
+    example_html=('<pre class="study-code"><code>'+esc(example)+'</code></pre>' if is_command
+                  else '<p class="study-example-text">'+esc(example)+'</p>')
     substitutions={
         "{{LAB_MODE}}":esc(mode),"{{LAB_TITLE}}":esc(lab_title),
         "{{LAB_DESCRIPTION}}":esc(lab_description),"{{LAB_BOUNDARY}}":esc(lab_boundary),
@@ -99,7 +105,7 @@ def render_study(page, study, p):
         "{{STATUS}}":esc(p["status"]),"{{TITLE}}":name,"{{QUESTION}}":esc(study["question"]),
         "{{SUMMARY}}":esc(study["summary"]),"{{METHOD}}":items("method"),
         "{{ARTIFACTS}}":items("artifacts"),"{{EXAMPLE_LABEL}}":esc(study["example_label"]),
-        "{{EXAMPLE}}":esc(study["example"]),"{{LIMITS}}":items("limits"),
+        "{{EXAMPLE_HTML}}":example_html,"{{LIMITS}}":items("limits"),
         "{{LINKS}}":''.join(links)}
     for key,value in substitutions.items():
         if key not in page:raise RuntimeError("Missing project page placeholder "+key)
