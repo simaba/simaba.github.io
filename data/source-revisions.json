@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "reviewed_on": "2026-10-28",
+  "description": "Public source revisions used to scope the browser excerpts. Not an assertion that the repositories are integrated or unchanged after review.",
+  "references": {
+    "lean-ai-ops": {
+      "commit": "2601dbd8d535f672185e3cabdc9433f7603f0d48",
+      "reference_path": "analytics/capability.py"
+    },
+    "everything-program-management": {
+      "commit": "aef7e66b87ab07f38e9410cbc831274cb959fb41",
+      "reference_path": "src/pmkit/validators.py"
+    },
+    "automotive-llm-eval-harness": {
+      "commit": "10e4e71313a11b93ce71b9c5750d55fdb51115a7",
+      "reference_path": "src/automotive_llm_eval_harness/core.py"
+    },
+    "release-checklist": {
+      "commit": "b400063973acf011cae515fa985e83aa63a8ed29",
+      "reference_path": "src/airc/validator.py"
+    },
+    "agent-eval": {
+      "commit": "2e213fc28ded6d4944c7b8a064823b0dd737094a",
+      "reference_path": "tools/validate_evaluation_report.py"
+    },
+    "governance-playbook": {
+      "commit": "e21d0d6608a61042e166412a32a39d988cd38f75",
+      "reference_path": "docs/operating-model-design.md"
+    },
+    "agent-simulator": {
+      "commit": "8fa1bce9994f33e428592555d35acff79663f602",
+      "reference_path": "src/controller.py"
+    },
+    "multi-agent-governance": {
+      "commit": "c5ad895b01d11240ba7fca0c6f416b7ff3d60b8f",
+      "reference_path": "docs/authority-and-containment.md"
+    },
+    "ai-prism": {
+      "commit": "6beed6b8e70b678c9d5c20f6d0a5ddfb1a8cd1d5",
+      "reference_path": "README.md"
+    },
+    "prompt-harness-translator": {
+      "commit": "6a431004c06de1abca4dc47c5f6476ef4f00bf8e",
+      "reference_path": "src/prompt_harness_translator/core.py"
+    },
+    "mcp-agent-risk-checklist": {
+      "commit": "83a5abc45acf2184edfa1385e8895700d4c71b30",
+      "reference_path": "schemas/mcp-risk-review.schema.json"
+    },
+    "nist-rmf-guide": {
+      "commit": "0776e82aec138d81aecf250cf7e98d50e2e1ef45",
+      "reference_path": "templates/nist-rmf-gap-assessment.md"
+    }
+  }
+}
