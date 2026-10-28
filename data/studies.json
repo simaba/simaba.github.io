@@ -184,6 +184,254 @@
           "https://github.com/simaba/agent-eval/blob/main/examples/sample-evaluation-report.json"
         ]
       ]
+    },
+    {
+      "repo": "governance-playbook",
+      "question": "Who makes which AI lifecycle decision, with which evidence and authority?",
+      "orientation": "GOVERNANCE / PRACTITIONER METHOD",
+      "summary": "A decision-and-evidence operating-model playbook. It defines intake, review, decision, exception and follow-through contracts, and treats governance burden as a design concern.",
+      "method": [
+        "Build a decision inventory that identifies the specific decision, accountable owner, evidence standard and useful-by deadline rather than starting with committees.",
+        "Route requests proportionately according to action authority, reversibility, affected people and evidence—not one generic risk label.",
+        "Make decisions traceable through conditions, expiry, exceptions, independent challenge and verification of follow-through."
+      ],
+      "artifacts": [
+        "Decision inventory and operating-model design guidance",
+        "Intake, prioritization, release and monitoring templates",
+        "A fictional worked operating-model example"
+      ],
+      "example_label": "Inspect a fictional operating model",
+      "example": "Read the fictional example and edit an intake decision in the browser workbench above. The real repository supplies templates, not an automated governance policy engine.",
+      "limits": [
+        "The browser routing is a worked illustration, not a normative risk model or an entitlement to authorize use.",
+        "This repository defines organizational decisions and evidence contracts; it has no executable compliance or regulatory approval engine."
+      ],
+      "links": [
+        [
+          "Decision and evidence operating-model design",
+          "https://github.com/simaba/governance-playbook/blob/main/docs/operating-model-design.md"
+        ],
+        [
+          "Fictional operating-model example",
+          "https://github.com/simaba/governance-playbook/blob/main/examples/sample-ai-governance-operating-model.md"
+        ],
+        [
+          "Read the full playbook",
+          "https://github.com/simaba/governance-playbook"
+        ]
+      ]
+    },
+    {
+      "repo": "agent-simulator",
+      "question": "When should an agent retry, use a bounded fallback, or hand control to a human?",
+      "orientation": "SIMULATION / WORKING PYTHON CODE",
+      "summary": "A deterministic Python control-flow simulator exercising explicit acceptance criteria, bounded retries, fallback-specific acceptance and escalation. It records why each transition occurred.",
+      "method": [
+        "Planner produces a bounded plan; executor supplies output and observable evidence fields.",
+        "Evaluator checks task_complete, output_present and boundary_respected independently of self-reported confidence.",
+        "Supervisor accepts, requests a bounded retry, checks the separate fallback contract or escalates with a traceable decision log."
+      ],
+      "artifacts": [
+        "Python scenario controller and deterministic executor fixtures",
+        "Four published scenarios covering acceptance, retry, fallback and escalation",
+        "Decision trace, attempt counters and CLI output"
+      ],
+      "example_label": "Run a published scenario",
+      "example": "python run_demo.py --scenario retry_then_success\npython run_demo.py --scenario fallback_after_failure",
+      "limits": [
+        "The interactive trace uses the published deterministic fixtures, not a live language model, external tools, or real execution.",
+        "Self-reported confidence is diagnostic metadata. The fixture cannot establish safe behavior in deployed agents."
+      ],
+      "links": [
+        [
+          "Controller implementation",
+          "https://github.com/simaba/agent-simulator/blob/main/src/controller.py"
+        ],
+        [
+          "Published scenarios",
+          "https://github.com/simaba/agent-simulator/blob/main/src/scenarios.py"
+        ],
+        [
+          "Source and instructions",
+          "https://github.com/simaba/agent-simulator"
+        ]
+      ]
+    },
+    {
+      "repo": "multi-agent-governance",
+      "question": "What authority can propagate through a chain of agents and tools?",
+      "orientation": "SYSTEMS / AUTHORITY MODEL",
+      "summary": "A practitioner framework for reviewing identity, delegated authority, untrusted instructions, containment and recovery in workflows spanning agents and tools.",
+      "method": [
+        "Describe each component's authority envelope in terms of principal, data reach, action effects and delegation.",
+        "Keep propose, validate, authorize, execute, verify and record as distinguishable transitions.",
+        "Plan revocation, queued-work cancellation, partial-state recovery and independent evidence review before high-consequence actions."
+      ],
+      "artifacts": [
+        "Authority-and-containment design rules with a sample envelope",
+        "Templates for agent roles, review, escalation and accountability",
+        "A fictional research-assistant governance review"
+      ],
+      "example_label": "Inspect an authority envelope",
+      "example": "Review the sample authority envelope and change the proposed tool action in the browser. No tool is invoked by the illustration.",
+      "limits": [
+        "A static browser cannot enforce permissions on real MCP servers or agents; actual restrictions must be implemented at identity and tool layers.",
+        "The authority exercise demonstrates decision points, not an independent penetration test or assurance of safety."
+      ],
+      "links": [
+        [
+          "Authority and containment model",
+          "https://github.com/simaba/multi-agent-governance/blob/main/docs/authority-and-containment.md"
+        ],
+        [
+          "Fictional review",
+          "https://github.com/simaba/multi-agent-governance/blob/main/examples/sample-system-governance-review.md"
+        ],
+        [
+          "Repository",
+          "https://github.com/simaba/multi-agent-governance"
+        ]
+      ]
+    },
+    {
+      "repo": "ai-prism",
+      "question": "How can a useful AI governance source be found and assessed without relying on a link dump?",
+      "orientation": "RESEARCH / CURATED RESOURCE HUB",
+      "summary": "A curated directory of frameworks, standards, evaluation tooling, incident references and research. Its value lies in classification, provenance and the distinction between primary and secondary sources.",
+      "method": [
+        "Group references by their practical use: official frameworks, measurement, engineering tools, incident response and research.",
+        "Preserve source ownership and distinguish official text from secondary interpretation.",
+        "Treat link availability and publication freshness as different review questions; recheck applicability and versions before relying on a source."
+      ],
+      "artifacts": [
+        "Curated links to official frameworks, tools and papers",
+        "Source descriptions grouped by practitioner topic",
+        "Contribution and source-review guidance in the public repository"
+      ],
+      "example_label": "Explore selected public sources",
+      "example": "Search the representative, repo-derived browser index by publisher or topic. Open the publisher's page to verify its current version and applicability.",
+      "limits": [
+        "The browser index is a curated extract from the repository, not a live crawler, freshness audit or endorsement.",
+        "Links can change after publication; do not assume legal or standards materials are current without checking the source."
+      ],
+      "links": [
+        [
+          "Explore the complete curated index",
+          "https://github.com/simaba/ai-prism/blob/main/README.md"
+        ],
+        [
+          "Repository",
+          "https://github.com/simaba/ai-prism"
+        ]
+      ]
+    },
+    {
+      "repo": "prompt-harness-translator",
+      "question": "What changes when a structured prompt asset moves between harnesses?",
+      "orientation": "FORMATS / WORKING TRANSLATOR CLI",
+      "summary": "A Python Markdown/YAML prompt-asset translator rendering bounded Codex, Cursor and generic representations while explicitly retaining metadata that a target does not natively apply.",
+      "method": [
+        "Parse frontmatter into name, description, instructions and source metadata; reject unsupported or malformed inputs.",
+        "Generate distinct target layouts rather than falsely treating harness capabilities as interchangeable.",
+        "Preserve unmapped metadata and place an explicit lossy-conversion warning into generated outputs."
+      ],
+      "artifacts": [
+        "Python translator CLI and format-specific renderers",
+        "Public-safe sample Markdown/YAML prompt asset",
+        "Tests for nested metadata, invalid frontmatter and lossy target conversion"
+      ],
+      "example_label": "Try the real CLI",
+      "example": "python -m pip install -e .\nprompt-harness translate examples/sample_agent.md --target cursor",
+      "limits": [
+        "The browser editor reproduces output for a bounded editable fixture; it does not parse arbitrary YAML or cover all metadata types.",
+        "Successful translation does not prove equivalent tool permissions, model behavior or enforcement across runtimes."
+      ],
+      "links": [
+        [
+          "Source translation rules",
+          "https://github.com/simaba/prompt-harness-translator/blob/main/src/prompt_harness_translator/core.py"
+        ],
+        [
+          "Format limitations",
+          "https://github.com/simaba/prompt-harness-translator/blob/main/docs/SUPPORTED_FORMATS.md"
+        ],
+        [
+          "Repository",
+          "https://github.com/simaba/prompt-harness-translator"
+        ]
+      ]
+    },
+    {
+      "repo": "mcp-agent-risk-checklist",
+      "question": "What does a review actually know about an agent's effective tool authority?",
+      "orientation": "SECURITY / STRUCTURED REVIEW",
+      "summary": "A bounded review toolkit for MCP integrations covering principal binding, action effect, data reach, untrusted content, containment, recovery and evidence ownership.",
+      "method": [
+        "Inventory tool effects, identities and data boundaries rather than treating a server name as a trust guarantee.",
+        "Record individual failure scenarios with likelihood, impact, mitigation, owner and remediation status.",
+        "Make the decision scope explicit; structure validation checks the review record, not actual permissions or server vulnerability."
+      ],
+      "artifacts": [
+        "Machine-readable MCP risk-review JSON schema",
+        "Fictional example with three concrete findings",
+        "Authority, mitigation and scenario-based risk-scoring guidance"
+      ],
+      "example_label": "Validate a fictional risk finding",
+      "example": "python scripts/validate_examples.py\n# Inspect the schema and sample record before using it on real integrations.",
+      "limits": [
+        "The browser only checks the selected fields of a fictional review record; it does not connect to or scan MCP servers.",
+        "Likelihood and impact are ordinal triage aids. A reviewer must independently substantiate the findings and control boundaries."
+      ],
+      "links": [
+        [
+          "Fictional review JSON",
+          "https://github.com/simaba/mcp-agent-risk-checklist/blob/main/examples/fictional-mcp-risk-review.json"
+        ],
+        [
+          "Risk review schema",
+          "https://github.com/simaba/mcp-agent-risk-checklist/blob/main/schemas/mcp-risk-review.schema.json"
+        ],
+        [
+          "Repository",
+          "https://github.com/simaba/mcp-agent-risk-checklist"
+        ]
+      ]
+    },
+    {
+      "repo": "nist-rmf-guide",
+      "question": "How does a framework reference become an evidence-bearing, scoped review item?",
+      "orientation": "RISK MANAGEMENT / PRACTITIONER GUIDE",
+      "summary": "An unofficial practitioner guide to using relevant NIST AI RMF references in scoped assessments, with explicit evidence states, decision consequences and review limitations.",
+      "method": [
+        "Start with the official function, category, subcategory and framework version rather than an invented universal maturity score.",
+        "Separate documented practice from demonstrated operation and outcomes; preserve provenance, gaps and not-applicable rationale.",
+        "Link each material gap to a decision, owner, review trigger and next evidence, without claiming automatic compliance."
+      ],
+      "artifacts": [
+        "Four-function Govern/Map/Measure/Manage assessment template",
+        "Fictional worked evidence and gap assessment",
+        "Guidance on evidence freshness and non-equivalence of cross-framework mappings"
+      ],
+      "example_label": "Build a bounded evidence worksheet",
+      "example": "The browser worksheet organizes selected prompts and user-entered evidence states, then exports a draft review. Reference numbers must be verified against official NIST material.",
+      "limits": [
+        "Not an official NIST assessment, implementation profile, compliance test or certification.",
+        "The worksheet does not decide applicability or establish control operation; unresolved or missing evidence is disclosed, not converted into a single score."
+      ],
+      "links": [
+        [
+          "NIST AI RMF official source",
+          "https://airc.nist.gov/home"
+        ],
+        [
+          "Source template",
+          "https://github.com/simaba/nist-rmf-guide/blob/main/templates/nist-rmf-gap-assessment.md"
+        ],
+        [
+          "Practitioner guide",
+          "https://github.com/simaba/nist-rmf-guide"
+        ]
+      ]
     }
   ]
 }
