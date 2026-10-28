@@ -110,7 +110,7 @@ class PortfolioChecks(unittest.TestCase):
     def test_study_routes_and_scope(self):
         build()
         case_studies=json.loads((ROOT/"data/studies.json").read_text("utf-8"))["studies"]
-        self.assertEqual(len(case_studies),5)
+        self.assertEqual(len(case_studies),12)
         self.assertEqual({p["repo"] for p in self.data["projects"] if p.get("study")},{x["repo"] for x in case_studies})
         for entry in case_studies:
             page=ROOT/"dist/projects"/entry["repo"]/"index.html"
@@ -126,9 +126,15 @@ class PortfolioChecks(unittest.TestCase):
                 self.assertIn('data-project-lab="'+p["repo"]+'"',page)
                 self.assertIn('id="workbench"',page)
                 self.assertIn('src="../../assets/project-labs.js"',page)
+                self.assertIn('src="../../assets/extended-labs.js"',page)
         js=(ROOT/"assets/project-labs.js").read_text()
         self.assertNotIn("fetch(",js)
         self.assertNotIn("XMLHttpRequest",js)
+        extended=(ROOT/"assets/extended-labs.js").read_text()
+        self.assertNotIn("fetch(",extended)
+        self.assertNotIn("XMLHttpRequest",extended)
+        self.assertIn("FALLBACK",extended)
+        self.assertIn("Lossy conversion warning",extended)
         self.assertIn("WEIGHTED SCORE",js)
         self.assertIn("CAPABILITY ESTIMATES COMPUTED",js)
     def test_featured_areas_are_diverse(self):

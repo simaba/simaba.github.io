@@ -46,7 +46,7 @@ def render_study(page, study, p):
         return '<ul class="study-points">'+''.join('<li>'+esc(t)+'</li>' for t in study[key])+'</ul>'
     links=[]
     for label,href in study["links"]:
-        if not (href.startswith("https://github.com/simaba/") or href=="https://simaba.github.io/lean-ai-ops/"):
+        if not (href.startswith("https://github.com/simaba/") or href=="https://simaba.github.io/lean-ai-ops/" or href=="https://airc.nist.gov/home"):
             raise ValueError("Unexpected project link destination")
         links.append('<a href="'+esc(href)+'" target="_blank" rel="noopener noreferrer">'+esc(label)+' ↗</a>')
     lab_info={
@@ -64,7 +64,28 @@ def render_study(page, study, p):
             "This bounded exercise checks decision semantics, not YAML syntax, evidence authenticity, industry requirements or the full Python validation contract."),
         "agent-eval":("EVALUATION VALIDITY","Test a report's decision coherence",
             "Change the recommendation, approval status, finding severity and accepted actions from a fictional agent-evaluation record.",
-            "This reproduces the validator's cross-field decision checks, not the complete JSON Schema or an evaluation of a deployed agent.")
+            "This reproduces the validator's cross-field decision checks, not the complete JSON Schema or an evaluation of a deployed agent."),
+        "governance-playbook":("GOVERNANCE SERVICE","Route the decision, not the committee",
+            "Choose an AI lifecycle decision, intended authority, accountable owner and evidence readiness; inspect the proposed review service and missing inputs.",
+            "An illustrative routing exercise from the playbook, not a prescribed enterprise control, policy engine or authorizing decision."),
+        "agent-simulator":("DETERMINISTIC CONTROL FLOW","A decision trace, step by step",
+            "Step through the four published fixture scenarios and see where evidence supports acceptance, bounded retries, fallback or human escalation.",
+            "An interactive port of deterministic scenario logic, not live agent orchestration, empirical model evaluation or measured correctness."),
+        "multi-agent-governance":("AUTHORITY ENVELOPE","Find the boundary before the tool call",
+            "Choose a proposed action, data reach and proof controls within the fictional catalog-drafter envelope.",
+            "No real agent/tool action is performed; enforcement must reside in authenticated tool, identity and data layers."),
+        "ai-prism":("SOURCE EXPLORER","Explore the curated source index",
+            "Search and filter representative public references by source, topic and publisher with explicit primary/secondary distinctions.",
+            "A snapshot of repository-curated links, not automated freshness verification, legal interpretation or live source evaluation."),
+        "prompt-harness-translator":("FORMAT CONVERSION","See what the target cannot carry",
+            "Change the published synthetic sample's fields and render bounded Codex, Cursor or generic outputs with visible metadata-loss warnings.",
+            "A constrained fixture editor, not the full YAML parser, full CLI or a claim of cross-harness behavioral equivalence."),
+        "mcp-agent-risk-checklist":("STRUCTURED SECURITY REVIEW","Inspect a risk finding, not a trust label",
+            "Edit one fictional MCP finding, check selected JSON-schema constraints and inspect likelihood-impact ordering without hiding owner or mitigation.",
+            "Does not scan MCP servers, enforce actual permissions or infer risk severity from ordinal multiplication."),
+        "nist-rmf-guide":("EVIDENCE WORKSHEET","Map evidence without inventing a maturity score",
+            "Assign evidence states to Govern/Map/Measure/Manage propositions and record provenance or limitations in an exportable worksheet.",
+            "Unofficial practitioner question extract. Reference applicability, control effectiveness and compliance remain unassessed.")
     }
     mode,lab_title,lab_description,lab_boundary=lab_info[p["repo"]]
     live=(' <a class="lab-live-link" href="https://simaba.github.io/lean-ai-ops/" target="_blank" rel="noopener noreferrer">Explore the separate interactive DMAIC walkthrough ↗</a>' if p["repo"]=="lean-ai-ops" else "")

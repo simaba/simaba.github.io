@@ -36,6 +36,7 @@ jobs:
           python3 -m unittest discover -s tests -v
           node --check assets/app.js
           node --check assets/project-labs.js
+          node --check assets/extended-labs.js
           test -s dist/index.html
           test -f dist/.nojekyll
       - name: Install pinned browser tooling
