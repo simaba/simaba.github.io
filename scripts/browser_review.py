@@ -125,6 +125,13 @@ with sync_playwright() as playwright:
                         detail.locator("#lab-affected").check()
                         detail.locator("#lab-stop").check()
                         assert detail.locator("#lab-verdict").inner_text()=="REVIEW ROUTE PROPOSED"
+                        detail.locator("#lab-stop").uncheck()
+                        with detail.expect_download() as captured:
+                            detail.locator("#lab-download").click()
+                        intake=json.loads(captured.value.path().read_text(encoding="utf-8"))
+                        assert intake["readiness"]=="incomplete"
+                        assert intake["missing_inputs"] and intake["status"]=="draft_no_authorization"
+                        detail.locator("#lab-stop").check()
                     elif slug=="agent-simulator":
                         detail.locator("#lab-scenario").select_option("retry_then_success")
                         detail.locator("#lab-run").click()
@@ -155,6 +162,10 @@ with sync_playwright() as playwright:
                         assert "source_metadata" in detail.locator("#lab-preview").inner_text()
                         detail.locator("#lab-target").select_option("generic")
                         assert detail.locator("#lab-loss").inner_text()=="NONE"
+                        detail.locator("#lab-tools").fill(" , ")
+                        assert detail.locator("#lab-download").is_disabled()
+                        detail.locator("#lab-tools").fill("Read, Write")
+                        assert detail.locator("#lab-download").is_enabled()
                     elif slug=="mcp-agent-risk-checklist":
                         assert detail.locator("#lab-verdict").inner_text()=="FICTIONAL REVIEW STRUCTURED"
                         detail.locator("#lab-likelihood").fill("7")

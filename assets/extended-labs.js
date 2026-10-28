@@ -88,7 +88,7 @@ area("lab-instructions","Instructions",initial.instructions,5)+
 '<div class="lab-actions">'+button("lab-reset","Restore sample")+button("lab-download","Download target")+'</div>'+note,
 '<div class="lab-metrics">'+metric("lab-loss","METADATA MAPPING")+metric("lab-target-name","TARGET")+'</div><pre class="lab-preview"><code id="lab-preview"></code></pre>');
 const yaml=s=>JSON.stringify(s);
-let output="";
+let output="",valid=false;
 function evaluate(){
 const name=v("lab-name").trim(),description=v("lab-description").trim(),instructions=v("lab-instructions").trim(),tools=v("lab-tools").split(",").map(x=>x.trim()).filter(Boolean),model=v("lab-model").trim(),target=v("lab-target");
 const errors=[];
@@ -105,13 +105,15 @@ output="# "+name+"\n\n"+warn+description+"\n\n## Instructions\n\n"+instructions+
 }else if(target==="cursor"){
 output="name: "+yaml(name)+"\nrule: "+yaml(instructions)+"\n"+(extra?"conversion_warning: "+yaml("Lossy conversion: review source_metadata before use; preserved, not enforced.")+"\nsource_metadata:\n"+extra.split("\n").map(x=>"  "+x).join("\n")+"\n":"");
 }else output=Object.entries({...sourceMeta,instructions}).map(([key,value])=>key+": "+(Array.isArray(value)?"["+value.map(yaml).join(", ")+"]":yaml(value))).join("\n")+"\n";
-set("lab-preview",errors.length?"Correct the input to produce an artifact.":output);
+valid=errors.length===0;
+$("lab-download").disabled=!valid;
+set("lab-preview",valid?output:"Correct the input to produce an artifact.");
 set("lab-loss",preserved.length?preserved.join(", "):"NONE");set("lab-target-name",target.toUpperCase());
 findings(errors.length?"fail":"pass",errors.length?"SOURCE INPUT INCOMPLETE":preserved.length?"CONVERSION WITH REVIEW WARNINGS":"TARGET REPRESENTATION READY",errors.length?errors:preserved.length?["Preserved fields are not silently treated as native target configuration: "+preserved.join(", ")+".","Translation does not establish behavioral or permission equivalence."]:["All source fields are present in the bounded generic representation."]);
 }
 root.addEventListener("input",evaluate);root.addEventListener("change",evaluate);
 $("lab-reset").addEventListener("click",()=>{for(const [key,value] of Object.entries(initial))$("lab-"+key).value=value;$("lab-target").value="codex";evaluate();});
-$("lab-download").addEventListener("click",()=>{if(!v("lab-name").trim()||!v("lab-instructions").trim())return;const blob=new Blob([output],{type:"text/plain"}),url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download="translated-"+v("lab-target")+(v("lab-target")==="codex"?".md":".yaml");a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);set("lab-export-status","Prepared locally for inspection.");});
+$("lab-download").addEventListener("click",()=>{if(!valid)return;const blob=new Blob([output],{type:"text/plain"}),url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download="translated-"+v("lab-target")+(v("lab-target")==="codex"?".md":".yaml");a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);set("lab-export-status","Prepared locally for inspection.");});
 $("lab-target").value="codex";evaluate();
 }
 const sources=[
@@ -286,9 +288,9 @@ const route=["external","irreversible"].includes(request.authority)||request.dec
 set("lab-route",route);set("lab-ready",gaps.length?"INCOMPLETE":"READY TO REVIEW");
 const record=["Decision: "+request.decision+" · Authority: "+request.authority+".","Illustrative route: "+route+".","Record accountable authority, evidence cutoff, conditions, dissent, useful-by date and expiry.","Verify actions and conditions; re-open after material change or incident."];
 findings(gaps.length?"fail":"pass",gaps.length?"COMPLETE THE INTAKE":"REVIEW ROUTE PROPOSED",gaps.length?[...gaps,"The selected path has not authorized any pilot or release."]:record);
-return request;}
+return {...request,proposed_review_route:route,missing_inputs:gaps,readiness:gaps.length?"incomplete":"ready_to_review"};}
 $("lab-reset").addEventListener("click",()=>{$("lab-decision").value="pilot";$("lab-exposure").value="read";$("lab-owner").value="Fictional Program Sponsor";$("lab-evidence").checked=true;$("lab-affected").checked=false;$("lab-stop").checked=false;evaluate();});
-$("lab-download").addEventListener("click",()=>exportJSON({...evaluate(),status:"draft; no actual authorization"},"fictional-governance-intake.json"));
+$("lab-download").addEventListener("click",()=>exportJSON({...evaluate(),status:"draft_no_authorization"},"fictional-governance-intake.json"));
 root.addEventListener("input",evaluate);root.addEventListener("change",evaluate);evaluate();
 }
 const labs={"agent-simulator":simulator,"prompt-harness-translator":translator,"ai-prism":prism,

@@ -82,3 +82,7 @@ html[data-theme="dark"] .lab-output h3[data-state="fail"]{color:#F29B8F}
 .lab-source{display:inline-flex;align-items:center;gap:7px;color:var(--accent);text-underline-offset:3px;text-decoration:underline;text-decoration-thickness:1px;letter-spacing:0;font:500 11px/1.5 var(--font-mono)}
 .lab-source code{font:inherit;color:var(--muted);background:var(--paper);padding:3px 5px}
 @media(max-width:590px){.lab-provenance{align-items:flex-start}.lab-source{flex-wrap:wrap;word-break:break-word}}
+
+/* Disabled validation-dependent actions must not resemble available controls. */
+.lab-action:disabled,.lab-action:disabled:hover{opacity:.42;cursor:not-allowed;color:var(--muted);background:var(--paper);border-color:var(--line)}
+.lab-eyebrow{font-size:11px}.lab-metrics small{font-size:11px;letter-spacing:.035em}.lab-privacy,.lab-small{font-size:12px}
