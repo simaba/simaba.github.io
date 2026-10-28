@@ -68,7 +68,7 @@ with sync_playwright() as playwright:
                 page.evaluate("window.scrollTo(0,0)")
                 page.screenshot(path=str(OUT/(label+"-dark.png")),full_page=True,animations="disabled")
                 page.screenshot(path=str(OUT/(label+"-dark-first-fold.png")),animations="disabled")
-            for slug in ("lean-ai-ops","everything-program-management","automotive-llm-eval-harness","release-checklist","agent-eval"):
+            for slug in ("lean-ai-ops","everything-program-management","automotive-llm-eval-harness","release-checklist","agent-eval","governance-playbook","agent-simulator","multi-agent-governance","ai-prism","prompt-harness-translator","mcp-agent-risk-checklist","nist-rmf-guide"):
                 detail=page.context.new_page()
                 detail.goto((ROOT/"dist/projects"/slug/"index.html").as_uri(),wait_until="domcontentloaded")
                 accent=detail.evaluate("getComputedStyle(document.documentElement).getPropertyValue('--accent').trim().toUpperCase()")
@@ -79,6 +79,7 @@ with sync_playwright() as playwright:
                 assert detail.locator('link[href="../../assets/labs.css"]').count()==1
                 assert detail.locator('script[src="../../assets/project-labs.js"]').count()==1
                 assert detail.locator("#lab-verdict").is_visible(),f"{slug} workbench did not mount"
+                assert detail.locator('script[src="../../assets/extended-labs.js"]').count()==1
                 if width in (1440,390):
                     if slug=="lean-ai-ops":
                         assert detail.locator("#lab-verdict").inner_text()=="CAPABILITY ESTIMATES COMPUTED"
@@ -115,6 +116,55 @@ with sync_playwright() as playwright:
                         detail.locator("#lab-recommendation").select_option("do_not_release")
                         detail.locator("#lab-status").select_option("not_approved")
                         assert detail.locator("#lab-verdict").inner_text()=="REPORT SEMANTICS PASS"
+                    elif slug=="governance-playbook":
+                        assert detail.locator("#lab-verdict").inner_text()=="REVIEW ROUTE PROPOSED"
+                        detail.locator("#lab-exposure").select_option("irreversible")
+                        assert detail.locator("#lab-verdict").inner_text()=="COMPLETE THE INTAKE"
+                        detail.locator("#lab-affected").check()
+                        detail.locator("#lab-stop").check()
+                        assert detail.locator("#lab-verdict").inner_text()=="REVIEW ROUTE PROPOSED"
+                    elif slug=="agent-simulator":
+                        detail.locator("#lab-scenario").select_option("retry_then_success")
+                        detail.locator("#lab-run").click()
+                        assert detail.locator("#lab-outcome").inner_text()=="ACCEPT"
+                        assert "bounded retry" in detail.locator("#lab-trace").inner_text().lower()
+                        detail.locator("#lab-scenario").select_option("fallback_after_failure")
+                        detail.locator("#lab-run").click()
+                        assert detail.locator("#lab-outcome").inner_text()=="FALLBACK"
+                        detail.locator("#lab-scenario").select_option("escalate_after_failure")
+                        detail.locator("#lab-run").click()
+                        assert detail.locator("#lab-outcome").inner_text()=="ESCALATE"
+                    elif slug=="multi-agent-governance":
+                        assert detail.locator("#lab-verdict").inner_text()=="ILLUSTRATIVE PATH CONSISTENT"
+                        detail.locator("#lab-action").select_option("publish")
+                        assert detail.locator("#lab-verdict").inner_text()=="OUTSIDE DECLARED AUTHORITY"
+                        assert "prohibited" in detail.locator("#lab-findings").inner_text()
+                        detail.locator("#lab-reset").click()
+                    elif slug=="ai-prism":
+                        assert detail.locator("#lab-results").inner_text()=="16"
+                        detail.locator("#lab-query").fill("NIST")
+                        assert int(detail.locator("#lab-results").inner_text())>=1
+                        detail.locator("#lab-query").fill("zz-no-such-curated-source")
+                        assert detail.locator("#lab-results").inner_text()=="0"
+                        detail.locator("#lab-query").fill("")
+                    elif slug=="prompt-harness-translator":
+                        assert "Lossy conversion warning" in detail.locator("#lab-preview").inner_text()
+                        detail.locator("#lab-target").select_option("cursor")
+                        assert "source_metadata" in detail.locator("#lab-preview").inner_text()
+                        detail.locator("#lab-target").select_option("generic")
+                        assert detail.locator("#lab-loss").inner_text()=="NONE"
+                    elif slug=="mcp-agent-risk-checklist":
+                        assert detail.locator("#lab-verdict").inner_text()=="FICTIONAL FINDING STRUCTURED"
+                        detail.locator("#lab-likelihood").fill("7")
+                        assert detail.locator("#lab-verdict").inner_text()=="SCHEMA REVIEW REQUIRED"
+                        detail.locator("#lab-likelihood").fill("4")
+                        assert detail.locator("#lab-priority").inner_text()=="16"
+                    elif slug=="nist-rmf-guide":
+                        assert detail.locator("#lab-gaps").inner_text()=="8/8"
+                        detail.locator("#lab-state0").select_option("not_applicable")
+                        assert detail.locator("#lab-verdict").inner_text()=="EVIDENCE RECORD INCOMPLETE"
+                        detail.locator("#lab-evidence0").fill("Documented exclusion for the fictional scope")
+                        assert detail.locator("#lab-verdict").inner_text()=="DRAFT EVIDENCE MAP"
                 if width<=590:
                     open_menu=detail.get_by_role("button",name="Open navigation")
                     open_menu.click()
@@ -126,7 +176,13 @@ with sync_playwright() as playwright:
                 if label in ("desktop","mobile"):
                     # Capture the actual default experience, not whatever failure
                     # state was deliberately induced during the behavior test.
-                    detail.locator("#"+("lab-pilot" if slug=="release-checklist" else "lab-reset")).click()
+                    if slug=="release-checklist":
+                        detail.locator("#lab-pilot").click()
+                    elif slug=="ai-prism":
+                        detail.locator("#lab-query").fill("")
+                        detail.locator("#lab-topic").select_option("all")
+                    else:
+                        detail.locator("#lab-reset").click()
                     if detail.locator("html").get_attribute("data-theme")=="dark":
                         detail.locator("#theme-toggle").click()
                     detail.evaluate("window.scrollTo(0,0)")
