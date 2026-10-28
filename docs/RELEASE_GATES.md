@@ -40,7 +40,7 @@ No automatic CI can certify that design is beautiful, WCAG-conformant or free of
 
 ## Portfolio depth and proportional CI
 - Four featured projects cover operations, program management, automotive evaluation and AI release governance; the full public index remains twelve curated projects.
-- Five generated project pages state documented artifacts, examples and limitations. They are *project analyses*, not fabricated production case studies or claimed business results.
+- Twelve generated project pages explain documented artifacts, show source-specific browser exercises, and state limitations. Some reproduce bounded executable rules; others are clearly labeled method/curation exercises. None is a fabricated production case study, hosted Python engine, safety demonstration or claimed business result.
 - Homepage links to verified published essays; editorial copy stays human-maintained.
 - Removed the former daily schedule: refreshes occur only on trusted-main pushes or manual dispatch to avoid repeated browser installation and artifact storage for minor push dates.
 - Migrated the remaining older checkout and upload-artifact pins to immutable Node 24-compatible commits.
