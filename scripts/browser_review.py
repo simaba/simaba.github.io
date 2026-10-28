@@ -180,9 +180,9 @@ with sync_playwright() as playwright:
                         detail.locator("#lab-pilot").click()
                     elif slug=="ai-prism":
                         detail.locator("#lab-query").fill("")
+                        detail.locator("#lab-topic").select_option("all")
                     elif slug=="agent-simulator":
                         detail.locator("#lab-scenario").select_option("normal_success")
-                        detail.locator("#lab-topic").select_option("all")
                     else:
                         detail.locator("#lab-reset").click()
                     if detail.locator("html").get_attribute("data-theme")=="dark":
