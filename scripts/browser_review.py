@@ -158,6 +158,31 @@ with sync_playwright() as playwright:
                         detail.locator("#lab-hold").click()
                         assert detail.locator("#lab-valid").inner_text()=="COHERENT"
                         assert detail.locator("#lab-supported").inner_text()=="NO"
+                        detail.locator("#lab-pilot").click()
+                        detail.locator("#lab-g0").select_option("not_applicable")
+                        detail.locator("#lab-limitation0").fill("")
+                        assert detail.locator("#lab-export").is_disabled()
+                        assert "not applicable" in detail.locator("#lab-findings").inner_text()
+                        detail.locator("#lab-limitation0").fill("The fictional pilot excludes this test by approved, scoped rationale.")
+                        detail.locator("#lab-g0").select_option("pass")
+                        assert detail.locator("#lab-export").is_enabled()
+                        with detail.expect_download() as release_export:
+                            detail.locator("#lab-export").click()
+                        exported=json.loads(release_export.value.path().read_text(encoding="utf-8"))
+                        assert set(exported)=={"metadata","decision","gates"}
+                        assert len(exported["gates"])==4
+                        assert exported["gates"][0]["evidence"]
+                        if label=="desktop":
+                            from release_reference_check import check_release
+                            check_release(release_export.value.path(),expected_supported=True)
+                            check_release(release_export.value.path(),strict=True,expected_supported=False)
+                        detail.locator("#lab-hold").click()
+                        with detail.expect_download() as held_export:
+                            detail.locator("#lab-export").click()
+                        if label=="desktop":
+                            from release_reference_check import check_release
+                            check_release(held_export.value.path(),expected_supported=False)
+                        detail.locator("#lab-pilot").click()
                     elif slug=="agent-eval":
                         assert detail.locator("#lab-verdict").inner_text()=="REPORT SEMANTICS PASS"
                         detail.locator("#lab-severity").select_option("critical")

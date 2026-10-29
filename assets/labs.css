@@ -139,3 +139,11 @@ html[data-theme='dark']{--accent-text:#A5B0FF}
 .lab-option-comparison p{font:400 13px/1.65 var(--font-sans);color:var(--ink-soft);margin:7px 0 0}
 .lab-document-preview{min-width:0}
 .lab-document-preview .lab-preview{max-height:340px}
+
+/* Release decision evidence, each gate retaining question, status, source and limitation. */
+.lab-gate-editor{padding:17px 0;border-top:1px solid var(--line)}
+.lab-gate-editor:first-of-type{border-top:0}
+.lab-gate-title{margin:0 0 16px;font:600 14px/1.55 var(--font-sans);color:var(--ink)}
+.lab-gate-title small{font:600 10px/1.4 var(--font-mono);padding:3px 7px;margin-left:5px;color:var(--muted);border:1px solid var(--line)}
+.lab-decision-record{min-width:0}
+.lab-decision-record .lab-preview{max-height:460px}

@@ -124,13 +124,14 @@
       "artifacts": [
         "Python CLI and validator package",
         "Fictional release-decision YAML examples and reporting formats",
-        "Automated tests of conditional release, blocker and hard-gate consistency"
+        "Structured fictional release-decision records with decision scope, owner, evidence references, gate statuses, conditions and residual risks"
       ],
       "example_label": "Inspect a fictional decision record",
       "example": "python -m pip install -e .\nrelease-checklist validate configs/medium-risk-example.yaml\nrelease-checklist report configs/high-risk-example.yaml --format markdown",
       "limits": [
         "A logically coherent release record does not prove that its evidence is authentic or sufficient.",
-        "The tool cannot establish legal applicability, certify safety, or authorize any real release."
+        "The tool cannot establish legal applicability, certify safety, or authorize any real release.",
+        "Exported JSON is valid YAML input for the source release-checklist validator. Internal coherence is not evidence authenticity, legal applicability or a safety determination."
       ],
       "links": [
         [

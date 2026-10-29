@@ -66,6 +66,17 @@ jobs:
             schemas/decision-memo-frontmatter.schema.json
           sparse-checkout-cone-mode: false
           persist-credentials: false
+      - name: Checkout pinned Release Validator source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7, Node 24
+        with:
+          repository: simaba/release-checklist
+          ref: b400063973acf011cae515fa985e83aa63a8ed29
+          path: .source-reference/release
+          sparse-checkout: |
+            src/airc/__init__.py
+            src/airc/validator.py
+          sparse-checkout-cone-mode: false
+          persist-credentials: false
       - name: Verify structured content, generated website, privacy and editorial design
         env:
           AUTOMOTIVE_REFERENCE_CORE: .source-reference/automotive/src/automotive_llm_eval_harness/core.py
@@ -89,6 +100,7 @@ jobs:
       - name: Browser behavior, responsive layout and screenshot evidence
         env:
           PMKIT_REFERENCE_ROOT: .source-reference/pmkit
+          RELEASE_REFERENCE_ROOT: .source-reference/release
         run: .venv/bin/python scripts/browser_review.py
       - name: Require review screenshots
         run: |

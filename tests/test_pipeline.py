@@ -169,6 +169,12 @@ class PortfolioChecks(unittest.TestCase):
         source=(ROOT/"assets/project-labs.js").read_text()
         self.assertIn("linked_decision_id",source)
         self.assertIn("lab-export-memo",source)
+    def test_release_record_editor_exposes_source_evidence_fields(self):
+        build()
+        text=(ROOT/"assets/project-labs.js").read_text()
+        self.assertIn('lab-evidence',text)
+        self.assertIn('lab-limitation',text)
+        self.assertIn('fictional-release-decision.json',text)
     def test_featured_areas_are_diverse(self):
         featured={p["repo"] for p in self.data["projects"] if p["featured"]}
         self.assertEqual(featured,{"lean-ai-ops","everything-program-management","automotive-llm-eval-harness","release-checklist"})
