@@ -234,14 +234,15 @@
       ],
       "artifacts": [
         "Python scenario controller and deterministic executor fixtures",
-        "Four published scenarios covering acceptance, retry, fallback and escalation",
-        "Decision trace, attempt counters and CLI output"
+        "Four published, executable scenario fixtures plus bounded hypothetical evidence experiments",
+        "Full decision log, retry and outcome counts, primary/fallback separation and downloadable report"
       ],
       "example_label": "Run a published scenario",
       "example": "python run_demo.py --scenario retry_then_success\npython run_demo.py --scenario fallback_after_failure",
       "limits": [
         "The interactive trace uses the published deterministic fixtures, not a live language model, external tools, or real execution.",
-        "Self-reported confidence is diagnostic metadata. The fixture cannot establish safe behavior in deployed agents."
+        "Self-reported confidence is diagnostic metadata. The fixture cannot establish safe behavior in deployed agents.",
+        "Experimental evidence overrides are hypothetical, clearly separated from the source fixtures; published latency and cost are metadata, not recomputed measurements."
       ],
       "links": [
         [

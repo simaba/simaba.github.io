@@ -156,14 +156,30 @@ with sync_playwright() as playwright:
                     elif slug=="agent-simulator":
                         detail.locator("#lab-scenario").select_option("retry_then_success")
                         detail.locator("#lab-run").click()
-                        assert detail.locator("#lab-outcome").inner_text()=="ACCEPT"
+                        assert detail.locator("#lab-outcome").inner_text()=="PRIMARY ACCEPT"
                         assert "bounded retry" in detail.locator("#lab-trace").inner_text().lower()
+                        assert detail.locator("#lab-retries").inner_text()=="1"
+                        with detail.expect_download() as captured:
+                            detail.locator("#lab-export").click()
+                        report=json.loads(captured.value.path().read_text(encoding="utf-8"))
+                        assert report["accepted"] is True and report["attempts"]==2
+                        assert report["mode"]=="published_fixture"
                         detail.locator("#lab-scenario").select_option("fallback_after_failure")
                         detail.locator("#lab-run").click()
-                        assert detail.locator("#lab-outcome").inner_text()=="FALLBACK"
+                        assert detail.locator("#lab-outcome").inner_text()=="VALIDATED FALLBACK"
+                        assert detail.locator("#lab-fallback-used").inner_text()=="YES"
                         detail.locator("#lab-scenario").select_option("escalate_after_failure")
                         detail.locator("#lab-run").click()
                         assert detail.locator("#lab-outcome").inner_text()=="ESCALATE"
+                        detail.locator("#lab-whatif").check()
+                        assert detail.locator("#lab-mode").inner_text().startswith("Hypothetical")
+                        detail.locator("#lab-scenario").select_option("fallback_after_failure")
+                        detail.locator("#lab-fallback1").uncheck()
+                        detail.locator("#lab-run").click()
+                        assert detail.locator("#lab-outcome").inner_text()=="ESCALATE"
+                        assert "Fallback failed" in detail.locator("#lab-trace").inner_text()
+                        detail.locator("#lab-reset").click()
+                        assert detail.locator("#lab-whatif").is_checked() is False
                     elif slug=="multi-agent-governance":
                         assert detail.locator("#lab-verdict").inner_text()=="ILLUSTRATIVE PATH CONSISTENT"
                         detail.locator("#lab-action").select_option("publish")
@@ -225,6 +241,7 @@ with sync_playwright() as playwright:
                         detail.locator("#lab-query").fill("")
                         detail.locator("#lab-topic").select_option("all")
                     elif slug=="agent-simulator":
+                        detail.locator("#lab-reset").click()
                         detail.locator("#lab-scenario").select_option("normal_success")
                     else:
                         detail.locator("#lab-reset").click()

@@ -40,14 +40,29 @@ jobs:
             src/automotive_llm_eval_harness/core.py
           sparse-checkout-cone-mode: false
           persist-credentials: false
+      - name: Checkout pinned Agent Simulator reference source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7, Node 24
+        with:
+          repository: simaba/agent-simulator
+          ref: 8fa1bce9994f33e428592555d35acff79663f602
+          path: .source-reference/agent
+          sparse-checkout: |
+            src/agents.py
+            src/controller.py
+            src/scenarios.py
+            src/evaluation.py
+          sparse-checkout-cone-mode: false
+          persist-credentials: false
       - name: Verify structured content, generated website, privacy and editorial design
         env:
           AUTOMOTIVE_REFERENCE_CORE: .source-reference/automotive/src/automotive_llm_eval_harness/core.py
+          AGENT_REFERENCE_SRC: .source-reference/agent/src
         run: |
           python3 scripts/verify.py
           python3 -m unittest discover -s tests -v
           node --check assets/app.js
           node --check assets/automotive-core.js
+          node --check assets/simulator-core.js
           node --check assets/project-labs.js
           node --check assets/extended-labs.js
           test -s dist/index.html

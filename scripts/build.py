@@ -73,7 +73,7 @@ def render_study(page, study, p, source):
             "Choose an AI lifecycle decision, intended authority, accountable owner and evidence readiness; inspect the proposed review service and missing inputs.",
             "An illustrative routing exercise from the playbook, not a prescribed enterprise control, policy engine or authorizing decision."),
         "agent-simulator":("DETERMINISTIC CONTROL FLOW","A decision trace, step by step",
-            "Step through the four published fixture scenarios and see where evidence supports acceptance, bounded retries, fallback or human escalation.",
+            "Step through real source-controlled scenarios, then vary the observable evidence in a separately marked experiment to inspect retry, fallback and escalation decisions.",
             "An interactive port of deterministic scenario logic, not live agent orchestration, empirical model evaluation or measured correctness."),
         "multi-agent-governance":("AUTHORITY ENVELOPE","Find the boundary before the tool call",
             "Choose a proposed action, data reach and proof controls within the fictional catalog-drafter envelope.",

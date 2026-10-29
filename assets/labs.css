@@ -113,3 +113,13 @@ html[data-theme='dark']{--accent-text:#A5B0FF}
 .lab-contribution-track{position:relative;height:7px;width:100%;background:var(--line);overflow:hidden}
 .lab-contribution-fill{display:block;height:100%;background:var(--accent);transition:width .1s ease-out}
 @media(prefers-reduced-motion:reduce){.lab-contribution-fill{transition:none}}
+
+/* Agent Simulator: explicit published-fixture vs hypothetical-experiment space. */
+.lab-simulator-attempt{border:1px solid var(--line);padding:16px;margin:12px 0;background:var(--bg)}
+.lab-simulator-attempt .lab-eyebrow{margin:0 0 13px}
+#lab-simulator-experiment{margin:18px 0 26px;padding:16px;border-left:3px solid var(--accent);background:var(--bg)}
+#lab-simulator-experiment>.lab-context{margin-bottom:20px}
+#lab-simulator-experiment[hidden],#lab-fallback-panel[hidden]{display:none!important}
+#lab-simulator-experiment .lab-check{min-height:26px}
+#lab-mode{padding-left:12px;border-left:2px solid var(--accent-text);margin:5px 0}
+@media(max-width:590px){#lab-simulator-experiment{padding:10px}.lab-simulator-attempt{padding:10px}}

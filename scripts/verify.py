@@ -120,6 +120,7 @@ def verify():
         assert "../../assets/styles.css" in content and "../../assets/detail.js" in content
         assert "../../assets/labs.css" in content and "../../assets/project-labs.js" in content
         assert "../../assets/extended-labs.js" in content
+        assert "../../assets/simulator-core.js" in content
         assert 'data-project-lab="'+s["repo"]+'"' in content
         source=sources["references"][s["repo"]]
         assert ('/blob/'+source["commit"]+'/'+source["reference_path"]) in content
@@ -129,6 +130,7 @@ def verify():
     assert (ROOT/"dist/assets/detail.js").is_file()
     assert (ROOT/"dist/assets/project-labs.js").is_file()
     assert (ROOT/"dist/assets/extended-labs.js").is_file()
+    assert (ROOT/"dist/assets/simulator-core.js").is_file()
     assert (ROOT/"dist/assets/labs.css").is_file()
     assert "BUILT WITH INTENTION" not in HTML
     assert "Each project addresses a different part" not in HTML
