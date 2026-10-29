@@ -224,45 +224,126 @@
     showSelected();
   }
     function release(){
-    const gates=[["SCOPE-001","Declared scope",true],["AUTH-001","Tool authorization",true],["EVAL-001","Evaluation coverage",false],["OPS-001","Stop and recovery procedure",true]];
-    let controls=select("lab-outcome","Declared decision",[["release","Release"],["release_with_conditions","Release with conditions"],["hold","Hold"],["do_not_release","Do not release"],["defer","Defer"]])+
-      '<fieldset class="lab-fieldset"><legend>Gate evidence status</legend>'+gates.map((g,i)=>select("lab-g"+i,g[0]+" · "+g[1]+(g[2]?" / HARD":" / SUPPORTING"),[["pass","Pass — cited"],["fail","Fail"],["partial","Partial"],["not_tested","Not tested"]])).join("")+'</fieldset>'+
-      '<fieldset class="lab-fieldset"><legend>Decision record</legend>'+
+    const gates=[
+      {id:"SCOPE-001",question:"Is pilot scope explicit and versioned?",hard_gate:true,owner:"Fictional Product Owner",ref:"evidence/fictional-pilot-scope-v4.md",limitation:"Staging only."},
+      {id:"AUTH-001",question:"Are write, publish and external message permissions unavailable?",hard_gate:true,owner:"Fictional Platform Owner",ref:"evidence/fictional-permission-test.json",limitation:"Manual source-system changes excluded."},
+      {id:"EVAL-001",question:"Does evaluation cover the bounded population?",hard_gate:false,owner:"Fictional Evaluation Owner",ref:"evidence/fictional-evaluation-report.md",limitation:"Rare-record coverage remains limited."},
+      {id:"OPS-001",question:"Can this pilot be stopped and recovered?",hard_gate:true,owner:"Fictional Operations Owner",ref:"evidence/fictional-stop-exercise.md",limitation:"Staging pilot configuration only."}
+    ];
+    const controls=
+      '<p class="lab-eyebrow">EVIDENCE / DECISION INPUT</p>'+
+      field("lab-project","Fictional project","Northstar Catalog Drafting Pilot")+
+      field("lab-scope","Decision scope","40 trained internal staff; public catalog records and read/draft tools only")+
+      field("lab-owner","Decision owner","Fictional Pilot Sponsor")+
+      field("lab-rationale","Decision rationale","Fictional evidence supports a small bounded pilot; rare-record coverage remains limited.")+
+      select("lab-outcome","Declared decision",[["release","Release"],["release_with_conditions","Release with conditions"],["hold","Hold"],["do_not_release","Do not release"],["defer","Defer"]])+
+      '<fieldset class="lab-fieldset"><legend>Source-defined gates and evidence</legend>'+
+      gates.map((g,i)=>
+        '<div class="lab-gate-editor"><p class="lab-gate-title">'+g.id+' · '+g.question+
+        ' <small>'+(g.hard_gate?"HARD":"SUPPORTING")+'</small></p>'+
+        select("lab-g"+i,"Gate result",[["pass","Pass"],["not_applicable","Not applicable"],["fail","Fail"],["partial","Partial"],["not_tested","Not tested"]])+
+        field("lab-evidence"+i,"Evidence reference (fictional)",g.ref)+
+        field("lab-limitation"+i,"Scope limitation or not-applicable rationale",g.limitation)+
+        '</div>').join("")+'</fieldset>'+
+      '<fieldset class="lab-fieldset"><legend>Decision-record elements</legend>'+
       tick("lab-blocker","Unresolved decision blocker",false)+
       tick("lab-condition","Bounded release condition",true)+
       tick("lab-action-needed","Accepted required action",true)+
       tick("lab-gap","Evidence gap disclosed",true)+
-      tick("lab-strict","Strict mode: supporting gates also block",false)+'</fieldset>'+
-      '<div class="lab-actions">'+action("Load conditional pilot","lab-pilot")+action("Load hold example","lab-hold")+'</div>';
-    shell("Explore the repository’s decision contract using fictional evidence and declared gates. Validity of the record and permission to release are intentionally separate.",controls,
-      '<div class="lab-metrics"><div><small>RECORD</small><strong id="lab-valid">—</strong></div><div><small>RELEASE SUPPORTED</small><strong id="lab-supported">—</strong></div></div>');
+      tick("lab-strict","Strict mode: supporting gates must pass too",false)+'</fieldset>'+
+      '<div class="lab-actions">'+action("Load conditional pilot","lab-pilot")+
+      action("Load coherent hold","lab-hold")+
+      action("Export decision record · JSON","lab-export")+'</div>'+
+      '<p class="lab-small" id="lab-export-message" role="status"></p>';
+    shell("Examine a fictional release-decision record with identity, owner, scope, evidence cutoff, actual gate questions, evidence references, conditions and residual risks. Structural coherence and permission to release are separate outcomes.",controls,
+      '<div class="lab-metrics lab-four"><div><small>RECORD</small><strong id="lab-valid">—</strong></div>'+
+      '<div><small>DECLARED RELEASE</small><strong id="lab-supported">—</strong></div>'+
+      '<div><small>GATES IN SCOPE</small><strong id="lab-total-gates">—</strong></div>'+
+      '<div><small>UNRESOLVED</small><strong id="lab-unresolved">—</strong></div></div>'+
+      '<div class="lab-decision-record"><p class="lab-eyebrow">SOURCE-CONTRACT RECORD / STRUCTURAL PREVIEW</p>'+
+      '<pre class="lab-preview"><code id="lab-record-preview"></code></pre></div>');
+    function textItems(flag,entry){return flag?[entry]:[];}
+    function input(){
+      const outcome=val("lab-outcome"),strict=bool("lab-strict");
+      return {
+        metadata:{
+          project:val("lab-project"),version:"0.4.0-pilot",environment:"staging",
+          risk_classification:"medium",domain_context:"library-operations",
+          decision_scope:val("lab-scope"),decision_owner:val("lab-owner"),
+          evidence_cutoff:"2026-10-15"
+        },
+        decision:{
+          outcome,rationale:val("lab-rationale"),
+          blockers:textItems(bool("lab-blocker"),"Unresolved authorization boundary must be addressed."),
+          required_actions:textItems(bool("lab-action-needed"),"Complete a stratified rare-record review before expansion."),
+          conditions:textItems(bool("lab-condition"),"Read/draft-only tools; trained users; time-limited pilot; stop on restricted-record retrieval."),
+          evidence_gaps:textItems(bool("lab-gap"),"Rare-record cases are underrepresented in current synthetic evaluations."),
+          residual_risks:["Staff may over-trust fluent drafts despite visible citations."]
+        },
+        gates:gates.map((g,i)=>({
+          id:g.id,question:g.question,hard_gate:g.hard_gate,status:val("lab-g"+i),
+          evidence:val("lab-evidence"+i).trim()?[val("lab-evidence"+i).trim()]:[],
+          owner:g.owner,limitation:val("lab-limitation"+i).trim()
+        })),strict
+      };
+    }
+    const gatePassed=g=>g.status==="pass"||g.status==="not_applicable";
     function evaluate(){
-      const outcome=val("lab-outcome"),blocker=bool("lab-blocker"),condition=bool("lab-condition"),action=bool("lab-action-needed"),gap=bool("lab-gap"),strict=bool("lab-strict");
-      const unresolved=gates.filter((g,i)=>(g[2]||strict)&&val("lab-g"+i)!=="pass").map((g,i)=>g[0]);
-      const errors=[];
-      if(outcome==="release"&&(condition||action))errors.push("An unconditional release cannot include conditions or required actions.");
-      if(outcome==="release_with_conditions"&&!condition&&!action)errors.push("Conditional release must specify a condition or required action.");
-      if(outcome==="defer"&&!gap)errors.push("A deferred decision must identify an evidence gap.");
-      if(outcome==="do_not_release"&&!blocker&&!gates.some((g,i)=>g[2]&&val("lab-g"+i)!=="pass"))errors.push("Do-not-release requires a blocker or unresolved hard gate.");
-      const valid=!errors.length,allow=valid&&["release","release_with_conditions"].includes(outcome)&&!blocker&&!unresolved.length;
-      note("lab-valid",valid?"COHERENT":"INCONSISTENT");note("lab-supported",allow?"YES":"NO");
-      const findings=errors.slice();
-      if(unresolved.length)findings.push("Unresolved "+(strict?"declared":"hard")+" gates: "+unresolved.join(", ")+".");
-      if(blocker)findings.push("A declared blocker prevents release.");
-      if(!findings.length&&allow)findings.push("Declared release is internally supported by this bounded record; the source evidence has not been authenticated.");
-      if(!findings.length&&!allow)findings.push("This record is coherent, but the chosen outcome does not authorize release.");
-      report(valid?(allow?"DECLARED RELEASE SUPPORTED":"DECISION RECORD COHERENT"):"INVALID DECISION RECORD",errors,findings);
-      if(errors.length)list("lab-findings",findings);
+      const p=input(),outcome=p.decision.outcome,errs=[];
+      for(const [key,value] of Object.entries(p.metadata)){
+        if(typeof value!=="string"||!value.trim())errs.push("metadata."+key+" cannot be empty.");
+      }
+      if(!p.decision.rationale.trim())errs.push("Decision rationale must be recorded.");
+      for(const g of p.gates){
+        if(["pass","not_applicable"].includes(g.status)&&!g.evidence.length)
+          errs.push(g.id+": pass/not applicable requires a named evidence reference.");
+        if(g.status==="not_applicable"&&!g.limitation)
+          errs.push(g.id+": not applicable requires a scoped rationale.");
+      }
+      if(outcome==="release"&&(p.decision.conditions.length||p.decision.required_actions.length))
+        errs.push("Unconditional release cannot contain conditions or required actions.");
+      if(outcome==="release_with_conditions"&&!p.decision.conditions.length&&!p.decision.required_actions.length)
+        errs.push("Conditional release requires at least one condition or required action.");
+      if(outcome==="defer"&&!p.decision.evidence_gaps.length)
+        errs.push("Defer requires an identified evidence gap.");
+      const unresolvedHard=p.gates.filter(g=>g.hard_gate&&!gatePassed(g));
+      if(outcome==="do_not_release"&&!p.decision.blockers.length&&!unresolvedHard.length)
+        errs.push("Do-not-release needs an explicit blocker or unresolved hard gate.");
+      const scoped=p.gates.filter(g=>g.hard_gate||p.strict),unresolved=scoped.filter(g=>!gatePassed(g));
+      const supported=errs.length===0&&["release","release_with_conditions"].includes(outcome)&&
+        !p.decision.blockers.length&&!unresolved.length;
+      note("lab-valid",errs.length?"INCOHERENT":"COHERENT");
+      note("lab-supported",supported?"YES":"NO");
+      note("lab-total-gates",scoped.length);
+      note("lab-unresolved",unresolved.length);
+      q("lab-export").disabled=!!errs.length;
+      // Strict is a CLI execution flag, not a source-file configuration field.
+      const {strict,...record}=p;
+      note("lab-record-preview",JSON.stringify(record,null,2));
+      const notes=[...errs];
+      if(unresolved.length)notes.push("Unresolved "+(p.strict?"declared":"hard")+" gates: "+unresolved.map(g=>g.id).join(", ")+".");
+      if(p.decision.blockers.length)notes.push("Declared blocker prevents release.");
+      if(!notes.length)notes.push(supported?"Bounded release is internally supported; evidence authenticity and appropriateness are not established.":"The record is coherent but does not authorize a release.");
+      report(errs.length?"INVALID DECISION RECORD":supported?"DECLARED RELEASE SUPPORTED":"DECISION RECORD COHERENT",errs,notes);
+      if(errs.length)list("lab-findings",notes);
+      return {record,valid:!errs.length,strict:p.strict,supported};
     }
     function pilot(){
       q("lab-outcome").value="release_with_conditions";
-      ["pass","pass","partial","pass"].forEach((s,i)=>q("lab-g"+i).value=s);
-      for(const [id,flag] of [["lab-blocker",false],["lab-condition",true],["lab-action-needed",true],["lab-gap",true],["lab-strict",false]])q(id).checked=flag;
+      ["pass","pass","partial","pass"].forEach((x,i)=>q("lab-g"+i).value=x);
+      for(const [id,b] of [["lab-blocker",false],["lab-condition",true],["lab-action-needed",true],["lab-gap",true],["lab-strict",false]])q(id).checked=b;
       evaluate();
     }
     q("lab-pilot").addEventListener("click",pilot);
-    q("lab-hold").addEventListener("click",()=>{pilot();q("lab-outcome").value="hold";q("lab-g1").value="fail";q("lab-g3").value="not_tested";q("lab-blocker").checked=true;evaluate();});
-    root.addEventListener("change",evaluate);
+    q("lab-hold").addEventListener("click",()=>{
+      pilot();q("lab-outcome").value="hold";q("lab-g1").value="fail";q("lab-g3").value="not_tested";q("lab-blocker").checked=true;
+      evaluate();
+    });
+    q("lab-export").addEventListener("click",()=>{
+      const x=evaluate();if(!x.valid)return;
+      exportJSON(x.record,"fictional-release-decision.json");
+    });
+    root.addEventListener("input",evaluate);root.addEventListener("change",evaluate);
     pilot();
   }
   function program(){
