@@ -105,6 +105,9 @@ with sync_playwright() as playwright:
                         assert detail.locator("#lab-verdict").inner_text()=="CASE BLOCKED"
                         assert "safety_behavior" in detail.locator("#lab-findings").inner_text()
                         assert detail.locator("#lab-blocked").inner_text()=="1"
+                        assert detail.locator('.lab-contribution-track[role="meter"]').count()==6
+                        contribution_sum=sum(float(node.inner_text()) for node in detail.locator(".lab-contribution-header code").all())
+                        assert abs(contribution_sum-float(detail.locator("#lab-weighted").inner_text()))<=0.0001
                         with detail.expect_download() as scored:
                             detail.locator("#lab-export").click()
                         summary=json.loads(scored.value.path().read_text(encoding="utf-8"))

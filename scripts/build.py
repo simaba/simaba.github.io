@@ -61,7 +61,7 @@ def render_study(page, study, p, source):
             "Edit the fictional risk owner, probability, impact, score and lifecycle. The checks follow the repository's published RAID schema and risk-score semantics for this record type.",
             "This workbench checks a single risk-row subset, not every RAID/decision-memo schema or the full pmkit CLI."),
         "automotive-llm-eval-harness":("SCORING PROTOTYPE","When a high score still fails",
-            "Change the values of three real synthetic case artifacts from the repository and watch the weighted score and non-compensable safety/privacy gates recompute.",
+            "Inspect or import prescored cases, change their dimensions, and examine each weighted contribution, risk-tiered hard gate, and whole-dataset result.",
             "Scores are supplied inputs, not measured model responses. Thresholds are illustrative and are not safety or release criteria."),
         "release-checklist":("DECISION SEMANTICS","Can the declared decision stand?",
             "Change a fictional pilot's gates, conditions, blockers and declared release outcome to explore the release-validator's real decision rules.",

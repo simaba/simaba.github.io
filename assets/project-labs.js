@@ -81,6 +81,8 @@
       '<div class="lab-metrics"><div><small>SELECTED CASE SCORE</small><strong id="lab-weighted">—</strong></div>'+
       '<div><small>QUALITY THRESHOLD</small><strong id="lab-threshold">—</strong></div></div>'+
       '<div class="lab-gate-grid"><span id="lab-safety"></span><span id="lab-privacy-gate"></span></div>'+
+      '<div class="lab-contributions"><p class="lab-eyebrow">WEIGHTED SCORE COMPOSITION / COMMON 0–0.30 SCALE</p>'+
+      '<div id="lab-contribution-rows" aria-label="Contributions to the selected case score"></div></div>'+
       '<div class="lab-dataset"><p class="lab-eyebrow">DATASET RESULTS / SELECT TO INSPECT</p>'+
       '<div id="lab-ledger" class="lab-ledger" aria-label="Individual case evaluation results"></div></div>');
     const riskGates=engine.HARD_GATE_MINIMUMS;
@@ -116,6 +118,25 @@
         ledger.append(item);
       });
     }
+    function renderContributions(caseData){
+      const dest=q("lab-contribution-rows");dest.replaceChildren();
+      for(const [name,weight] of Object.entries(engine.WEIGHTS)){
+        const contribution=caseData.scores[name]*weight;
+        const row=document.createElement("div");row.className="lab-contribution-row";
+        const head=document.createElement("div");head.className="lab-contribution-header";
+        const label=document.createElement("span");label.textContent=name.replaceAll("_"," ")+" · "+Math.round(weight*100)+"% weight";
+        const value=document.createElement("code");value.textContent=contribution.toFixed(4);
+        head.append(label,value);
+        const track=document.createElement("div");track.className="lab-contribution-track";
+        track.setAttribute("role","meter");track.setAttribute("aria-valuemin","0");
+        track.setAttribute("aria-valuemax","0.3");
+        track.setAttribute("aria-valuenow",String(contribution));
+        track.setAttribute("aria-label",name.replaceAll("_"," ")+" weighted contribution");
+        const bar=document.createElement("span");bar.className="lab-contribution-fill";
+        bar.style.width=(contribution/.30*100)+"%";track.append(bar);
+        row.append(head,track);dest.append(row);
+      }
+    }
     function update(){
       try {
         saveSelected();
@@ -128,6 +149,7 @@
         note("lab-blocked",summary.blocked_count);
         note("lab-weighted",result.score.toFixed(4));
         note("lab-threshold",threshold.toFixed(2));
+        renderContributions(c);
         note("lab-safety","Safety ≥ "+gate.safety_behavior.toFixed(2)+": "+(c.scores.safety_behavior>=gate.safety_behavior?"PASS":"BLOCK"));
         note("lab-privacy-gate","Privacy ≥ "+gate.privacy_behavior.toFixed(2)+": "+(c.scores.privacy_behavior>=gate.privacy_behavior?"PASS":"BLOCK"));
         report(result.passed?"PROTOTYPE CHECKS PASS":"CASE BLOCKED",result.blockers,
