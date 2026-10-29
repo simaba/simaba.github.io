@@ -53,6 +53,19 @@ jobs:
             src/evaluation.py
           sparse-checkout-cone-mode: false
           persist-credentials: false
+      - name: Checkout pinned Program Management validators and schemas
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7, Node 24
+        with:
+          repository: simaba/everything-program-management
+          ref: aef7e66b87ab07f38e9410cbc831274cb959fb41
+          path: .source-reference/pmkit
+          sparse-checkout: |
+            src/pmkit/__init__.py
+            src/pmkit/validators.py
+            schemas/raid-row.schema.json
+            schemas/decision-memo-frontmatter.schema.json
+          sparse-checkout-cone-mode: false
+          persist-credentials: false
       - name: Verify structured content, generated website, privacy and editorial design
         env:
           AUTOMOTIVE_REFERENCE_CORE: .source-reference/automotive/src/automotive_llm_eval_harness/core.py
@@ -62,6 +75,7 @@ jobs:
           python3 -m unittest discover -s tests -v
           node --check assets/app.js
           node --check assets/automotive-core.js
+          node --check assets/pmkit-core.js
           node --check assets/simulator-core.js
           node --check assets/project-labs.js
           node --check assets/extended-labs.js
@@ -70,9 +84,11 @@ jobs:
       - name: Install pinned browser tooling
         run: |
           python3 -m venv .venv
-          .venv/bin/pip install playwright==1.57.0 pillow==12.0.0
+          .venv/bin/pip install playwright==1.57.0 pillow==12.0.0 PyYAML==6.0.2 jsonschema==4.25.1
           .venv/bin/python -m playwright install --with-deps chromium
       - name: Browser behavior, responsive layout and screenshot evidence
+        env:
+          PMKIT_REFERENCE_ROOT: .source-reference/pmkit
         run: .venv/bin/python scripts/browser_review.py
       - name: Require review screenshots
         run: |

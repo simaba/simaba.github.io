@@ -161,6 +161,14 @@ class PortfolioChecks(unittest.TestCase):
             page=(ROOT/"dist/projects"/slug/"index.html").read_text()
             self.assertIn("/blob/"+ref["commit"]+"/"+ref["reference_path"],page)
             self.assertIn("REVIEWED SOURCE SNAPSHOT",page)
+    def test_program_workflow_assets_and_source_contract(self):
+        build()
+        html=(ROOT/"dist/projects/everything-program-management/index.html").read_text()
+        self.assertIn('assets/pmkit-core.js',html)
+        self.assertIn('src="../../assets/project-labs.js"',html)
+        source=(ROOT/"assets/project-labs.js").read_text()
+        self.assertIn("linked_decision_id",source)
+        self.assertIn("lab-export-memo",source)
     def test_featured_areas_are_diverse(self):
         featured={p["repo"] for p in self.data["projects"] if p["featured"]}
         self.assertEqual(featured,{"lean-ai-ops","everything-program-management","automotive-llm-eval-harness","release-checklist"})

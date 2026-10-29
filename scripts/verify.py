@@ -130,6 +130,7 @@ def verify():
     assert (ROOT/"dist/assets/detail.js").is_file()
     assert (ROOT/"dist/assets/project-labs.js").is_file()
     assert (ROOT/"dist/assets/extended-labs.js").is_file()
+    assert (ROOT/"dist/assets/pmkit-core.js").is_file()
     assert (ROOT/"dist/assets/simulator-core.js").is_file()
     assert (ROOT/"dist/assets/labs.css").is_file()
     assert "BUILT WITH INTENTION" not in HTML

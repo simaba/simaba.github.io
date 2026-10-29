@@ -50,13 +50,14 @@
       "artifacts": [
         "Authored skills and templates for different program decisions",
         "Connected, clearly fictional examples illustrating handoffs",
-        "A packaged pmkit CLI validating JSON RAID rows and decision-memo frontmatter"
+        "A packaged pmkit CLI validating RAID JSON and decision memo frontmatter, illustrated by this linked two-artifact browser workflow"
       ],
       "example_label": "Validate an example program artifact",
       "example": "python -m pip install -e .\npmkit validate raid examples/data/raid-row.json\npmkit validate decision-memo examples/data/decision-memo.md",
       "limits": [
         "Schemas check bounded structure and selected semantics, not whether a program manager's judgment or evidence is sound.",
-        "The examples are invented. This is not a program-management system of record or autonomous chief of staff."
+        "The examples are invented. This is not a program-management system of record or autonomous chief of staff.",
+        "This workbench exports linked fictional artifacts whose structure can be checked by the source CLI. It does not manage a program of record, review live evidence, or select the preferred option."
       ],
       "links": [
         [

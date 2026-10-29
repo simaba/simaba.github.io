@@ -96,6 +96,33 @@ with sync_playwright() as playwright:
                         assert "4 × 4 = 16" in detail.locator("#lab-findings").inner_text()
                         detail.locator("#lab-score").fill("16")
                         assert detail.locator("#lab-verdict").inner_text()=="RAID ROW CHECK PASSED"
+                        assert detail.locator("#lab-memo-valid").inner_text()=="VALID"
+                        assert detail.locator("#lab-link-valid").inner_text()=="BIDIRECTIONAL"
+                        detail.locator("#lab-memo-status").select_option("decided")
+                        assert detail.locator("#lab-verdict").inner_text()=="RAID ROW CHECK PASSED"
+                        with detail.expect_download() as risk_download:
+                            detail.locator("#lab-export").click()
+                        with detail.expect_download() as memo_download:
+                            detail.locator("#lab-export-memo").click()
+                        memo_text=memo_download.value.path().read_text(encoding="utf-8")
+                        risk_json=json.loads(risk_download.value.path().read_text(encoding="utf-8"))
+                        assert risk_json["linked_decision_id"]=="DM-0001"
+                        assert "linked_raid_ids: [\\"RAID-0001\\"]" in memo_text
+                        assert 'status: "decided"' in memo_text
+                        if label=="desktop":
+                            from pmkit_reference_check import check_exports
+                            check_exports(risk_download.value.path(),memo_download.value.path())
+                        detail.locator("#lab-memo-status").select_option("deferred")
+                        detail.locator("#lab-review-date").fill("")
+                        assert detail.locator("#lab-export-memo").is_disabled()
+                        assert "Deferred" in detail.locator("#lab-findings").inner_text()
+                        detail.locator("#lab-memo-status").select_option("in_review")
+                        detail.locator("#lab-review-date").fill("2026-05-10")
+                        detail.locator("#lab-status").select_option("closed")
+                        assert detail.locator("#lab-export").is_disabled()
+                        detail.locator("#lab-resolution").fill("Dependency resolved by the fictional supplier.")
+                        assert detail.locator("#lab-export").is_enabled()
+                        detail.locator("#lab-reset").click()
                     elif slug=="automotive-llm-eval-harness":
                         assert detail.locator("#lab-verdict").inner_text()=="PROTOTYPE CHECKS PASS"
                         assert detail.locator("#lab-count").inner_text()=="3"

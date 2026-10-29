@@ -130,3 +130,12 @@ html[data-theme='dark']{--accent-text:#A5B0FF}
 .lab-state-flow span[data-position='past']{border-color:var(--accent-secondary);color:var(--ink-soft)}
 .lab-state-flow span[data-position='current']{border-color:var(--accent);color:var(--ink)}
 @media(max-width:590px){.lab-state-flow span{font-size:9px;letter-spacing:0}}
+
+/* Related, independently validated program artifacts and option comparison. */
+.lab-stage-title{padding-top:23px;margin-top:30px;border-top:1px solid var(--line)}
+.lab-option-comparison{display:grid;gap:12px;border-top:1px solid var(--line);padding-top:22px}
+.lab-option-comparison>div{padding:17px;border:1px solid var(--line);background:var(--paper)}
+.lab-option-comparison strong{display:block;font:600 15px/1.4 var(--font-sans);color:var(--ink)}
+.lab-option-comparison p{font:400 13px/1.65 var(--font-sans);color:var(--ink-soft);margin:7px 0 0}
+.lab-document-preview{min-width:0}
+.lab-document-preview .lab-preview{max-height:340px}
