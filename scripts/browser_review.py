@@ -107,7 +107,7 @@ with sync_playwright() as playwright:
                         memo_text=memo_download.value.path().read_text(encoding="utf-8")
                         risk_json=json.loads(risk_download.value.path().read_text(encoding="utf-8"))
                         assert risk_json["linked_decision_id"]=="DM-0001"
-                        assert "linked_raid_ids: [\\"RAID-0001\\"]" in memo_text
+                        assert 'linked_raid_ids: ["RAID-0001"]' in memo_text
                         assert 'status: "decided"' in memo_text
                         if label=="desktop":
                             from pmkit_reference_check import check_exports
