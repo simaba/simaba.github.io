@@ -266,40 +266,134 @@
     pilot();
   }
   function program(){
-    const controls=field("lab-title","Risk title","External interface decision may delay the fictional pilot")+
-      field("lab-owner","Action owner","Fictional Delivery Lead")+
+    const engine=globalThis.PortfolioPMKit;
+    if(!engine)throw new Error("Program Management schema helper is unavailable");
+    const defaultValues={
+      "lab-title":"External interface decision may delay the fictional pilot",
+      "lab-owner":"Fictional Delivery Lead","lab-probability":"3","lab-impact":"4","lab-score":"12",
+      "lab-status":"mitigating","lab-resolution":"",
+      "lab-decider":"Fictional Program Sponsor","lab-memo-status":"in_review",
+      "lab-choice":"Option B","lab-decision-date":"2026-04-26",
+      "lab-review-date":"2026-05-10","lab-supersedes":"DM-0002",
+      "lab-rationale":"Option B keeps a bounded reversible evidence path open while external interface confirmation is pending. This fictional recommendation requires independent review."
+    };
+    const controls='<p class="lab-eyebrow">01 / UNCERTAINTY REGISTER</p>'+
+      field("lab-title","Risk title",defaultValues["lab-title"])+
+      field("lab-owner","Action owner",defaultValues["lab-owner"])+
       '<div class="lab-split">'+field("lab-probability","Probability (1–5)","3","number",'min="1" max="5" step="1"')+
       field("lab-impact","Impact (1–5)","4","number",'min="1" max="5" step="1"')+'</div>'+
       field("lab-score","Recorded ordinal score","12","number",'min="1" max="25" step="1"')+
       select("lab-status","Risk status",[["mitigating","Mitigating"],["open","Open"],["monitoring","Monitoring"],["blocked","Blocked"],["accepted","Accepted"],["closed","Closed"],["transferred","Transferred"]])+
-      field("lab-resolution","Closure / transfer resolution (when needed)","")+
-      '<div class="lab-actions">'+action("Restore fictional risk","lab-reset")+action("Export RAID row · JSON","lab-export")+'</div><p id="lab-export-message" class="lab-small" aria-live="polite"></p>';
-    shell("Edit a fictional risk from the repository’s RAID examples. This is a working, bounded risk-row check—enforcing the same selected schema fields and risk-score relation, not validating an entire program.",controls,
-      '<div class="lab-metrics"><div><small>CALCULATED RISK SCORE</small><strong id="lab-calculated">—</strong></div><div><small>RECORD VALIDITY</small><strong id="lab-valid">—</strong></div></div>');
-    function collect(){return {
-      id:"RAID-0001",type:"risk",title:val("lab-title"),description:"The fictional library pilot depends on an external interface decision that may delay the validation window.",
-      category:"schedule",owner:val("lab-owner"),opened:"2026-04-26",due:"2026-05-15",status:val("lab-status"),
-      last_updated:"2026-04-26",probability:num("lab-probability"),impact:num("lab-impact"),score:num("lab-score"),
-      mitigation:"Confirm external decision and define a reversible fallback.",trigger:"Dependency remains unresolved before review window.",...(val("lab-resolution").trim()?{resolution:val("lab-resolution").trim()}:{})
-    };}
-    function update(){
-      const p=collect(),expected=p.probability*p.impact,errors=[];
-      if(p.title.trim().length<5||p.title.length>120)errors.push("Title must be 5–120 characters.");
-      if(p.owner.trim().length<2||p.owner.length>120)errors.push("Owner must be 2–120 characters.");
-      for(const name of ["probability","impact"])if(!Number.isInteger(p[name])||p[name]<1||p[name]>5)errors.push(name+" must be an integer from 1 to 5.");
-      if(!Number.isInteger(p.score)||p.score<1||p.score>25)errors.push("Recorded score must be an integer from 1 to 25.");
-      if(Number.isFinite(expected)&&p.score!==expected)errors.push("Risk score is inconsistent: "+p.probability+" × "+p.impact+" = "+expected+", not "+p.score+".");
-      if(["closed","transferred"].includes(p.status)&&(!p.resolution||p.resolution.length<5))errors.push("Closed or transferred records require a resolution of at least 5 characters.");
-      if(p.resolution&&p.resolution.length>700)errors.push("Resolution is too long (700-character maximum).");
-      note("lab-calculated",Number.isFinite(expected)?String(expected):"—");
-      note("lab-valid",errors.length?"NEEDS WORK":"VALID");
-      report(errors.length?"REVIEW REQUIRED":"RAID ROW CHECK PASSED",errors,
-        ["Required risk fields and risk-score semantics are consistent.","The ordinal score is a prioritization aid, not expected-loss mathematics."]);
-      return {data:p,valid:!errors.length};
+      field("lab-resolution","Closure or transfer resolution, if applicable","")+
+      '<p class="lab-eyebrow lab-stage-title">02 / DECISION RECORD</p>'+
+      field("lab-decider","Decision owner",defaultValues["lab-decider"])+
+      select("lab-memo-status","Memo status",[["in_review","In review"],["draft","Draft"],["decided","Decided"],["deferred","Deferred"],["superseded","Superseded"]])+
+      select("lab-choice","Proposed option (recorded only if decided)",[["Option B","B · Bounded fallback"],["Option A","A · Wait for confirmation"]])+
+      field("lab-decision-date","Decision date","2026-04-26","date")+
+      field("lab-review-date","Review date","2026-05-10","date")+
+      field("lab-supersedes","Superseded memo ID, if applicable","DM-0002")+
+      '<label class="lab-field"><span>Reasoning or deferral explanation</span><textarea rows="4" id="lab-rationale">'+defaultValues["lab-rationale"]+'</textarea></label>'+
+      '<div class="lab-actions">'+action("Restore linked example","lab-reset")+
+      action("Export RAID · JSON","lab-export")+
+      action("Export memo · Markdown","lab-export-memo")+'</div>'+
+      '<p id="lab-export-message" class="lab-small" role="status"></p>';
+    shell("Review a linked fictional risk and decision memo. Both artifacts have source-defined lifecycle and identifier contracts. The tool checks structure and internal consistency; evidence sufficiency and decision authority remain with people.",controls,
+      '<div class="lab-metrics lab-four">'+
+      '<div><small>CALCULATED RISK SCORE</small><strong id="lab-calculated">—</strong></div>'+
+      '<div><small>RAID VALIDITY</small><strong id="lab-valid">—</strong></div>'+
+      '<div><small>MEMO VALIDITY</small><strong id="lab-memo-valid">—</strong></div>'+
+      '<div><small>LINK INTEGRITY</small><strong id="lab-link-valid">—</strong></div></div>'+
+      '<div class="lab-option-comparison"><p class="lab-eyebrow">ACTUAL ALTERNATIVES / FICTIONAL LIBRARY PILOT</p>'+
+      '<div><strong>Option A · Wait for confirmation</strong><p>Preserves the original interface scope while risking a compressed review window.</p></div>'+
+      '<div><strong>Option B · Bounded fallback</strong><p>Maintains a reversible test path but may require later scope adjustment.</p></div>'+
+      '<p class="lab-small">Neither is automatically correct. Restricted records and irreversible external state remain hard boundaries.</p></div>'+
+      '<div class="lab-document-preview"><p class="lab-eyebrow">DECISION FRONTMATTER / LIVE PREVIEW</p>'+
+      '<pre class="lab-preview"><code id="lab-memo-preview"></code></pre></div>');
+    function risk(){
+      const p={id:"RAID-0001",type:"risk",title:val("lab-title"),
+        description:"The fictional research-library pilot depends on an external interface decision not yet confirmed; a late decision may compress its validation window.",
+        category:"schedule",owner:val("lab-owner"),opened:"2026-04-26",due:"2026-05-15",
+        status:val("lab-status"),last_updated:"2026-04-26",probability:num("lab-probability"),
+        impact:num("lab-impact"),score:num("lab-score"),
+        mitigation:"Confirm the interface, retain a bounded fallback and review the open dependency.",
+        trigger:"The interface decision remains unresolved before the validation review window.",
+        linked_decision_id:"DM-0001",tags:["fictional","dependency","decision-support"]};
+      if(val("lab-resolution").trim())p.resolution=val("lab-resolution").trim();
+      return p;
     }
-    q("lab-reset").addEventListener("click",()=>{q("lab-title").value="External interface decision may delay the fictional pilot";q("lab-owner").value="Fictional Delivery Lead";q("lab-probability").value=3;q("lab-impact").value=4;q("lab-score").value=12;q("lab-status").value="mitigating";q("lab-resolution").value="";update();});
-    q("lab-export").addEventListener("click",()=>{const result=update();if(result.valid)exportJSON(result.data,"fictional-raid-row.json");else note("lab-export-message","Correct validation errors before exporting.");});
-    root.addEventListener("input",update);root.addEventListener("change",update);update();
+    function memo(){
+      const status=val("lab-memo-status");
+      const p={id:"DM-0001",title:"Confirm a bounded fallback for the fictional library pilot",
+        decider:val("lab-decider"),due:"2026-04-26",status,
+        decided:status==="decided"?val("lab-decision-date"):null,
+        decision:status==="decided"?val("lab-choice"):status==="deferred"?val("lab-rationale").trim():null,
+        review_date:val("lab-review-date")||null,
+        decision_scope:"Choose whether to wait for external interface confirmation or authorize a reversible fallback for the fictional library pilot.",
+        linked_raid_ids:["RAID-0001"],tags:["fictional","dependency","decision-support"]};
+      if(status==="superseded")p.supersedes=val("lab-supersedes").trim();
+      return p;
+    }
+    function body(r,m){
+      const paragraphs=[
+        "# Fictional decision memo",
+        "## Decision under review",
+        "Choose between waiting for complete interface confirmation and authorizing a bounded fallback.",
+        "## Evidence classes and unknowns",
+        "- Scenario fact: the linked RAID-0001 interface dependency remains unconfirmed.",
+        "- Fictional estimate: probability "+r.probability+" and impact "+r.impact+" are ordinal inputs, not expected monetary loss.",
+        "- Unknown: confirmation timing and sufficiency of future validation evidence.",
+        "## Hard constraints",
+        "- No restricted records or irreversible external state are authorized by this memo.",
+        "- The fallback must remain reversible until the interface evidence is complete.",
+        "## Options",
+        "- Option A: wait for full confirmation; protect scope, risk validation schedule.",
+        "- Option B: proceed within a bounded reversible pilot; risk follow-on scope adjustment.",
+        "## User-supplied reasoning",
+        val("lab-rationale").trim()||"No rationale provided.",
+        "## Decision and review",
+        "Status: "+m.status+"; selected option: "+(m.decision||"not yet authorized")+".",
+        "Linked risk: RAID-0001.",
+        "## Review triggers",
+        "Revisit if restricted data, irreversible effects or scope changes become necessary."
+      ];
+      return paragraphs.join("\n\n");
+    }
+    function update(){
+      const r=risk(),m=memo(),re=engine.raidErrors(r),me=engine.memoErrors(m),
+        links=engine.crossReferenceErrors(r,m);
+      if(!val("lab-rationale").trim())me.push("Decision rationale or deferral reason must be recorded.");
+      if(val("lab-rationale").length>1500)me.push("Rationale exceeds this workbench's 1500-character limit.");
+      note("lab-calculated",Number.isFinite(r.probability*r.impact)?String(r.probability*r.impact):"—");
+      note("lab-valid",re.length?"NEEDS WORK":"VALID");
+      note("lab-memo-valid",me.length?"NEEDS WORK":"VALID");
+      note("lab-link-valid",links.length?"BROKEN":"BIDIRECTIONAL");
+      q("lab-export").disabled=!!re.length;
+      q("lab-export-memo").disabled=!!(me.length||links.length);
+      note("lab-memo-preview",engine.frontmatter(m));
+      report(re.length||me.length||links.length?"REVIEW REQUIRED":"RAID ROW CHECK PASSED",
+        [...re,...me,...links],[
+        "Risk and memo link in both directions, with selected schema constraints satisfied.",
+        "Schema coherence does not validate the evidence, choice of alternative or decider's actual authority."
+      ]);
+      return {r,m,re,me,links};
+    }
+    q("lab-reset").addEventListener("click",()=>{
+      for(const [id,value] of Object.entries(defaultValues))q(id).value=value;
+      update();
+    });
+    q("lab-export").addEventListener("click",()=>{
+      const d=update();if(!d.re.length)exportJSON(d.r,"fictional-raid-row.json");
+    });
+    q("lab-export-memo").addEventListener("click",()=>{
+      const d=update();if(d.me.length||d.links.length)return;
+      const blob=new Blob([engine.markdown(d.m,body(d.r,d.m))],{type:"text/markdown"});
+      const uri=URL.createObjectURL(blob),link=document.createElement("a");
+      link.href=uri;link.download="fictional-decision-memo.md";link.click();
+      setTimeout(()=>URL.revokeObjectURL(uri),1000);
+      note("lab-export-message","Prepared Markdown locally; nothing was uploaded.");
+    });
+    root.addEventListener("input",update);root.addEventListener("change",update);
+    update();
   }
   function agent(){
     const controls=select("lab-recommendation","Recommendation",[["release_with_conditions","Release with conditions"],["release","Release"],["do_not_release","Do not release"]])+
