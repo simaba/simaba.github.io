@@ -33,50 +33,124 @@ if($("lab-export-status"))set("lab-export-status","Prepared locally; no upload w
 };
 const note='<p id="lab-export-status" class="lab-small" aria-live="polite"></p>';
 function simulator(){
-const scenarios={
-normal_success:{task:"Summarize a straightforward support request.",confidence:[.93],evidence:[[true,true,true]],fallback:false},
-retry_then_success:{task:"Handle a partially ambiguous user request.",confidence:[.91,.72],evidence:[[false,true,true],[true,true,true]],fallback:false},
-fallback_after_failure:{task:"Handle a request that repeatedly fails the primary path.",confidence:[.88,.88],evidence:[[false,true,true],[false,true,true]],fallback:true},
-escalate_after_failure:{task:"Handle a high-impact request that repeatedly fails validation.",confidence:[.95,.95],evidence:[[false,true,false],[false,true,false]],fallback:false}
-};
-let events=[],pointer=0;
-shell("Step through the four deterministic scenarios in src/scenarios.py. Each transition is decided from the published executor evidence—not its confidence value.",
-select("lab-scenario","Published scenario",Object.keys(scenarios).map(s=>[s,s.replaceAll("_"," ")]))+
-'<div class="lab-actions">'+button("lab-step","Next state")+button("lab-run","Run to outcome")+button("lab-reset","Reset trace")+'</div>',
-'<div class="lab-metrics">'+metric("lab-step-num","STEP")+metric("lab-outcome","OUTCOME")+'</div><ol id="lab-trace" class="lab-trace"></ol>');
-function prepare(){
-const s=scenarios[v("lab-scenario")],criteria=["task_complete","output_present","boundary_respected"];
-events=[{type:"plan",text:"Planner: "+s.task}];
-let accepted=false;
-for(let i=0;i<s.evidence.length;i++){
-const failed=s.evidence[i].map((val,j)=>val?null:criteria[j]).filter(Boolean);
-events.push({type:"exec",text:"Executor attempt "+(i+1)+": confidence "+s.confidence[i].toFixed(2)+" (not authority); evidence "+s.evidence[i].map((x,j)=>criteria[j]+"="+x).join(", ")});
-events.push({type:failed.length?"fail":"pass",text:failed.length?"Evaluator: rejected; missing "+failed.join(", "):"Evaluator: all required observable criteria satisfied"});
-if(!failed.length){events.push({type:"pass",text:"Supervisor: ACCEPT the demonstrated primary result."});accepted=true;break;}
-if(i<s.evidence.length-1)events.push({type:"retry",text:"Supervisor: bounded retry requested ("+(i+1)+"/2)."});
+const engine=globalThis.PortfolioAgentSimulator;
+if(!engine)throw Error("Simulator source module is not available");
+const choices=Object.keys(engine.SCENARIOS);
+let run=null,pointer=0;
+const columns=["task_complete","output_present","boundary_respected"],fallbackFields=["output_present","boundary_respected","fallback_is_bounded"];
+const boolCheck=(id,label,checked)=>tick(id,label,checked);
+const attempt=(index)=>'<div class="lab-simulator-attempt"><p class="lab-eyebrow">ATTEMPT '+(index+1)+' / EVIDENCE CONTRACT</p>'+
+ columns.map((key,i)=>boolCheck("lab-a"+index+"-"+i,key.replaceAll("_"," "),true)).join("")+
+ field("lab-confidence"+index,"Reported confidence · diagnostic only","0.90","number")+'</div>';
+const controls=
+select("lab-scenario","Published scenario",choices.map(s=>[s,s.replaceAll("_"," ")]))+
+'<div class="lab-scenario" id="lab-scenario-description"></div>'+
+'<label class="lab-check"><input id="lab-whatif" type="checkbox"><span>Explore alternative evidence (hypothetical, not published fixtures)</span></label>'+
+'<div id="lab-simulator-experiment" hidden><p class="lab-context">Change the evidence, number of attempts or fallback contract to inspect how supervisor decisions change. The original source fixture remains unchanged.</p>'+
+select("lab-attempt-limit","Maximum primary attempts",[["1","One"],["2","Two"],["3","Three"]])+
+attempt(0)+attempt(1)+attempt(2)+
+'<div class="lab-simulator-attempt" id="lab-fallback-panel"><p class="lab-eyebrow">SEPARATE FALLBACK CONTRACT</p>'+
+fallbackFields.map((name,i)=>boolCheck("lab-fallback"+i,name.replaceAll("_"," "),true)).join("")+'</div></div>'+
+'<div class="lab-actions">'+button("lab-step","Next event")+button("lab-run","Run to outcome")+button("lab-reset","Reset to published scenario")+button("lab-export","Download decision report")+'</div>'+note;
+shell("Inspect actual deterministic controller decisions. Confidence never authorizes acceptance: observable evidence does. The published fixture and hypothetical overrides are explicitly separated.",controls,
+'<div class="lab-metrics lab-four">'+metric("lab-step-num","EVENTS")+metric("lab-outcome","PATH")+
+metric("lab-attempts","ATTEMPTS")+metric("lab-retries","RETRIES")+'</div>'+
+'<p class="lab-small" id="lab-mode">Published source fixture</p>'+
+'<ol id="lab-trace" class="lab-trace"></ol>'+
+'<div class="lab-metrics lab-four">'+metric("lab-accepted","PRIMARY ACCEPTED")+metric("lab-fallback-used","FALLBACK USED")+
+metric("lab-escalated","HUMAN ESCALATION")+metric("lab-proxy","STATE LABEL ONLY")+'</div>');
+function source(){return engine.SCENARIOS[v("lab-scenario")];}
+function loadFixture(){
+const fixture=source();
+set("lab-scenario-description",fixture.task);
+$("lab-attempt-limit").value=String(fixture.max_attempts);
+for(let attempt=0;attempt<3;attempt++){
+const ev=fixture.attempts[Math.min(attempt,fixture.attempts.length-1)];
+for(let index=0;index<3;index++)$("lab-a"+attempt+"-"+index).checked=ev.evidence[index];
+$("lab-confidence"+attempt).value=String(ev.confidence);
 }
-if(!accepted){if(s.fallback){
-events.push({type:"fallback",text:"Fallback independently checked: output_present=true, boundary_respected=true, fallback_is_bounded=true."});
-events.push({type:"pass",text:"Supervisor: ACCEPT bounded fallback (not primary success)."});
-}else events.push({type:"escalate",text:"Supervisor: ESCALATE to human; no authorized fallback contract."});}
-pointer=0;draw();
+for(let index=0;index<3;index++)$("lab-fallback"+index).checked=fixture.fallback?fixture.fallback.evidence[index]:true;
+$("lab-fallback-panel").hidden=!fixture.fallback;
 }
-function draw(){
-const view=events.slice(0,pointer),list=$("lab-trace");list.replaceChildren();
-for(const item of view){const li=document.createElement("li");li.dataset.kind=item.type;li.textContent=item.text;list.append(li);}
-set("lab-step-num",pointer+" / "+events.length);
-const final=view.at(-1),done=pointer===events.length;
-const state=done?(final.type==="pass"?(final.text.includes("fallback")?"FALLBACK":"ACCEPT"):"ESCALATE"):"IN PROGRESS";
-set("lab-outcome",state);
-findings(done&&state==="ESCALATE"?"fail":"pass",
-done?"FINAL STATE: "+state:"TRACE IN PROGRESS",
-done?["The final state follows the evidence and bounded supervisor transitions."]:["Use Next state to inspect each decision, or Run to outcome for the complete trace."]);
+function configured(){
+if(!$("lab-whatif").checked)return {};
+const attempts=[];
+for(let i=0;i<Number(v("lab-attempt-limit"));i++){
+attempts.push({evidence:columns.map((_,j)=>check("lab-a"+i+"-"+j)),confidence:Number(v("lab-confidence"+i))});
 }
-$("lab-step").addEventListener("click",()=>{pointer=Math.min(pointer+1,events.length);draw();});
-$("lab-run").addEventListener("click",()=>{pointer=events.length;draw();});
-$("lab-reset").addEventListener("click",prepare);
-$("lab-scenario").addEventListener("change",prepare);
-prepare();
+return {max_attempts:Number(v("lab-attempt-limit")),attempts,
+ ...(source().fallback?{fallback_evidence:fallbackFields.map((_,j)=>check("lab-fallback"+j))}:{})};
+}
+function verdict(){
+const report=run.report;
+if(report.accepted)return "PRIMARY ACCEPT";
+if(report.fallback_used)return "VALIDATED FALLBACK";
+if(report.escalated)return "ESCALATE";
+return "UNRESOLVED";
+}
+function display(){
+const current=run.trace.slice(0,pointer),dest=$("lab-trace");
+dest.replaceChildren();
+for(const event of current){
+const li=document.createElement("li");li.dataset.kind=event.kind;li.textContent=event.text;dest.append(li);
+}
+const done=pointer>=run.trace.length,report=run.report;
+set("lab-step-num",pointer+" / "+run.trace.length);
+set("lab-outcome",done?verdict():"INSPECTING");
+set("lab-attempts",done?report.attempts:"—");
+set("lab-retries",done?report.retries_requested:"—");
+set("lab-accepted",done?(report.accepted?"YES":"NO"):"—");
+set("lab-fallback-used",done?(report.fallback_used?"YES":"NO"):"—");
+set("lab-escalated",done?(report.escalated?"YES":"NO"):"—");
+set("lab-proxy",done?report.correctness_proxy.toUpperCase():"—");
+set("lab-mode",run.mode==="published"?"Published source fixture · fixed evidence and latency/cost values":
+ "Hypothetical evidence experiment · latency and cost remain original fixture metadata, not recomputed estimates");
+findings(done&&report.escalated?"fail":"pass",
+done?"SIMULATION COMPLETE · "+verdict():"TRACE IN PROGRESS",
+done?[report.final_outcome,
+"Primary acceptance, fallback and escalation are distinct outcomes. Correctness proxy is a simulator label, not measured system quality."]:
+["The trace is derived from named observable criteria; advance to inspect each supervisor transition."]);
+}
+function calculate(){
+try{
+run=engine.runScenario(v("lab-scenario"),configured());
+pointer=0;
+$("lab-export").disabled=false;
+display();
+}catch(error){
+$("lab-export").disabled=true;
+findings("fail","SIMULATOR INPUT INVALID",[String(error.message||error)]);
+set("lab-mode","Correct the input to continue; no trace was executed");
+}
+}
+function reload(){
+loadFixture();
+calculate();
+}
+$("lab-scenario").addEventListener("change",reload);
+$("lab-whatif").addEventListener("change",()=>{
+$("lab-simulator-experiment").hidden=!check("lab-whatif");
+loadFixture();calculate();
+});
+$("lab-attempt-limit").addEventListener("change",calculate);
+root.addEventListener("change",event=>{
+if(event.target.closest("#lab-simulator-experiment"))calculate();
+});
+root.addEventListener("input",event=>{
+if(event.target.id.startsWith("lab-confidence"))calculate();
+});
+$("lab-step").addEventListener("click",()=>{if(run){pointer=Math.min(pointer+1,run.trace.length);display();}});
+$("lab-run").addEventListener("click",()=>{if(run){pointer=run.trace.length;display();}});
+$("lab-reset").addEventListener("click",()=>{
+$("lab-whatif").checked=false;$("lab-simulator-experiment").hidden=true;reload();
+});
+$("lab-export").addEventListener("click",()=>{
+if(run)exportJSON({...run.report,mode:run.mode==="published"?"published_fixture":"hypothetical_override",
+  note:run.mode==="published"?"Deterministic source fixture; no model calls":
+  "What-if user modification; source fixture costs/latency retained without re-estimation"},
+  "agent-simulator-decision-report.json");
+});
+reload();
 }
 function translator(){
 const initial={name:"executive-summary",description:"Creates concise leadership-ready summaries.",tools:"Read, Write",model:"reasoning",instructions:"Produce a crisp executive summary with a recommendation, risks, and next steps."};
