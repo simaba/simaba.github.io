@@ -30,11 +30,24 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: python3 scripts/sync.py
+      - name: Checkout pinned automotive reference source for direct semantic parity
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7, Node 24
+        with:
+          repository: simaba/automotive-llm-eval-harness
+          ref: 10e4e71313a11b93ce71b9c5750d55fdb51115a7
+          path: .source-reference/automotive
+          sparse-checkout: |
+            src/automotive_llm_eval_harness/core.py
+          sparse-checkout-cone-mode: false
+          persist-credentials: false
       - name: Verify structured content, generated website, privacy and editorial design
+        env:
+          AUTOMOTIVE_REFERENCE_CORE: .source-reference/automotive/src/automotive_llm_eval_harness/core.py
         run: |
           python3 scripts/verify.py
           python3 -m unittest discover -s tests -v
           node --check assets/app.js
+          node --check assets/automotive-core.js
           node --check assets/project-labs.js
           node --check assets/extended-labs.js
           test -s dist/index.html

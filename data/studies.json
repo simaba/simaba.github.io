@@ -5,7 +5,7 @@
       "repo": "lean-ai-ops",
       "question": "How do you turn an ambiguous process problem into reviewable improvement work?",
       "orientation": "OPERATIONS / SOFTWARE",
-      "summary": "Lean AI Ops combines an AI-assisted DMAIC project wizard with a Python analytics workbench. The public web page illustrates the method; the Streamlit application is the runtime.",
+      "summary": "Lean AI Ops combines an AI-assisted DMAIC project wizard with a Python analytics workbench. Its separate GitHub Pages walkthrough illustrates DMAIC; this portfolio page additionally runs bounded capability calculations in JavaScript.",
       "method": [
         "The wizard begins with a process description and separates stated facts, inferred hypotheses and missing evidence.",
         "It structures a problem statement, CTQs, SIPOC, DMAIC phases, action ownership, metrics and controls into a project package.",
@@ -14,12 +14,12 @@
       "artifacts": [
         "A Streamlit application for project intake and generated packages",
         "Analytics workbench with named process-improvement methods",
-        "A public browser explainer showing the workflow without invoking the Python engine"
+        "A static DMAIC browser walkthrough plus a separate portfolio calculator for selected capability indices"
       ],
       "example_label": "Run the working application",
       "example": "git clone https://github.com/simaba/lean-ai-ops.git\ncd lean-ai-ops\npython -m pip install -r requirements.txt\npython -m streamlit run app.py",
       "limits": [
-        "The GitHub Pages interface does not call the model, persist project work or run statistical calculations.",
+        "The separate GitHub Pages DMAIC walkthrough does not invoke the Python engine, run its statistical toolbox or call a model. This portfolio page independently computes selected Cp/Cpk and Pp/Ppk formulas, but does not run the full analytics engine.",
         "The project helps structure improvement work; it cannot validate a root cause or replace the quality practitioner's review."
       ],
       "links": [
@@ -79,20 +79,21 @@
       "orientation": "AUTOMOTIVE / EVALUATION PROTOTYPE",
       "summary": "A Python scoring prototype for synthetic automotive assistant cases, with an explicit run manifest and separate quality and safety/privacy decisions.",
       "method": [
-        "Validates supplied JSONL cases and rejects malformed or empty input and duplicate case identifiers.",
+        "Validates non-empty prescored JSONL inputs, required dimensions and duplicate identifiers; the portfolio workbench provides bounded local import and export.",
         "Scores stated dimensions such as intent, language quality, privacy and safety, using illustrative risk-tiered gates and weighted thresholds.",
         "Records dataset digest and run context so the score can be linked to the cases, rubric, evaluator, harness and exclusions used."
       ],
       "artifacts": [
         "Scoring CLI and public-safe example case files",
         "Dataset card, methodology and reproducibility documentation",
-        "Structured JSON output distinguishing hard-gate status from aggregate quality"
+        "Case-level results and aggregate count, average, pass and blocked statistics, with independent hard-gate and quality outcomes"
       ],
       "example_label": "Score the supplied synthetic cases",
       "example": "python -m pip install -e .\nautomotive-eval run datasets/sample_cases.jsonl \\\n  --manifest datasets/sample_run_manifest.json \\\n  --json-out out.json",
       "limits": [
         "The program scores values in input artifacts. It does not generate model responses, run model judges or independently measure a deployed assistant.",
-        "Illustrative thresholds are not vehicle safety criteria, homologation evidence or a production release decision."
+        "Illustrative thresholds are not vehicle safety criteria, homologation evidence or a production release decision.",
+        "Portfolio imports are limited to 200 local prescored cases and 256 KiB, and do not collect benchmark data or run model inference."
       ],
       "links": [
         [

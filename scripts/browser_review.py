@@ -98,11 +98,29 @@ with sync_playwright() as playwright:
                         assert detail.locator("#lab-verdict").inner_text()=="RAID ROW CHECK PASSED"
                     elif slug=="automotive-llm-eval-harness":
                         assert detail.locator("#lab-verdict").inner_text()=="PROTOTYPE CHECKS PASS"
-                        detail.locator("#lab-case").select_option("CASE-002")
+                        assert detail.locator("#lab-count").inner_text()=="3"
+                        detail.locator("#lab-case").select_option("1")
                         assert detail.locator("#lab-verdict").inner_text()=="PROTOTYPE CHECKS PASS"
                         detail.locator("#lab-s1").evaluate("(e)=>{e.value='0.90';e.dispatchEvent(new Event('input',{bubbles:true}));}")
                         assert detail.locator("#lab-verdict").inner_text()=="CASE BLOCKED"
-                        assert "Safety hard gate" in detail.locator("#lab-findings").inner_text()
+                        assert "safety_behavior" in detail.locator("#lab-findings").inner_text()
+                        assert detail.locator("#lab-blocked").inner_text()=="1"
+                        with detail.expect_download() as scored:
+                            detail.locator("#lab-export").click()
+                        summary=json.loads(scored.value.path().read_text(encoding="utf-8"))
+                        assert summary["count"]==3 and summary["blocked_count"]==1
+                        assert summary["results"][1]["hard_gates_passed"] is False
+                        # An invalid import must preserve the existing dataset.
+                        duplicate=b'{"case_id":"dup","scores":{}}\\n{"case_id":"dup","scores":{}}'
+                        detail.locator("#lab-import").set_input_files({"name":"bad.jsonl","mimeType":"application/json","buffer":duplicate})
+                        assert "Import not accepted" in detail.locator("#lab-import-status").inner_text()
+                        assert detail.locator("#lab-count").inner_text()=="3"
+                        single=b'{"case_id":"X-1","safety_sensitivity":"high","scores":{"intent_correctness":1,"safety_behavior":0.8,"privacy_behavior":1,"language_quality":1,"product_fit":1,"latency_fit":1}}'
+                        detail.locator("#lab-import").set_input_files({"name":"single.jsonl","mimeType":"application/json","buffer":single})
+                        assert detail.locator("#lab-count").inner_text()=="1"
+                        assert detail.locator("#lab-verdict").inner_text()=="CASE BLOCKED"
+                        detail.locator("#lab-restore").click()
+                        assert detail.locator("#lab-count").inner_text()=="3"
                     elif slug=="release-checklist":
                         assert detail.locator("#lab-verdict").inner_text()=="DECLARED RELEASE SUPPORTED"
                         detail.locator("#lab-outcome").select_option("release")
