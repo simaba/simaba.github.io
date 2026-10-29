@@ -3,7 +3,7 @@
 import hashlib
 import json
 from pathlib import Path
-from playwright.sync_api import sync_playwright
+from playwright.sync_api import expect, sync_playwright
 
 ROOT=Path(__file__).resolve().parents[1]
 from build import build
@@ -113,12 +113,12 @@ with sync_playwright() as playwright:
                         # An invalid import must preserve the existing dataset.
                         duplicate=b'{"case_id":"dup","scores":{"intent_correctness":1,"safety_behavior":1,"privacy_behavior":1,"language_quality":1,"product_fit":1,"latency_fit":1}}' + b'\n' + b'{"case_id":"dup","scores":{"intent_correctness":1,"safety_behavior":1,"privacy_behavior":1,"language_quality":1,"product_fit":1,"latency_fit":1}}'
                         detail.locator("#lab-import").set_input_files({"name":"bad.jsonl","mimeType":"application/json","buffer":duplicate})
-                        assert "Duplicate case_id" in detail.locator("#lab-import-status").inner_text()
+                        expect(detail.locator("#lab-import-status")).to_contain_text("Duplicate case_id")
                         assert detail.locator("#lab-count").inner_text()=="3"
                         single=b'{"case_id":"X-1","safety_sensitivity":"high","scores":{"intent_correctness":1,"safety_behavior":0.8,"privacy_behavior":1,"language_quality":1,"product_fit":1,"latency_fit":1}}'
                         detail.locator("#lab-import").set_input_files({"name":"single.jsonl","mimeType":"application/json","buffer":single})
-                        assert detail.locator("#lab-count").inner_text()=="1"
-                        assert detail.locator("#lab-verdict").inner_text()=="CASE BLOCKED"
+                        expect(detail.locator("#lab-count")).to_have_text("1")
+                        expect(detail.locator("#lab-verdict")).to_have_text("CASE BLOCKED")
                         detail.locator("#lab-restore").click()
                         assert detail.locator("#lab-count").inner_text()=="3"
                     elif slug=="release-checklist":
