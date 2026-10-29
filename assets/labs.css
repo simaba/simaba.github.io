@@ -123,3 +123,10 @@ html[data-theme='dark']{--accent-text:#A5B0FF}
 #lab-simulator-experiment .lab-check{min-height:26px}
 #lab-mode{padding-left:12px;border-left:2px solid var(--accent-text);margin:5px 0}
 @media(max-width:590px){#lab-simulator-experiment{padding:10px}.lab-simulator-attempt{padding:10px}}
+
+/* Source-derived Agent Simulator control-flow position. */
+.lab-state-flow{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px}
+.lab-state-flow span{border-top:3px solid var(--line);padding:8px 2px 4px;color:var(--muted);font:600 10px/1.45 var(--font-mono);letter-spacing:.025em;text-align:center}
+.lab-state-flow span[data-position='past']{border-color:var(--accent-secondary);color:var(--ink-soft)}
+.lab-state-flow span[data-position='current']{border-color:var(--accent);color:var(--ink)}
+@media(max-width:590px){.lab-state-flow span{font-size:9px;letter-spacing:0}}

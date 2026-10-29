@@ -154,7 +154,16 @@ with sync_playwright() as playwright:
                         assert intake["missing_inputs"] and intake["status"]=="draft_no_authorization"
                         detail.locator("#lab-stop").check()
                     elif slug=="agent-simulator":
-                        detail.locator("#lab-scenario").select_option("retry_then_success")
+                        assert detail.locator("#lab-scenario").input_value()=="retry_then_success"
+                        assert int(detail.locator("#lab-step-num").inner_text().split(" / ")[0])==3
+                        assert detail.locator(".lab-state-flow [data-position='current']").count()==1
+                        detail.locator("#lab-replay").click()
+                        assert detail.locator("#lab-step-num").inner_text().startswith("0 / ")
+                        assert detail.locator("#lab-prev").is_disabled()
+                        detail.locator("#lab-step").click()
+                        assert detail.locator("#lab-step-num").inner_text().startswith("1 / ")
+                        detail.locator("#lab-prev").click()
+                        assert detail.locator("#lab-step-num").inner_text().startswith("0 / ")
                         detail.locator("#lab-run").click()
                         assert detail.locator("#lab-outcome").inner_text()=="PRIMARY ACCEPT"
                         assert "bounded retry" in detail.locator("#lab-trace").inner_text().lower()
@@ -242,7 +251,7 @@ with sync_playwright() as playwright:
                         detail.locator("#lab-topic").select_option("all")
                     elif slug=="agent-simulator":
                         detail.locator("#lab-reset").click()
-                        detail.locator("#lab-scenario").select_option("normal_success")
+                        detail.locator("#lab-scenario").select_option("retry_then_success")
                     else:
                         detail.locator("#lab-reset").click()
                     if detail.locator("html").get_attribute("data-theme")=="dark":

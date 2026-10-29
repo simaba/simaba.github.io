@@ -51,11 +51,12 @@ select("lab-attempt-limit","Maximum primary attempts",[["1","One"],["2","Two"],[
 attempt(0)+attempt(1)+attempt(2)+
 '<div class="lab-simulator-attempt" id="lab-fallback-panel"><p class="lab-eyebrow">SEPARATE FALLBACK CONTRACT</p>'+
 fallbackFields.map((name,i)=>boolCheck("lab-fallback"+i,name.replaceAll("_"," "),true)).join("")+'</div></div>'+
-'<div class="lab-actions">'+button("lab-step","Next event")+button("lab-run","Run to outcome")+button("lab-reset","Reset to published scenario")+button("lab-export","Download decision report")+'</div>'+note;
+'<div class="lab-actions">'+button("lab-prev","Previous")+button("lab-step","Next event")+button("lab-run","Run to outcome")+button("lab-replay","Replay trace")+button("lab-reset","Restore source fixture")+button("lab-export","Download decision report")+'</div>'+note;
 shell("Inspect actual deterministic controller decisions. Confidence never authorizes acceptance: observable evidence does. The published fixture and hypothetical overrides are explicitly separated.",controls,
 '<div class="lab-metrics lab-four">'+metric("lab-step-num","EVENTS")+metric("lab-outcome","PATH")+
 metric("lab-attempts","ATTEMPTS")+metric("lab-retries","RETRIES")+'</div>'+
 '<p class="lab-small" id="lab-mode">Published source fixture</p>'+
+'<div class="lab-state-flow" id="lab-state-flow" aria-label="Current control-flow stage"></div>'+
 '<ol id="lab-trace" class="lab-trace"></ol>'+
 '<div class="lab-metrics lab-four">'+metric("lab-accepted","PRIMARY ACCEPTED")+metric("lab-fallback-used","FALLBACK USED")+
 metric("lab-escalated","HUMAN ESCALATION")+metric("lab-proxy","STATE LABEL ONLY")+'</div>');
@@ -95,6 +96,16 @@ for(const event of current){
 const li=document.createElement("li");li.dataset.kind=event.kind;li.textContent=event.text;dest.append(li);
 }
 const done=pointer>=run.trace.length,report=run.report;
+const phases=["PLAN","EXECUTE","EVALUATE","SUPERVISE"];
+const stage=pointer?(({plan:0,execute:1,reject:2,accept:2,retry:3,fallback:3,escalate:3})[run.trace[pointer-1]?.kind]??0):-1;
+const flow=$("lab-state-flow");flow.replaceChildren();
+phases.forEach((phase,i)=>{
+ const el=document.createElement("span");el.textContent=phase;
+ el.dataset.position=i<stage?"past":i===stage?"current":"pending";
+ flow.append(el);
+});
+$("lab-prev").disabled=pointer===0;
+$("lab-step").disabled=done;
 set("lab-step-num",pointer+" / "+run.trace.length);
 set("lab-outcome",done?verdict():"INSPECTING");
 set("lab-attempts",done?report.attempts:"—");
@@ -114,7 +125,7 @@ done?[report.final_outcome,
 function calculate(){
 try{
 run=engine.runScenario(v("lab-scenario"),configured());
-pointer=0;
+pointer=Math.min(3,run.trace.length);
 $("lab-export").disabled=false;
 display();
 }catch(error){
@@ -139,7 +150,9 @@ if(event.target.closest("#lab-simulator-experiment"))calculate();
 root.addEventListener("input",event=>{
 if(event.target.id.startsWith("lab-confidence"))calculate();
 });
+$("lab-prev").addEventListener("click",()=>{if(run){pointer=Math.max(0,pointer-1);display();}});
 $("lab-step").addEventListener("click",()=>{if(run){pointer=Math.min(pointer+1,run.trace.length);display();}});
+$("lab-replay").addEventListener("click",()=>{if(run){pointer=0;display();}});
 $("lab-run").addEventListener("click",()=>{if(run){pointer=run.trace.length;display();}});
 $("lab-reset").addEventListener("click",()=>{
 $("lab-whatif").checked=false;$("lab-simulator-experiment").hidden=true;reload();
@@ -150,6 +163,7 @@ if(run)exportJSON({...run.report,mode:run.mode==="published"?"published_fixture"
   "What-if user modification; source fixture costs/latency retained without re-estimation"},
   "agent-simulator-decision-report.json");
 });
+$("lab-scenario").value="retry_then_success";
 reload();
 }
 function translator(){
