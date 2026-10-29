@@ -126,7 +126,7 @@ class PortfolioChecks(unittest.TestCase):
                 self.assertIn('data-project-lab="'+p["repo"]+'"',page)
                 self.assertIn('id="workbench"',page)
                 self.assertIn('src="../../assets/project-labs.js"',page)
-            self.assertIn('src="../../assets/automotive-core.js"',page)
+                self.assertIn('src="../../assets/automotive-core.js"',page)
                 self.assertIn('src="../../assets/extended-labs.js"',page)
         js=(ROOT/"assets/project-labs.js").read_text()
         core=(ROOT/"assets/automotive-core.js").read_text()
@@ -139,7 +139,7 @@ class PortfolioChecks(unittest.TestCase):
         self.assertNotIn("XMLHttpRequest",extended)
         self.assertIn("FALLBACK",extended)
         self.assertIn("Lossy conversion warning",extended)
-        self.assertIn("WEIGHTED SCORE",js)
+        self.assertIn("MEAN SCORE",js)
         self.assertIn("CAPABILITY ESTIMATES COMPUTED",js)
     def test_examples_are_typed_as_commands_or_prose(self):
         build()

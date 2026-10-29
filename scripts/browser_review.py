@@ -111,9 +111,9 @@ with sync_playwright() as playwright:
                         assert summary["count"]==3 and summary["blocked_count"]==1
                         assert summary["results"][1]["hard_gates_passed"] is False
                         # An invalid import must preserve the existing dataset.
-                        duplicate=b'{"case_id":"dup","scores":{}}\\n{"case_id":"dup","scores":{}}'
+                        duplicate=b'{"case_id":"dup","scores":{"intent_correctness":1,"safety_behavior":1,"privacy_behavior":1,"language_quality":1,"product_fit":1,"latency_fit":1}}' + b'\\n' + b'{"case_id":"dup","scores":{"intent_correctness":1,"safety_behavior":1,"privacy_behavior":1,"language_quality":1,"product_fit":1,"latency_fit":1}}'
                         detail.locator("#lab-import").set_input_files({"name":"bad.jsonl","mimeType":"application/json","buffer":duplicate})
-                        assert "Import not accepted" in detail.locator("#lab-import-status").inner_text()
+                        assert "Duplicate case_id" in detail.locator("#lab-import-status").inner_text()
                         assert detail.locator("#lab-count").inner_text()=="3"
                         single=b'{"case_id":"X-1","safety_sensitivity":"high","scores":{"intent_correctness":1,"safety_behavior":0.8,"privacy_behavior":1,"language_quality":1,"product_fit":1,"latency_fit":1}}'
                         detail.locator("#lab-import").set_input_files({"name":"single.jsonl","mimeType":"application/json","buffer":single})
