@@ -98,8 +98,28 @@ with sync_playwright() as playwright:
                         assert detail.locator("#lab-verdict").inner_text()=="RAID ROW CHECK PASSED"
                         assert detail.locator("#lab-memo-valid").inner_text()=="VALID"
                         assert detail.locator("#lab-link-valid").inner_text()=="BIDIRECTIONAL"
+                        assert detail.locator("#lab-review-ready").inner_text()=="REVIEW FIELDS PRESENT"
+                        assert detail.locator("#lab-export-brief").is_enabled()
+                        assert detail.locator(".lab-review-trace-row").count()==7
+                        detail.locator("#lab-evidence-reference").fill("")
+                        assert detail.locator("#lab-export-brief").is_disabled()
+                        assert "Identify a fictional evidence source" in detail.locator("#lab-review-findings").inner_text()
+                        detail.locator("#lab-evidence-reference").fill("Fictional owner estimate, pending corroboration")
+                        assert detail.locator("#lab-export-brief").is_enabled()
+                        with detail.expect_download() as handoff_download:
+                            detail.locator("#lab-export-brief").click()
+                        handoff=handoff_download.value.path().read_text(encoding="utf-8")
+                        assert "**Classification:** Decision" in handoff
+                        assert "RAID-0001" in handoff and "DM-0001" in handoff
+                        assert "Evidence" in handoff and "Action" in handoff
                         detail.locator("#lab-memo-status").select_option("decided")
                         assert detail.locator("#lab-verdict").inner_text()=="RAID ROW CHECK PASSED"
+                        detail.locator("#lab-option-b-gate").select_option("failed")
+                        assert detail.locator("#lab-export-memo").is_disabled()
+                        assert detail.locator("#lab-export-brief").is_disabled()
+                        assert "fails a declared hard boundary" in detail.locator("#lab-review-findings").inner_text()
+                        detail.locator("#lab-option-b-gate").select_option("supported")
+                        assert detail.locator("#lab-export-memo").is_enabled()
                         with detail.expect_download() as risk_download:
                             detail.locator("#lab-export").click()
                         with detail.expect_download() as memo_download:
