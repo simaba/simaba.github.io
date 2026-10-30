@@ -87,6 +87,7 @@ jobs:
           node --check assets/app.js
           node --check assets/automotive-core.js
           node --check assets/pmkit-core.js
+          node --check assets/pmkit-analysis.js
           node --check assets/simulator-core.js
           node --check assets/project-labs.js
           node --check assets/extended-labs.js

@@ -58,7 +58,7 @@ def render_study(page, study, p, source):
             "Edit observations and engineering specification limits. Explore Cp/Cpk and Pp/Ppk using the same selected formulas as the Python analytics module.",
             "A narrow calculation from analytics/capability.py, without Shapiro-Wilk normality testing, DPMO estimation or full project generation."),
         "everything-program-management":("LINKED PROGRAM ARTIFACTS","From uncertainty to a traceable decision",
-            "Edit a fictional risk, compare two real alternatives, move a linked decision through its lifecycle, and export both schema-aligned artifacts.",
+            "Edit a linked RAID risk and decision memo, inspect option feasibility, evidence provenance, and change triggers, then export a decision brief and source-compatible artifacts.",
             "This browser workbench covers a connected RAID risk and decision memo. The original Python validators check its exports; evidence quality and authority remain outside the tool."),
         "automotive-llm-eval-harness":("SCORING PROTOTYPE","When a high score still fails",
             "Inspect or import prescored cases, change their dimensions, and examine each weighted contribution, risk-tiered hard gate, and whole-dataset result.",

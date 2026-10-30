@@ -48,8 +48,8 @@
         "Connects a fictional research-library scenario across planning, risk, decisions and briefings, demonstrating how the artifacts relate without pretending to be a real client case."
       ],
       "artifacts": [
-        "Authored skills and templates for different program decisions",
-        "Connected, clearly fictional examples illustrating handoffs",
+        "Authored skills, templates and source-informed reviews of hard constraints, evidence classes, risk triage and executive handoffs",
+        "Connected, clearly fictional RAID and decision-memo examples with a generated reviewer-facing executive handoff",
         "A packaged pmkit CLI validating RAID JSON and decision memo frontmatter, illustrated by this linked two-artifact browser workflow"
       ],
       "example_label": "Validate an example program artifact",
@@ -57,7 +57,8 @@
       "limits": [
         "Schemas check bounded structure and selected semantics, not whether a program manager's judgment or evidence is sound.",
         "The examples are invented. This is not a program-management system of record or autonomous chief of staff.",
-        "This workbench exports linked fictional artifacts whose structure can be checked by the source CLI. It does not manage a program of record, review live evidence, or select the preferred option."
+        "This workbench exports linked fictional artifacts whose structure can be checked by the source CLI. It does not manage a program of record, review live evidence, or select the preferred option.",
+        "The supplemental decision-quality review and executive handoff are browser-authored methods, not an additional Python pmkit schema, validated record of authority, or AI-generated decision."
       ],
       "links": [
         [

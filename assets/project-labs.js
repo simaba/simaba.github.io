@@ -347,8 +347,8 @@
     pilot();
   }
   function program(){
-    const engine=globalThis.PortfolioPMKit;
-    if(!engine)throw new Error("Program Management schema helper is unavailable");
+    const engine=globalThis.PortfolioPMKit,analysis=globalThis.PortfolioPMAnalysis;
+    if(!engine||!analysis)throw new Error("Program Management schema or analysis helper is unavailable");
     const defaultValues={
       "lab-title":"External interface decision may delay the fictional pilot",
       "lab-owner":"Fictional Delivery Lead","lab-probability":"3","lab-impact":"4","lab-score":"12",
@@ -356,7 +356,16 @@
       "lab-decider":"Fictional Program Sponsor","lab-memo-status":"in_review",
       "lab-choice":"Option B","lab-decision-date":"2026-04-26",
       "lab-review-date":"2026-05-10","lab-supersedes":"DM-0002",
-      "lab-rationale":"Option B keeps a bounded reversible evidence path open while external interface confirmation is pending. This fictional recommendation requires independent review."
+      "lab-rationale":"Option B keeps a bounded reversible evidence path open while external interface confirmation is pending. This fictional recommendation requires independent review.",
+      "lab-option-a-gate":"unverified","lab-option-b-gate":"supported",
+      "lab-evidence-class":"estimated",
+      "lab-evidence-reference":"Fictional delivery-team interface estimate; requires independent corroboration",
+      "lab-state-change":"The external interface decision remains unconfirmed before the validation package is due.",
+      "lab-delay-consequence":"Waiting protects scope but compresses the scheduled pilot review window.",
+      "lab-next-action":"Confirm the interface boundary and obtain evidence of fallback reversibility.",
+      "lab-next-owner":"Fictional Delivery Lead","lab-next-date":"2026-05-01",
+      "lab-reopen-trigger":"Reopen if restricted records, irreversible state, or a changed integration scope become necessary.",
+      "lab-residual-risk":"The fallback may require a second scope review once the interface is confirmed."
     };
     const controls='<p class="lab-eyebrow">01 / UNCERTAINTY REGISTER</p>'+
       field("lab-title","Risk title",defaultValues["lab-title"])+
@@ -374,9 +383,23 @@
       field("lab-review-date","Review date","2026-05-10","date")+
       field("lab-supersedes","Superseded memo ID, if applicable","DM-0002")+
       '<label class="lab-field"><span>Reasoning or deferral explanation</span><textarea rows="4" id="lab-rationale">'+defaultValues["lab-rationale"]+'</textarea></label>'+
+      '<p class="lab-eyebrow lab-stage-title">03 / EVIDENCE AND ALTERNATIVE REVIEW</p>'+
+      select("lab-option-a-gate","Option A hard-boundary status",[["unverified","Not verified"],["supported","Supported (fictional scenario)"],["failed","Failed"]])+
+      select("lab-option-b-gate","Option B hard-boundary status",[["supported","Supported (fictional scenario)"],["unverified","Not verified"],["failed","Failed"]])+
+      select("lab-evidence-class","Key evidence classification",[["estimated","Estimated"],["documented","Documented (scenario)"],["assumed","Assumed"],["unknown","Unknown"]])+
+      field("lab-evidence-reference","Evidence reference / estimate owner",defaultValues["lab-evidence-reference"])+
+      '<label class="lab-field"><span>Material state change</span><textarea id="lab-state-change" rows="3">'+defaultValues["lab-state-change"]+'</textarea></label>'+
+      '<label class="lab-field"><span>Consequence of delay</span><textarea id="lab-delay-consequence" rows="3">'+defaultValues["lab-delay-consequence"]+'</textarea></label>'+
+      '<label class="lab-field"><span>Reopen / sensitivity trigger</span><textarea id="lab-reopen-trigger" rows="3">'+defaultValues["lab-reopen-trigger"]+'</textarea></label>'+
+      '<label class="lab-field"><span>Material residual risk</span><textarea id="lab-residual-risk" rows="3">'+defaultValues["lab-residual-risk"]+'</textarea></label>'+
+      '<p class="lab-eyebrow lab-stage-title">04 / ACTION HANDOFF</p>'+
+      field("lab-next-action","Concrete next action",defaultValues["lab-next-action"])+
+      field("lab-next-owner","Accountable action owner",defaultValues["lab-next-owner"])+
+      field("lab-next-date","Action due date",defaultValues["lab-next-date"],"date")+
       '<div class="lab-actions">'+action("Restore linked example","lab-reset")+
       action("Export RAID · JSON","lab-export")+
-      action("Export memo · Markdown","lab-export-memo")+'</div>'+
+      action("Export memo · Markdown","lab-export-memo")+
+      action("Export executive handoff","lab-export-brief")+'</div>'+
       '<p id="lab-export-message" class="lab-small" role="status"></p>';
     shell("Review a linked fictional risk and decision memo. Both artifacts have source-defined lifecycle and identifier contracts. The tool checks structure and internal consistency; evidence sufficiency and decision authority remain with people.",controls,
       '<div class="lab-metrics lab-four">'+
@@ -384,6 +407,10 @@
       '<div><small>RAID VALIDITY</small><strong id="lab-valid">—</strong></div>'+
       '<div><small>MEMO VALIDITY</small><strong id="lab-memo-valid">—</strong></div>'+
       '<div><small>LINK INTEGRITY</small><strong id="lab-link-valid">—</strong></div></div>'+
+      '<div class="lab-decision-audit"><p class="lab-eyebrow">DECISION REVIEW / NOT AN AUTHORIZATION</p>'+
+      '<strong id="lab-review-ready">—</strong>'+
+      '<ul id="lab-review-findings" class="lab-findings" aria-live="polite"></ul>'+
+      '<div id="lab-review-trace" class="lab-review-trace"></div></div>'+
       '<div class="lab-option-comparison"><p class="lab-eyebrow">ACTUAL ALTERNATIVES / FICTIONAL LIBRARY PILOT</p>'+
       '<div><strong>Option A · Wait for confirmation</strong><p>Preserves the original interface scope while risking a compressed review window.</p></div>'+
       '<div><strong>Option B · Bounded fallback</strong><p>Maintains a reversible test path but may require later scope adjustment.</p></div>'+
@@ -439,9 +466,35 @@
       ];
       return paragraphs.join("\n\n");
     }
+    function reviewInputs(m){
+      return {
+        status:m.status,choice:val("lab-choice"),
+        options:{A:{constraint:val("lab-option-a-gate")},B:{constraint:val("lab-option-b-gate")}},
+        evidence_class:val("lab-evidence-class"),evidence_reference:val("lab-evidence-reference"),
+        changed:val("lab-state-change"),delay_consequence:val("lab-delay-consequence"),
+        action:val("lab-next-action"),owner:val("lab-next-owner"),
+        action_date:val("lab-next-date"),trigger:val("lab-reopen-trigger"),
+        residual_risk:val("lab-residual-risk")
+      };
+    }
+    function renderReview(res){
+      note("lab-review-ready",res.ready?"REVIEW FIELDS PRESENT":"REVIEW GAPS TO RESOLVE");
+      const findings=q("lab-review-findings");findings.replaceChildren();
+      for(const message of [...res.blocking,...res.warnings]){
+        const li=document.createElement("li");li.textContent=message;findings.append(li);
+      }
+      const trace=q("lab-review-trace");trace.replaceChildren();
+      for(const item of res.trace){
+        const line=document.createElement("div");line.className="lab-review-trace-row";
+        const label=document.createElement("span");label.textContent=item.label;
+        const value=document.createElement("strong");value.textContent=item.value;
+        line.append(label,value);trace.append(line);
+      }
+    }
     function update(){
       const r=risk(),m=memo(),re=engine.raidErrors(r),me=engine.memoErrors(m),
-        links=engine.crossReferenceErrors(r,m);
+        links=engine.crossReferenceErrors(r,m),reviewInputsValue=reviewInputs(m),
+        decisionReview=analysis.review(reviewInputsValue);
       if(!val("lab-rationale").trim())me.push("Decision rationale or deferral reason must be recorded.");
       if(val("lab-rationale").length>1500)me.push("Rationale exceeds this workbench's 1500-character limit.");
       note("lab-calculated",Number.isFinite(r.probability*r.impact)?String(r.probability*r.impact):"—");
@@ -449,14 +502,18 @@
       note("lab-memo-valid",me.length?"NEEDS WORK":"VALID");
       note("lab-link-valid",links.length?"BROKEN":"BIDIRECTIONAL");
       q("lab-export").disabled=!!re.length;
+      const chosenIsInvalid=m.status==="decided"&&decisionReview.blocking.some(x=>x.startsWith("The selected option"));
+      if(chosenIsInvalid)me.push("A decided memo cannot claim the selected option satisfies a failed or unverified hard boundary.");
       q("lab-export-memo").disabled=!!(me.length||links.length);
+      q("lab-export-brief").disabled=!!(me.length||links.length||re.length||!decisionReview.ready);
+      renderReview(decisionReview);
       note("lab-memo-preview",engine.frontmatter(m));
       report(re.length||me.length||links.length?"REVIEW REQUIRED":"RAID ROW CHECK PASSED",
         [...re,...me,...links],[
         "Risk and memo link in both directions, with selected schema constraints satisfied.",
         "Schema coherence does not validate the evidence, choice of alternative or decider's actual authority."
       ]);
-      return {r,m,re,me,links};
+      return {r,m,re,me,links,decisionReview,reviewInputsValue};
     }
     q("lab-reset").addEventListener("click",()=>{
       for(const [id,value] of Object.entries(defaultValues))q(id).value=value;
@@ -472,6 +529,15 @@
       link.href=uri;link.download="fictional-decision-memo.md";link.click();
       setTimeout(()=>URL.revokeObjectURL(uri),1000);
       note("lab-export-message","Prepared Markdown locally; nothing was uploaded.");
+    });
+    q("lab-export-brief").addEventListener("click",()=>{
+      const d=update();if(d.re.length||d.me.length||d.links.length||!d.decisionReview.ready)return;
+      const file=analysis.handoff(d.reviewInputsValue,d.r,d.m,d.decisionReview);
+      const blob=new Blob([file],{type:"text/markdown"});
+      const uri=URL.createObjectURL(blob),link=document.createElement("a");
+      link.href=uri;link.download="fictional-executive-handoff.md";link.click();
+      setTimeout(()=>URL.revokeObjectURL(uri),1000);
+      note("lab-export-message","Prepared a source-linked handoff locally; no upload.");
     });
     root.addEventListener("input",update);root.addEventListener("change",update);
     update();
