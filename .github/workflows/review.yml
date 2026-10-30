@@ -30,19 +30,78 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: python3 scripts/sync.py
+      - name: Checkout pinned automotive reference source for direct semantic parity
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7, Node 24
+        with:
+          repository: simaba/automotive-llm-eval-harness
+          ref: 10e4e71313a11b93ce71b9c5750d55fdb51115a7
+          path: .source-reference/automotive
+          sparse-checkout: |
+            src/automotive_llm_eval_harness/core.py
+          sparse-checkout-cone-mode: false
+          persist-credentials: false
+      - name: Checkout pinned Agent Simulator reference source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7, Node 24
+        with:
+          repository: simaba/agent-simulator
+          ref: 8fa1bce9994f33e428592555d35acff79663f602
+          path: .source-reference/agent
+          sparse-checkout: |
+            src/agents.py
+            src/controller.py
+            src/scenarios.py
+            src/evaluation.py
+          sparse-checkout-cone-mode: false
+          persist-credentials: false
+      - name: Checkout pinned Program Management validators and schemas
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7, Node 24
+        with:
+          repository: simaba/everything-program-management
+          ref: aef7e66b87ab07f38e9410cbc831274cb959fb41
+          path: .source-reference/pmkit
+          sparse-checkout: |
+            src/pmkit/__init__.py
+            src/pmkit/validators.py
+            schemas/raid-row.schema.json
+            schemas/decision-memo-frontmatter.schema.json
+          sparse-checkout-cone-mode: false
+          persist-credentials: false
+      - name: Checkout pinned Release Validator source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7, Node 24
+        with:
+          repository: simaba/release-checklist
+          ref: b400063973acf011cae515fa985e83aa63a8ed29
+          path: .source-reference/release
+          sparse-checkout: |
+            src/airc/__init__.py
+            src/airc/validator.py
+          sparse-checkout-cone-mode: false
+          persist-credentials: false
       - name: Verify structured content, generated website, privacy and editorial design
+        env:
+          AUTOMOTIVE_REFERENCE_CORE: .source-reference/automotive/src/automotive_llm_eval_harness/core.py
+          AGENT_REFERENCE_SRC: .source-reference/agent/src
         run: |
           python3 scripts/verify.py
           python3 -m unittest discover -s tests -v
           node --check assets/app.js
+          node --check assets/automotive-core.js
+          node --check assets/pmkit-core.js
+          node --check assets/pmkit-analysis.js
+          node --check assets/simulator-core.js
+          node --check assets/project-labs.js
+          node --check assets/extended-labs.js
           test -s dist/index.html
           test -f dist/.nojekyll
       - name: Install pinned browser tooling
         run: |
           python3 -m venv .venv
-          .venv/bin/pip install playwright==1.57.0 pillow==12.0.0
+          .venv/bin/pip install playwright==1.57.0 pillow==12.0.0 PyYAML==6.0.2 jsonschema==4.25.1
           .venv/bin/python -m playwright install --with-deps chromium
       - name: Browser behavior, responsive layout and screenshot evidence
+        env:
+          PMKIT_REFERENCE_ROOT: .source-reference/pmkit
+          RELEASE_REFERENCE_ROOT: .source-reference/release
         run: .venv/bin/python scripts/browser_review.py
       - name: Require review screenshots
         run: |
@@ -63,6 +122,15 @@ jobs:
           path: .qa/
           if-no-files-found: error
           include-hidden-files: true
+          retention-days: 1
+      - name: Package local interactive preview for PR review
+        if: success() && github.event_name == 'pull_request'
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7, Node 24
+        with:
+          name: interactive-portfolio-preview-${{ github.run_id }}
+          path: dist/
+          include-hidden-files: true
+          if-no-files-found: error
           retention-days: 1
       - name: Preserve exact verified site (trusted main only)
         if: success() && github.event_name != 'pull_request' && github.ref == 'refs/heads/main'

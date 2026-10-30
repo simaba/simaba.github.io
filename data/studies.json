@@ -5,7 +5,7 @@
       "repo": "lean-ai-ops",
       "question": "How do you turn an ambiguous process problem into reviewable improvement work?",
       "orientation": "OPERATIONS / SOFTWARE",
-      "summary": "Lean AI Ops combines an AI-assisted DMAIC project wizard with a Python analytics workbench. The public web page illustrates the method; the Streamlit application is the runtime.",
+      "summary": "Lean AI Ops combines an AI-assisted DMAIC project wizard with a Python analytics workbench. Its separate GitHub Pages walkthrough illustrates DMAIC; this portfolio page additionally runs bounded capability calculations in JavaScript.",
       "method": [
         "The wizard begins with a process description and separates stated facts, inferred hypotheses and missing evidence.",
         "It structures a problem statement, CTQs, SIPOC, DMAIC phases, action ownership, metrics and controls into a project package.",
@@ -14,12 +14,12 @@
       "artifacts": [
         "A Streamlit application for project intake and generated packages",
         "Analytics workbench with named process-improvement methods",
-        "A public browser explainer showing the workflow without invoking the Python engine"
+        "A static DMAIC browser walkthrough plus a separate portfolio calculator for selected capability indices"
       ],
       "example_label": "Run the working application",
       "example": "git clone https://github.com/simaba/lean-ai-ops.git\ncd lean-ai-ops\npython -m pip install -r requirements.txt\npython -m streamlit run app.py",
       "limits": [
-        "The GitHub Pages interface does not call the model, persist project work or run statistical calculations.",
+        "The separate GitHub Pages DMAIC walkthrough does not invoke the Python engine, run its statistical toolbox or call a model. This portfolio page independently computes selected Cp/Cpk and Pp/Ppk formulas, but does not run the full analytics engine.",
         "The project helps structure improvement work; it cannot validate a root cause or replace the quality practitioner's review."
       ],
       "links": [
@@ -48,15 +48,17 @@
         "Connects a fictional research-library scenario across planning, risk, decisions and briefings, demonstrating how the artifacts relate without pretending to be a real client case."
       ],
       "artifacts": [
-        "Authored skills and templates for different program decisions",
-        "Connected, clearly fictional examples illustrating handoffs",
-        "A packaged pmkit CLI validating JSON RAID rows and decision-memo frontmatter"
+        "Authored skills, templates and source-informed reviews of hard constraints, evidence classes, risk triage and executive handoffs",
+        "Connected, clearly fictional RAID and decision-memo examples with a generated reviewer-facing executive handoff",
+        "A packaged pmkit CLI validating RAID JSON and decision memo frontmatter, illustrated by this linked two-artifact browser workflow"
       ],
       "example_label": "Validate an example program artifact",
       "example": "python -m pip install -e .\npmkit validate raid examples/data/raid-row.json\npmkit validate decision-memo examples/data/decision-memo.md",
       "limits": [
         "Schemas check bounded structure and selected semantics, not whether a program manager's judgment or evidence is sound.",
-        "The examples are invented. This is not a program-management system of record or autonomous chief of staff."
+        "The examples are invented. This is not a program-management system of record or autonomous chief of staff.",
+        "This workbench exports linked fictional artifacts whose structure can be checked by the source CLI. It does not manage a program of record, review live evidence, or select the preferred option.",
+        "The supplemental decision-quality review and executive handoff are browser-authored methods, not an additional Python pmkit schema, validated record of authority, or AI-generated decision."
       ],
       "links": [
         [
@@ -79,20 +81,21 @@
       "orientation": "AUTOMOTIVE / EVALUATION PROTOTYPE",
       "summary": "A Python scoring prototype for synthetic automotive assistant cases, with an explicit run manifest and separate quality and safety/privacy decisions.",
       "method": [
-        "Validates supplied JSONL cases and rejects malformed or empty input and duplicate case identifiers.",
+        "Validates non-empty prescored JSONL inputs, required dimensions and duplicate identifiers; the portfolio workbench provides bounded local import and export.",
         "Scores stated dimensions such as intent, language quality, privacy and safety, using illustrative risk-tiered gates and weighted thresholds.",
         "Records dataset digest and run context so the score can be linked to the cases, rubric, evaluator, harness and exclusions used."
       ],
       "artifacts": [
         "Scoring CLI and public-safe example case files",
         "Dataset card, methodology and reproducibility documentation",
-        "Structured JSON output distinguishing hard-gate status from aggregate quality"
+        "Case-level results and aggregate count, average, pass and blocked statistics, with independent hard-gate and quality outcomes"
       ],
       "example_label": "Score the supplied synthetic cases",
       "example": "python -m pip install -e .\nautomotive-eval run datasets/sample_cases.jsonl \\\n  --manifest datasets/sample_run_manifest.json \\\n  --json-out out.json",
       "limits": [
         "The program scores values in input artifacts. It does not generate model responses, run model judges or independently measure a deployed assistant.",
-        "Illustrative thresholds are not vehicle safety criteria, homologation evidence or a production release decision."
+        "Illustrative thresholds are not vehicle safety criteria, homologation evidence or a production release decision.",
+        "Portfolio imports are limited to 200 local prescored cases and 256 KiB, and do not collect benchmark data or run model inference."
       ],
       "links": [
         [
@@ -122,13 +125,14 @@
       "artifacts": [
         "Python CLI and validator package",
         "Fictional release-decision YAML examples and reporting formats",
-        "Automated tests of conditional release, blocker and hard-gate consistency"
+        "Structured fictional release-decision records with decision scope, owner, evidence references, gate statuses, conditions and residual risks"
       ],
       "example_label": "Inspect a fictional decision record",
       "example": "python -m pip install -e .\nrelease-checklist validate configs/medium-risk-example.yaml\nrelease-checklist report configs/high-risk-example.yaml --format markdown",
       "limits": [
         "A logically coherent release record does not prove that its evidence is authentic or sufficient.",
-        "The tool cannot establish legal applicability, certify safety, or authorize any real release."
+        "The tool cannot establish legal applicability, certify safety, or authorize any real release.",
+        "Exported JSON is valid YAML input for the source release-checklist validator. Internal coherence is not evidence authenticity, legal applicability or a safety determination."
       ],
       "links": [
         [
@@ -182,6 +186,255 @@
         [
           "Inspect the fictional report",
           "https://github.com/simaba/agent-eval/blob/main/examples/sample-evaluation-report.json"
+        ]
+      ]
+    },
+    {
+      "repo": "governance-playbook",
+      "question": "Who makes which AI lifecycle decision, with which evidence and authority?",
+      "orientation": "GOVERNANCE / PRACTITIONER METHOD",
+      "summary": "A decision-and-evidence operating-model playbook. It defines intake, review, decision, exception and follow-through contracts, and treats governance burden as a design concern.",
+      "method": [
+        "Build a decision inventory that identifies the specific decision, accountable owner, evidence standard and useful-by deadline rather than starting with committees.",
+        "Route requests proportionately according to action authority, reversibility, affected people and evidence—not one generic risk label.",
+        "Make decisions traceable through conditions, expiry, exceptions, independent challenge and verification of follow-through."
+      ],
+      "artifacts": [
+        "Decision inventory and operating-model design guidance",
+        "Intake, prioritization, release and monitoring templates",
+        "A fictional worked operating-model example"
+      ],
+      "example_label": "Inspect a fictional operating model",
+      "example": "Read the fictional example and edit an intake decision in the browser workbench above. The real repository supplies templates, not an automated governance policy engine.",
+      "limits": [
+        "The browser routing is a worked illustration, not a normative risk model or an entitlement to authorize use.",
+        "This repository defines organizational decisions and evidence contracts; it has no executable compliance or regulatory approval engine."
+      ],
+      "links": [
+        [
+          "Decision and evidence operating-model design",
+          "https://github.com/simaba/governance-playbook/blob/main/docs/operating-model-design.md"
+        ],
+        [
+          "Fictional operating-model example",
+          "https://github.com/simaba/governance-playbook/blob/main/examples/sample-ai-governance-operating-model.md"
+        ],
+        [
+          "Read the full playbook",
+          "https://github.com/simaba/governance-playbook"
+        ]
+      ]
+    },
+    {
+      "repo": "agent-simulator",
+      "question": "When should an agent retry, use a bounded fallback, or hand control to a human?",
+      "orientation": "SIMULATION / WORKING PYTHON CODE",
+      "summary": "A deterministic Python control-flow simulator exercising explicit acceptance criteria, bounded retries, fallback-specific acceptance and escalation. It records why each transition occurred.",
+      "method": [
+        "Planner produces a bounded plan; executor supplies output and observable evidence fields.",
+        "Evaluator checks task_complete, output_present and boundary_respected independently of self-reported confidence.",
+        "Supervisor accepts, requests a bounded retry, checks the separate fallback contract or escalates with a traceable decision log."
+      ],
+      "artifacts": [
+        "Python scenario controller and deterministic executor fixtures",
+        "Four published, executable scenario fixtures plus bounded hypothetical evidence experiments",
+        "Full decision log, retry and outcome counts, primary/fallback separation and downloadable report"
+      ],
+      "example_label": "Run a published scenario",
+      "example": "python run_demo.py --scenario retry_then_success\npython run_demo.py --scenario fallback_after_failure",
+      "limits": [
+        "The interactive trace uses the published deterministic fixtures, not a live language model, external tools, or real execution.",
+        "Self-reported confidence is diagnostic metadata. The fixture cannot establish safe behavior in deployed agents.",
+        "Experimental evidence overrides are hypothetical, clearly separated from the source fixtures; published latency and cost are metadata, not recomputed measurements."
+      ],
+      "links": [
+        [
+          "Controller implementation",
+          "https://github.com/simaba/agent-simulator/blob/main/src/controller.py"
+        ],
+        [
+          "Published scenarios",
+          "https://github.com/simaba/agent-simulator/blob/main/src/scenarios.py"
+        ],
+        [
+          "Source and instructions",
+          "https://github.com/simaba/agent-simulator"
+        ]
+      ]
+    },
+    {
+      "repo": "multi-agent-governance",
+      "question": "What authority can propagate through a chain of agents and tools?",
+      "orientation": "SYSTEMS / AUTHORITY MODEL",
+      "summary": "A practitioner framework for reviewing identity, delegated authority, untrusted instructions, containment and recovery in workflows spanning agents and tools.",
+      "method": [
+        "Describe each component's authority envelope in terms of principal, data reach, action effects and delegation.",
+        "Keep propose, validate, authorize, execute, verify and record as distinguishable transitions.",
+        "Plan revocation, queued-work cancellation, partial-state recovery and independent evidence review before high-consequence actions."
+      ],
+      "artifacts": [
+        "Authority-and-containment design rules with a sample envelope",
+        "Templates for agent roles, review, escalation and accountability",
+        "A fictional research-assistant governance review"
+      ],
+      "example_label": "Inspect an authority envelope",
+      "example": "Review the sample authority envelope and change the proposed tool action in the browser. No tool is invoked by the illustration.",
+      "limits": [
+        "A static browser cannot enforce permissions on real MCP servers or agents; actual restrictions must be implemented at identity and tool layers.",
+        "The authority exercise demonstrates decision points, not an independent penetration test or assurance of safety."
+      ],
+      "links": [
+        [
+          "Authority and containment model",
+          "https://github.com/simaba/multi-agent-governance/blob/main/docs/authority-and-containment.md"
+        ],
+        [
+          "Fictional review",
+          "https://github.com/simaba/multi-agent-governance/blob/main/examples/sample-system-governance-review.md"
+        ],
+        [
+          "Repository",
+          "https://github.com/simaba/multi-agent-governance"
+        ]
+      ]
+    },
+    {
+      "repo": "ai-prism",
+      "question": "How can a useful AI governance source be found and assessed without relying on a link dump?",
+      "orientation": "RESEARCH / CURATED RESOURCE HUB",
+      "summary": "A curated directory of frameworks, standards, evaluation tooling, incident references and research. Its value lies in classification, provenance and the distinction between primary and secondary sources.",
+      "method": [
+        "Group references by their practical use: official frameworks, measurement, engineering tools, incident response and research.",
+        "Preserve source ownership and distinguish official text from secondary interpretation.",
+        "Treat link availability and publication freshness as different review questions; recheck applicability and versions before relying on a source."
+      ],
+      "artifacts": [
+        "Curated links to official frameworks, tools and papers",
+        "Source descriptions grouped by practitioner topic",
+        "Contribution and source-review guidance in the public repository"
+      ],
+      "example_label": "Explore selected public sources",
+      "example": "Search the representative, repo-derived browser index by publisher or topic. Open the publisher's page to verify its current version and applicability.",
+      "limits": [
+        "The browser index is a curated extract from the repository, not a live crawler, freshness audit or endorsement.",
+        "Links can change after publication; do not assume legal or standards materials are current without checking the source."
+      ],
+      "links": [
+        [
+          "Explore the complete curated index",
+          "https://github.com/simaba/ai-prism/blob/main/README.md"
+        ],
+        [
+          "Repository",
+          "https://github.com/simaba/ai-prism"
+        ]
+      ]
+    },
+    {
+      "repo": "prompt-harness-translator",
+      "question": "What changes when a structured prompt asset moves between harnesses?",
+      "orientation": "FORMATS / WORKING TRANSLATOR CLI",
+      "summary": "A Python Markdown/YAML prompt-asset translator rendering bounded Codex, Cursor and generic representations while explicitly retaining metadata that a target does not natively apply.",
+      "method": [
+        "Parse frontmatter into name, description, instructions and source metadata; reject unsupported or malformed inputs.",
+        "Generate distinct target layouts rather than falsely treating harness capabilities as interchangeable.",
+        "Preserve unmapped metadata and place an explicit lossy-conversion warning into generated outputs."
+      ],
+      "artifacts": [
+        "Python translator CLI and format-specific renderers",
+        "Public-safe sample Markdown/YAML prompt asset",
+        "Tests for nested metadata, invalid frontmatter and lossy target conversion"
+      ],
+      "example_label": "Try the real CLI",
+      "example": "python -m pip install -e .\nprompt-harness translate examples/sample_agent.md --target cursor",
+      "limits": [
+        "The browser editor reproduces output for a bounded editable fixture; it does not parse arbitrary YAML or cover all metadata types.",
+        "Successful translation does not prove equivalent tool permissions, model behavior or enforcement across runtimes."
+      ],
+      "links": [
+        [
+          "Source translation rules",
+          "https://github.com/simaba/prompt-harness-translator/blob/main/src/prompt_harness_translator/core.py"
+        ],
+        [
+          "Format limitations",
+          "https://github.com/simaba/prompt-harness-translator/blob/main/docs/SUPPORTED_FORMATS.md"
+        ],
+        [
+          "Repository",
+          "https://github.com/simaba/prompt-harness-translator"
+        ]
+      ]
+    },
+    {
+      "repo": "mcp-agent-risk-checklist",
+      "question": "What does a review actually know about an agent's effective tool authority?",
+      "orientation": "SECURITY / STRUCTURED REVIEW",
+      "summary": "A bounded review toolkit for MCP integrations covering principal binding, action effect, data reach, untrusted content, containment, recovery and evidence ownership.",
+      "method": [
+        "Inventory tool effects, identities and data boundaries rather than treating a server name as a trust guarantee.",
+        "Edit likelihood, impact, risk level, mitigation and ownership; the complete browser export follows the repository's review-envelope structure.",
+        "Make the decision scope explicit; structure validation checks the review record, not actual permissions or server vulnerability."
+      ],
+      "artifacts": [
+        "Machine-readable MCP risk-review JSON schema",
+        "Fictional review example and source schema with one or more findings",
+        "Authority, mitigation and scenario-based risk-scoring guidance"
+      ],
+      "example_label": "Validate the exported review record",
+      "example": "python scripts/validate_examples.py\n# The browser export uses the same record structure, with one editable fictional finding.",
+      "limits": [
+        "The browser only checks the selected fields of a fictional review record; it does not connect to or scan MCP servers.",
+        "Likelihood and impact are ordinal triage aids. A reviewer must independently substantiate the findings and control boundaries."
+      ],
+      "links": [
+        [
+          "Fictional review JSON",
+          "https://github.com/simaba/mcp-agent-risk-checklist/blob/main/examples/fictional-mcp-risk-review.json"
+        ],
+        [
+          "Risk review schema",
+          "https://github.com/simaba/mcp-agent-risk-checklist/blob/main/schemas/mcp-risk-review.schema.json"
+        ],
+        [
+          "Repository",
+          "https://github.com/simaba/mcp-agent-risk-checklist"
+        ]
+      ]
+    },
+    {
+      "repo": "nist-rmf-guide",
+      "question": "How does a framework reference become an evidence-bearing, scoped review item?",
+      "orientation": "RISK MANAGEMENT / PRACTITIONER GUIDE",
+      "summary": "An unofficial practitioner guide to using relevant NIST AI RMF references in scoped assessments, with explicit evidence states, decision consequences and review limitations.",
+      "method": [
+        "Start with the official function, category, subcategory and framework version rather than an invented universal maturity score.",
+        "Separate documented practice from demonstrated operation and outcomes; preserve provenance, gaps and not-applicable rationale.",
+        "Link each material gap to a decision, owner, review trigger and next evidence, without claiming automatic compliance."
+      ],
+      "artifacts": [
+        "Four-function Govern/Map/Measure/Manage assessment template",
+        "Fictional worked evidence and gap assessment",
+        "Guidance on evidence freshness and non-equivalence of cross-framework mappings"
+      ],
+      "example_label": "Build a bounded evidence worksheet",
+      "example": "The browser worksheet organizes selected prompts and user-entered evidence states, then exports a draft review. Reference numbers must be verified against official NIST material.",
+      "limits": [
+        "Not an official NIST assessment, implementation profile, compliance test or certification.",
+        "The worksheet does not decide applicability or establish control operation; unresolved or missing evidence is disclosed, not converted into a single score."
+      ],
+      "links": [
+        [
+          "NIST AI RMF official source",
+          "https://airc.nist.gov/home"
+        ],
+        [
+          "Source template",
+          "https://github.com/simaba/nist-rmf-guide/blob/main/templates/nist-rmf-gap-assessment.md"
+        ],
+        [
+          "Practitioner guide",
+          "https://github.com/simaba/nist-rmf-guide"
         ]
       ]
     }

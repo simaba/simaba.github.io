@@ -3,6 +3,7 @@
 from __future__ import annotations
 import html
 import json
+import re
 import shutil
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1]
@@ -39,24 +40,79 @@ def catalog_row(p,i,meta):
     return ('<a class="project-row" data-kind="'+esc(p["kind"])+'" data-search="'+esc(searchable)+'" href="'+esc(url)+'"'+attrs+'>'
         '<span class="project-num">'+f"{i:02d}"+'</span><span class="project-name">'+esc(p["title"])+'</span><span class="project-description">'+esc(p["description"])+'</span>'
         '<span class="project-type">'+esc(p["kind"].upper())+' / '+esc(p["status"])+updated+'</span><span class="project-arrow" aria-hidden="true">↗</span></a>')
-def render_study(page, study, p):
+def render_study(page, study, p, source):
     name=esc(p["title"])
     url="https://github.com/simaba/"+p["repo"]
     def items(key):
         return '<ul class="study-points">'+''.join('<li>'+esc(t)+'</li>' for t in study[key])+'</ul>'
+    # The snapshot is a review anchor, not a promise that the source has not changed.
+    source_url="https://github.com/simaba/"+p["repo"]+"/blob/"+source["commit"]+"/"+source["reference_path"]
+    source_markup='<a class="lab-source" href="'+esc(source_url)+'" target="_blank" rel="noopener noreferrer">Inspect referenced source <span aria-hidden="true">↗</span><code>'+esc(source["commit"][:9])+'</code></a>'
     links=[]
     for label,href in study["links"]:
-        if not (href.startswith("https://github.com/simaba/") or href=="https://simaba.github.io/lean-ai-ops/"):
+        if not (href.startswith("https://github.com/simaba/") or href=="https://simaba.github.io/lean-ai-ops/" or href=="https://airc.nist.gov/home"):
             raise ValueError("Unexpected project link destination")
         links.append('<a href="'+esc(href)+'" target="_blank" rel="noopener noreferrer">'+esc(label)+' ↗</a>')
+    lab_info={
+        "lean-ai-ops":("PROCESS CAPABILITY","Capability from ordered measurements",
+            "Edit observations and engineering specification limits. Explore Cp/Cpk and Pp/Ppk using the same selected formulas as the Python analytics module.",
+            "A narrow calculation from analytics/capability.py, without Shapiro-Wilk normality testing, DPMO estimation or full project generation."),
+        "everything-program-management":("LINKED PROGRAM ARTIFACTS","From uncertainty to a traceable decision",
+            "Edit a linked RAID risk and decision memo, inspect option feasibility, evidence provenance, and change triggers, then export a decision brief and source-compatible artifacts.",
+            "This browser workbench covers a connected RAID risk and decision memo. The original Python validators check its exports; evidence quality and authority remain outside the tool."),
+        "automotive-llm-eval-harness":("SCORING PROTOTYPE","When a high score still fails",
+            "Inspect or import prescored cases, change their dimensions, and examine each weighted contribution, risk-tiered hard gate, and whole-dataset result.",
+            "Scores are supplied inputs, not measured model responses. Thresholds are illustrative and are not safety or release criteria."),
+        "release-checklist":("EVIDENCE-BASED RELEASE RECORD","Inspect a bounded release decision",
+            "Edit gate results, fictional evidence citations, decision scope, owners, conditions and outcome. Export a complete record that can be validated by the original Python CLI.",
+            "The browser validates selected record semantics and uses pinned Python source tests for its exported sample. It does not authenticate evidence, infer legal controls, or certify a system's safety."),
+        "agent-eval":("EVALUATION VALIDITY","Test a report's decision coherence",
+            "Change the recommendation, approval status, finding severity and accepted actions from a fictional agent-evaluation record.",
+            "This reproduces the validator's cross-field decision checks, not the complete JSON Schema or an evaluation of a deployed agent."),
+        "governance-playbook":("GOVERNANCE SERVICE","Route the decision, not the committee",
+            "Choose an AI lifecycle decision, intended authority, accountable owner and evidence readiness; inspect the proposed review service and missing inputs.",
+            "An illustrative routing exercise from the playbook, not a prescribed enterprise control, policy engine or authorizing decision."),
+        "agent-simulator":("DETERMINISTIC CONTROL FLOW","A decision trace, step by step",
+            "Step through real source-controlled scenarios, then vary the observable evidence in a separately marked experiment to inspect retry, fallback and escalation decisions.",
+            "An interactive port of deterministic scenario logic, not live agent orchestration, empirical model evaluation or measured correctness."),
+        "multi-agent-governance":("AUTHORITY ENVELOPE","Find the boundary before the tool call",
+            "Choose a proposed action, data reach and proof controls within the fictional catalog-drafter envelope.",
+            "No real agent/tool action is performed; enforcement must reside in authenticated tool, identity and data layers."),
+        "ai-prism":("SOURCE EXPLORER","Explore the curated source index",
+            "Search and filter representative public references by source, topic and publisher with explicit primary/secondary distinctions.",
+            "A snapshot of repository-curated links, not automated freshness verification, legal interpretation or live source evaluation."),
+        "prompt-harness-translator":("FORMAT CONVERSION","See what the target cannot carry",
+            "Change the published synthetic sample's fields and render bounded Codex, Cursor or generic outputs with visible metadata-loss warnings.",
+            "A constrained fixture editor, not the full YAML parser, full CLI or a claim of cross-harness behavioral equivalence."),
+        "mcp-agent-risk-checklist":("STRUCTURED SECURITY REVIEW","Inspect a risk finding, not a trust label",
+            "Edit one fictional MCP finding, check selected JSON-schema constraints and inspect likelihood-impact ordering without hiding owner or mitigation.",
+            "Does not scan MCP servers, enforce actual permissions or infer risk severity from ordinal multiplication."),
+        "nist-rmf-guide":("EVIDENCE WORKSHEET","Map evidence without inventing a maturity score",
+            "Assign evidence states to Govern/Map/Measure/Manage propositions and record provenance or limitations in an exportable worksheet.",
+            "Unofficial practitioner question extract. Reference applicability, control effectiveness and compliance remain unassessed.")
+    }
+    mode,lab_title,lab_description,lab_boundary=lab_info[p["repo"]]
+    live=(' <a class="lab-live-link" href="https://simaba.github.io/lean-ai-ops/" target="_blank" rel="noopener noreferrer">Explore the separate interactive DMAIC walkthrough ↗</a>' if p["repo"]=="lean-ai-ops" else "")
+    # Runnable shell commands and explanatory examples are different artifact types.
+    # Do not format ordinary prose as a terminal command merely for visual effect.
+    example=study["example"].strip()
+    is_command=example.startswith(("git clone ","python ","python3 ","pip ","prompt-harness ","release-checklist ","automotive-eval "))
+    example_html=('<pre class="study-code"><code>'+esc(example)+'</code></pre>' if is_command
+                  else '<p class="study-example-text">'+esc(example)+'</p>')
+    example_note=("The command is from the linked repository; this website does not execute it."
+                  if is_command else
+                  "This is an explanatory example, not a shell command or a generated system result.")
     substitutions={
+        "{{LAB_MODE}}":esc(mode),"{{LAB_TITLE}}":esc(lab_title),
+        "{{LAB_DESCRIPTION}}":esc(lab_description),"{{LAB_BOUNDARY}}":esc(lab_boundary),
+        "{{LAB_LIVE}}":live,"{{LAB_SOURCE}}":source_markup,"{{REPO}}":esc(p["repo"]),
         "{{META_TITLE}}":name,"{{META_DESCRIPTION}}":esc(study["summary"]),
         "{{CANONICAL}}":esc("https://simaba.github.io/projects/"+p["repo"]+"/"),
         "{{SOURCE_URL}}":esc(url),"{{ORIENTATION}}":esc(study["orientation"]),
         "{{STATUS}}":esc(p["status"]),"{{TITLE}}":name,"{{QUESTION}}":esc(study["question"]),
         "{{SUMMARY}}":esc(study["summary"]),"{{METHOD}}":items("method"),
         "{{ARTIFACTS}}":items("artifacts"),"{{EXAMPLE_LABEL}}":esc(study["example_label"]),
-        "{{EXAMPLE}}":esc(study["example"]),"{{LIMITS}}":items("limits"),
+        "{{EXAMPLE_HTML}}":example_html,"{{EXAMPLE_NOTE}}":esc(example_note),"{{LIMITS}}":items("limits"),
         "{{LINKS}}":''.join(links)}
     for key,value in substitutions.items():
         if key not in page:raise RuntimeError("Missing project page placeholder "+key)
@@ -68,10 +124,17 @@ def build():
     snap=json.loads((ROOT/"data/public-metadata.json").read_text("utf-8"))
     projects=data["projects"];meta=snap["repositories"];verified=snap.get("fetched_at")
     study_data=json.loads((ROOT/"data/studies.json").read_text("utf-8"))
+    sources=json.loads((ROOT/"data/source-revisions.json").read_text("utf-8"))
+    references=sources["references"]
     studies=study_data["studies"]
     by_slug={s["repo"]:s for s in studies}
     if len(by_slug)!=len(studies) or set(by_slug)!={p["repo"] for p in projects if p.get("study")}:
         raise RuntimeError("Case-study route and catalog mismatch")
+    if sources["schema_version"]!=1 or set(references)!=set(by_slug):
+        raise RuntimeError("Missing or surplus pinned source references")
+    for repo,entry in references.items():
+        if not re.fullmatch(r"[0-9a-f]{40}",entry["commit"]) or not re.fullmatch(r"[A-Za-z0-9_./-]+",entry["reference_path"]):
+            raise RuntimeError("Malformed source reference for "+repo)
     freshness="Public metadata refreshed "+verified[:10]+"." if verified else "Public activity data pending first verified refresh."
     tpl=(ROOT/"site/template.html").read_text("utf-8")
     mapping={"{{FEATURED}}":"\n".join(featured_card(p,i) for i,p in enumerate((x for x in projects if x["featured"]),1)),
@@ -88,7 +151,7 @@ def build():
     for p in projects:
         if p["repo"] not in by_slug:continue
         folder=OUT/"projects"/p["repo"];folder.mkdir(parents=True,exist_ok=True)
-        (folder/"index.html").write_text(render_study(study_template,by_slug[p["repo"]],p),encoding="utf-8")
+        (folder/"index.html").write_text(render_study(study_template,by_slug[p["repo"]],p,references[p["repo"]]),encoding="utf-8")
     (OUT/"index.html").write_text(tpl,encoding="utf-8")
     (OUT/".nojekyll").write_text("",encoding="utf-8")
     print(f"Built {len(projects)} curated entries, {sum(p['featured'] for p in projects)} featured, {len(studies)} case pages")

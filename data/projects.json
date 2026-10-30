@@ -110,7 +110,7 @@
       ],
       "detail": "Practitioner guidance for designing governance; not a compliance certificate or ready-made organizational policy.",
       "editorial_source": "README.md",
-      "study": false
+      "study": true
     },
     {
       "repo": "agent-simulator",
@@ -126,7 +126,7 @@
       ],
       "detail": "Deterministic fixtures demonstrate control flow; they are not measurements of deployed multi-agent systems.",
       "editorial_source": "README.md",
-      "study": false
+      "study": true
     },
     {
       "repo": "multi-agent-governance",
@@ -142,7 +142,7 @@
       ],
       "detail": "Practitioner patterns; they do not enforce permissions or provide a running security boundary.",
       "editorial_source": "README.md",
-      "study": false
+      "study": true
     },
     {
       "repo": "ai-prism",
@@ -158,7 +158,7 @@
       ],
       "detail": "A reference hub with inclusion standards and review notes; it does not endorse or validate every linked tool.",
       "editorial_source": "README.md",
-      "study": false
+      "study": true
     },
     {
       "repo": "prompt-harness-translator",
@@ -174,7 +174,7 @@
       ],
       "detail": "Limited format translation, not cross-runtime behavioral equivalence. Generated assets require human review.",
       "editorial_source": "README.md",
-      "study": false
+      "study": true
     },
     {
       "repo": "mcp-agent-risk-checklist",
@@ -190,7 +190,7 @@
       ],
       "detail": "A structured review aid, not a server scanner or declaration that an integration is secure.",
       "editorial_source": "README.md",
-      "study": false
+      "study": true
     },
     {
       "repo": "nist-rmf-guide",
@@ -206,7 +206,7 @@
       ],
       "detail": "Not official NIST guidance; completing its templates does not establish implementation or compliance.",
       "editorial_source": "README.md",
-      "study": false
+      "study": true
     }
   ]
 }

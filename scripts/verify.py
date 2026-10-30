@@ -107,7 +107,9 @@ def verify():
     assert all(isinstance(p["description"],str) and len(p["description"])>=75 for p in data["projects"])
     assert all(p.get("editorial_source")=="README.md" for p in data["projects"])
     studies=json.loads((ROOT/"data/studies.json").read_text())
-    assert studies["schema_version"]==1 and len(studies["studies"])==5
+    sources=json.loads((ROOT/"data/source-revisions.json").read_text())
+    assert sources["schema_version"]==1 and len(sources["references"])==12
+    assert studies["schema_version"]==1 and len(studies["studies"])==12
     assert {s["repo"] for s in studies["studies"]}=={p["repo"] for p in data["projects"] if p.get("study")}
     assert {p["repo"] for p in data["projects"] if p["featured"]}=={"lean-ai-ops","everything-program-management","automotive-llm-eval-harness","release-checklist"}
     for s in studies["studies"]:
@@ -116,9 +118,22 @@ def verify():
         content=page.read_text(encoding="utf-8")
         assert "{{" not in content and "What it does not establish" in content
         assert "../../assets/styles.css" in content and "../../assets/detail.js" in content
+        assert "../../assets/labs.css" in content and "../../assets/project-labs.js" in content
+        assert "../../assets/extended-labs.js" in content
+        assert "../../assets/simulator-core.js" in content
+        assert 'data-project-lab="'+s["repo"]+'"' in content
+        source=sources["references"][s["repo"]]
+        assert ('/blob/'+source["commit"]+'/'+source["reference_path"]) in content
+        assert 'REVIEWED SOURCE SNAPSHOT' in content
         assert 'href="../../assets/favicon.svg"' in content
         assert 'property="og:title"' in content and 'property="og:description"' in content
     assert (ROOT/"dist/assets/detail.js").is_file()
+    assert (ROOT/"dist/assets/project-labs.js").is_file()
+    assert (ROOT/"dist/assets/extended-labs.js").is_file()
+    assert (ROOT/"dist/assets/pmkit-core.js").is_file()
+    assert (ROOT/"dist/assets/pmkit-analysis.js").is_file()
+    assert (ROOT/"dist/assets/simulator-core.js").is_file()
+    assert (ROOT/"dist/assets/labs.css").is_file()
     assert "BUILT WITH INTENTION" not in HTML
     assert "Each project addresses a different part" not in HTML
     assert "A score isn’t a release decision" not in HTML
