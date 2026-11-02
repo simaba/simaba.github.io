@@ -82,7 +82,7 @@ const example=Object.freeze({
  likelihood:2,impact:3,risk_level:"medium",mitigation:"Add privacy-aware audit logging and define retention/access rules before using non-synthetic data.",owner:"Fictional Operations Owner",status:"open"}
  ]});
 const clone=x=>JSON.parse(JSON.stringify(x));
-const api=Object.freeze({statuses,areas,levels,findingStatuses,validate,review,example,clone});
+const api=Object.freeze({statuses,areas,levels,findingStatuses,recordKeys,findingKeys,validate,review,example,clone});
 if(typeof module!=="undefined"&&module.exports)module.exports=api;
 root.PortfolioMCPReview=api;
 })(typeof globalThis!=="undefined"?globalThis:window);

@@ -18,6 +18,31 @@ process.stdout.write(JSON.stringify({errors:x.validate(input),review:x.review(in
         p=subprocess.run(["node","-e",cli,json.dumps(obj)],cwd=ROOT,
                          text=True,capture_output=True,check=True)
         return json.loads(p.stdout)
+    def test_source_example_and_exact_schema_keys(self):
+        fixture=ROOT/".source-reference/mcp/examples/fictional-mcp-risk-review.json"
+        schema_path=ROOT/".source-reference/mcp/schemas/mcp-risk-review.schema.json"
+        if not fixture.is_file() or not schema_path.is_file():
+            self.skipTest("Pinned source checkout only exists on hosted CI")
+        code="""const x=require('./assets/mcp-review-core.js');
+process.stdout.write(JSON.stringify({
+    example:x.example,recordKeys:x.recordKeys,findingKeys:x.findingKeys,
+    statuses:x.statuses,areas:x.areas,levels:x.levels,findingStatuses:x.findingStatuses
+}));"""
+        p=subprocess.run(["node","-e",code],cwd=ROOT,
+                         text=True,capture_output=True,check=True)
+        actual=json.loads(p.stdout)
+        example=json.loads(fixture.read_text(encoding="utf-8"))
+        schema=json.loads(schema_path.read_text(encoding="utf-8"))
+        self.assertEqual(example,actual["example"])
+        self.assertEqual(set(schema["properties"]),set(actual["recordKeys"]))
+        props=schema["properties"]["findings"]["items"]["properties"]
+        self.assertEqual(set(props),set(actual["findingKeys"]))
+        for js_field,schema_field in [
+            ("statuses",schema["properties"]["review_status"]),
+            ("areas",props["area"]),("levels",props["risk_level"]),
+            ("findingStatuses",props["status"])
+        ]:
+            self.assertEqual(set(schema_field["enum"]),set(actual[js_field]))
     def test_complete_example_and_finding_mutations(self):
         example=self.example()
         result=self.js(example)
