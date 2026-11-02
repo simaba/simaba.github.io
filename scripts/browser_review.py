@@ -268,12 +268,35 @@ with sync_playwright() as playwright:
                         assert "prohibited" in detail.locator("#lab-findings").inner_text()
                         detail.locator("#lab-reset").click()
                     elif slug=="ai-prism":
-                        assert detail.locator("#lab-results").inner_text()=="16"
+                        assert detail.locator("#lab-results").inner_text()=="56"
+                        assert detail.locator("#lab-total").inner_text()=="56"
+                        assert detail.locator("#lab-unique-count").inner_text()=="51"
+                        assert detail.locator(".lab-prism-entry").count()==56
+                        detail.locator("#lab-unique").check()
+                        assert detail.locator("#lab-results").inner_text()=="51"
+                        detail.locator("#lab-unique").uncheck()
                         detail.locator("#lab-query").fill("NIST")
-                        assert int(detail.locator("#lab-results").inner_text())>=1
+                        assert int(detail.locator("#lab-results").inner_text())>=2
                         detail.locator("#lab-query").fill("zz-no-such-curated-source")
                         assert detail.locator("#lab-results").inner_text()=="0"
-                        detail.locator("#lab-query").fill("")
+                        detail.locator("#lab-reset").click()
+                        detail.locator(".lab-prism-entry .lab-mini-button").first.click()
+                        assert detail.locator("#lab-selected").inner_text()=="1"
+                        with detail.expect_download() as captured:
+                            detail.locator("#lab-export").click()
+                        selected=json.loads(captured.value.path().read_text(encoding="utf-8"))
+                        assert len(selected["resources"])==1
+                        assert selected["source_commit"]=="6beed6b8e70b678c9d5c20f6d0a5ddfb1a8cd1d5"
+                        assert selected["resources"][0]["url"].startswith("https://")
+                        with detail.expect_download() as markdown_export:
+                            detail.locator("#lab-export-md").click()
+                        text_data=markdown_export.value.path().read_text(encoding="utf-8")
+                        assert "No live link or editorial freshness verification" in text_data
+                        detail.locator(".lab-reading-list .lab-mini-button").first.click()
+                        assert detail.locator("#lab-selected").inner_text()=="0"
+                        detail.locator("#lab-topic").select_option("AI Testing & Evaluation")
+                        assert detail.locator("#lab-results").inner_text()=="6"
+                        detail.locator("#lab-reset").click()
                     elif slug=="prompt-harness-translator":
                         assert "Lossy conversion warning" in detail.locator("#lab-preview").inner_text()
                         assert detail.locator("#lab-loss").inner_text()=="2 FIELDS"
