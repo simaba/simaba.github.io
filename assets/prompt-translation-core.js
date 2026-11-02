@@ -36,7 +36,6 @@ function asScalar(raw,line,allowComplex=true){
    try{const parsed=JSON.parse(value);if(typeof parsed!=="string")fail("Expected quoted string.",line);return parsed;}
    catch(e){fail("Invalid double-quoted YAML string.",line);}
  }
- }
  if(value[0]==="'"){
    if(!value.endsWith("'")||value.length<2)fail("Unterminated single-quoted string.",line);
    return value.slice(1,-1).replace(/''/g,"'");
