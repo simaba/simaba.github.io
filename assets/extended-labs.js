@@ -232,7 +232,7 @@ String(e.message||e),
 "This browser deliberately rejects YAML outside its supported subset. Use the linked Python CLI for additional YAML constructs."]);
 }
 }
-$("lab-reset").addEventListener("click",()=>{$("lab-source").value=sample;$("lab-target").value="codex";evaluate();});
+$("lab-reset").addEventListener("click",()=>{$("lab-source").value=sample;$("lab-target").value="codex";evaluate();set("lab-import-status","Published synthetic source restored. No file was uploaded.");});
 $("lab-nested").addEventListener("click",()=>{$("lab-source").value=nested;evaluate();});
 $("lab-download").addEventListener("click",()=>{
 if(!conversion)return;

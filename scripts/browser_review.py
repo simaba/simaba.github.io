@@ -304,6 +304,8 @@ with sync_playwright() as playwright:
                            "name":"invalid.md","mimeType":"text/plain","buffer":b"not frontmatter"})
                         expect(detail.locator("#lab-import-status")).to_contain_text("Import not accepted")
                         assert "executive-summary" in detail.locator("#lab-source").input_value()
+                        detail.locator("#lab-reset").click()
+                        assert "restored" in detail.locator("#lab-import-status").inner_text()
                     elif slug=="mcp-agent-risk-checklist":
                         assert detail.locator("#lab-verdict").inner_text()=="SCHEMA STRUCTURE VALID"
                         assert detail.locator("#lab-count").inner_text()=="3"
