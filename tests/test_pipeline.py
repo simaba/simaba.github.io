@@ -198,6 +198,13 @@ class PortfolioChecks(unittest.TestCase):
         core=(ROOT/"assets/rmf-evidence-core.js").read_text()
         self.assertIn("No compliance grade",core)
         self.assertIn("material blocker",core)
+    def test_prism_full_curated_catalog_is_built(self):
+        build()
+        html=(ROOT/"dist/projects/ai-prism/index.html").read_text()
+        self.assertIn('src="../../assets/prism-catalog.js"',html)
+        catalog=(ROOT/"assets/prism-catalog.js").read_text()
+        self.assertIn('"record_count":56',catalog)
+        self.assertIn('"unique_urls":51',catalog)
     def test_featured_areas_are_diverse(self):
         featured={p["repo"] for p in self.data["projects"] if p["featured"]}
         self.assertEqual(featured,{"lean-ai-ops","everything-program-management","automotive-llm-eval-harness","release-checklist"})

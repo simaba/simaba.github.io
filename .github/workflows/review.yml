@@ -110,6 +110,18 @@ jobs:
             templates/nist-rmf-gap-assessment.md
           sparse-checkout-cone-mode: false
           persist-credentials: false
+      - name: Checkout pinned AI Prism catalog and curation ledger
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7, Node 24
+        with:
+          repository: simaba/ai-prism
+          ref: 6beed6b8e70b678c9d5c20f6d0a5ddfb1a8cd1d5
+          path: .source-reference/prism
+          sparse-checkout: |
+            README.md
+            CURATION.md
+            REVIEW_STATUS.md
+          sparse-checkout-cone-mode: false
+          persist-credentials: false
       - name: Verify structured content, generated website, privacy and editorial design
         env:
           AUTOMOTIVE_REFERENCE_CORE: .source-reference/automotive/src/automotive_llm_eval_harness/core.py
@@ -126,6 +138,7 @@ jobs:
           node --check assets/mcp-review-core.js
           node --check assets/prompt-translation-core.js
           node --check assets/rmf-evidence-core.js
+          node --check assets/prism-catalog.js
           node --check assets/extended-labs.js
           test -s dist/index.html
           test -f dist/.nojekyll
@@ -141,6 +154,7 @@ jobs:
           MCP_REFERENCE_ROOT: .source-reference/mcp
           TRANSLATOR_REFERENCE_ROOT: .source-reference/translator
           RMF_REFERENCE_ROOT: .source-reference/rmf
+          PRISM_REFERENCE_ROOT: .source-reference/prism
         run: |
           .venv/bin/python -m unittest discover -s tests -p test_translator_reference.py -v
           .venv/bin/python scripts/browser_review.py

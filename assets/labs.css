@@ -193,3 +193,23 @@ html[data-theme='dark']{--accent-text:#A5B0FF}
 #lab-rmf-list .lab-ledger-row strong{max-width:125px;white-space:normal;overflow-wrap:anywhere;text-align:right}
 .lab-rmf-consequence{border-top:1px solid var(--line);margin-top:20px;padding-top:14px}
 @media(max-width:590px){#lab-rmf-list .lab-ledger-row{gap:8px}#lab-rmf-list .lab-ledger-row strong{max-width:110px}}
+
+/* Source-backed AI Prism research explorer and local review collection. */
+.lab-prism-provenance{border-top:1px solid var(--line);margin:25px 0 0;padding-top:16px}
+.lab-prism-provenance p:not(.lab-eyebrow){font:400 12px/1.7 var(--font-sans);color:var(--muted)}
+.lab-prism-provenance a{color:var(--accent-text);text-decoration:underline;text-underline-offset:3px}
+.lab-prism-reading{padding:15px 0;border-bottom:1px solid var(--line)}
+.lab-prism-reading-row{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:7px 0;padding:10px 0;border-bottom:1px solid var(--line)}
+.lab-prism-reading-row a{min-width:0;overflow-wrap:anywhere;color:var(--accent-text);font:600 12px/1.5 var(--font-sans)}
+.lab-mini-button{font:600 11px/1.5 var(--font-sans);border:1px solid var(--line);padding:6px 9px;cursor:pointer;background:var(--paper);color:var(--ink);border-radius:2px;flex-shrink:0}
+.lab-mini-button:hover{border-color:var(--accent)}
+.lab-mini-button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.lab-prism-resource-pane{margin-top:22px}
+.lab-resource-list{display:grid;gap:0}
+.lab-prism-entry{border-bottom:1px solid var(--line);padding:16px 0;min-width:0}
+.lab-prism-category{display:block;color:var(--muted);font:500 10px/1.5 var(--font-mono);letter-spacing:.015em;margin-bottom:6px;overflow-wrap:anywhere}
+.lab-prism-title{display:block;font:600 15px/1.45 var(--font-sans);color:var(--ink);text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:3px;overflow-wrap:anywhere}
+.lab-prism-entry p{font:400 12px/1.6 var(--font-sans);color:var(--ink-soft);margin:7px 0 10px}
+.lab-prism-actions{display:flex;align-items:center;flex-wrap:wrap;gap:9px}
+.lab-prism-repeated{font:500 10px/1.4 var(--font-mono);color:var(--muted)}
+[data-project-lab="ai-prism"] .lab-main,[data-project-lab="ai-prism"] .lab-controls,[data-project-lab="ai-prism"] .lab-output{min-width:0;max-width:100%}

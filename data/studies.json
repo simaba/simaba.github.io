@@ -304,20 +304,21 @@
       "orientation": "RESEARCH / CURATED RESOURCE HUB",
       "summary": "A curated directory of frameworks, standards, evaluation tooling, incident references and research. Its value lies in classification, provenance and the distinction between primary and secondary sources.",
       "method": [
-        "Group references by their practical use: official frameworks, measurement, engineering tools, incident response and research.",
-        "Preserve source ownership and distinguish official text from secondary interpretation.",
-        "Treat link availability and publication freshness as different review questions; recheck applicability and versions before relying on a source."
+        "Preserve entries from the pinned public README, including section, original source link and specific description.",
+        "Filter by repository section, host and keyword, with cross-listed URLs identifiable and optionally collapsible.",
+        "Select an exportable reading set and consult the separate manual-review ledger without inventing per-link verification."
       ],
       "artifacts": [
         "Curated links to official frameworks, tools and papers",
-        "Source descriptions grouped by practitioner topic",
+        "Complete source-backed 56-entry catalog, representing 51 unique URLs across ten sections",
         "Contribution and source-review guidance in the public repository"
       ],
       "example_label": "Explore selected public sources",
       "example": "Search the representative, repo-derived browser index by publisher or topic. Open the publisher's page to verify its current version and applicability.",
       "limits": [
-        "The browser index is a curated extract from the repository, not a live crawler, freshness audit or endorsement.",
-        "Links can change after publication; do not assume legal or standards materials are current without checking the source."
+        "A curated snapshot rather than live research. No automatic URL, publisher, description or content-freshness checks are performed.",
+        "Links can change after publication; do not assume legal or standards materials are current without checking the source.",
+        "Section-level manual review notes cannot establish that each linked resource is current or accurate."
       ],
       "links": [
         [
