@@ -397,7 +397,7 @@ with sync_playwright() as playwright:
                         assert detail.locator("#lab-rmf-list button").count()==12
                         detail.locator("#lab-reset").click()
                         assert detail.locator("#lab-gaps").inner_text()=="12/12"
-                                    if width<=590:
+                if width<=590:
                     open_menu=detail.get_by_role("button",name="Open navigation")
                     open_menu.click()
                     assert detail.locator(".primary-nav").is_visible()
