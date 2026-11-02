@@ -337,6 +337,9 @@ with sync_playwright() as playwright:
                     detail.keyboard.press("Escape")
                     assert open_menu.get_attribute("aria-expanded")=="false"
                 assert detail.get_by_role("heading",name="What it does not establish").count()==1
+                if slug=="mcp-agent-risk-checklist" and detail.evaluate("document.documentElement.scrollWidth>document.documentElement.clientWidth+1"):
+                    wide=detail.evaluate("""() => [...document.querySelectorAll('*')].map(x=>({tag:x.tagName,id:x.id,width:Math.round(x.getBoundingClientRect().width),right:Math.round(x.getBoundingClientRect().right)})).filter(x=>x.right>innerWidth+2).slice(0,15)""")
+                    raise AssertionError(f"MCP mobile overflow at {width}: {wide}")
                 assert detail.evaluate("document.documentElement.scrollWidth<=document.documentElement.clientWidth+1"),f"{slug} overflow at {width}"
                 if label in ("desktop","mobile"):
                     # Capture the actual default experience, not whatever failure

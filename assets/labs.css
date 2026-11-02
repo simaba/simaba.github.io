@@ -166,3 +166,8 @@ html[data-theme='dark']{--accent-text:#A5B0FF}
 #lab-mcp-list .lab-ledger-row{grid-template-columns:minmax(0,1fr) auto auto}
 #lab-mcp-list .lab-ledger-row span{overflow-wrap:anywhere}
 @media(max-width:590px){#lab-mcp-list .lab-ledger-row{grid-template-columns:minmax(0,1fr) auto}#lab-mcp-list .lab-ledger-row strong{grid-column:2}}
+
+/* MCP importer: native file picker may otherwise impose a min-content width on mobile. */
+[data-project-lab="mcp-agent-risk-checklist"] #lab-import{display:block;box-sizing:border-box;width:100%;max-width:100%;min-width:0;overflow:hidden;font:500 12px/1.5 var(--font-sans)}
+[data-project-lab="mcp-agent-risk-checklist"] .lab-main,[data-project-lab="mcp-agent-risk-checklist"] .lab-controls,[data-project-lab="mcp-agent-risk-checklist"] .lab-output,[data-project-lab="mcp-agent-risk-checklist"] .lab-field,[data-project-lab="mcp-agent-risk-checklist"] .lab-dataset{min-width:0;max-width:100%}
+[data-project-lab="mcp-agent-risk-checklist"] .lab-ledger-row{min-width:0;max-width:100%;overflow-wrap:anywhere}
