@@ -110,7 +110,7 @@ class PortfolioChecks(unittest.TestCase):
     def test_study_routes_and_scope(self):
         build()
         case_studies=json.loads((ROOT/"data/studies.json").read_text("utf-8"))["studies"]
-        self.assertEqual(len(case_studies),5)
+        self.assertEqual(len(case_studies),12)
         self.assertEqual({p["repo"] for p in self.data["projects"] if p.get("study")},{x["repo"] for x in case_studies})
         for entry in case_studies:
             page=ROOT/"dist/projects"/entry["repo"]/"index.html"
@@ -118,6 +118,93 @@ class PortfolioChecks(unittest.TestCase):
             html=page.read_text()
             self.assertIn("What it does not establish",html)
             self.assertNotIn("{{",html)
+    def test_every_detail_has_a_real_browser_workbench(self):
+        build()
+        for p in self.data["projects"]:
+            if p.get("study"):
+                page=(ROOT/"dist/projects"/p["repo"]/"index.html").read_text()
+                self.assertIn('data-project-lab="'+p["repo"]+'"',page)
+                self.assertIn('id="workbench"',page)
+                self.assertIn('src="../../assets/project-labs.js"',page)
+                self.assertIn('src="../../assets/automotive-core.js"',page)
+                self.assertIn('src="../../assets/extended-labs.js"',page)
+                self.assertIn('src="../../assets/simulator-core.js"',page)
+        js=(ROOT/"assets/project-labs.js").read_text()
+        core=(ROOT/"assets/automotive-core.js").read_text()
+        self.assertNotIn("fetch(",core)
+        self.assertNotIn("XMLHttpRequest",core)
+        self.assertNotIn("fetch(",js)
+        self.assertNotIn("XMLHttpRequest",js)
+        extended=(ROOT/"assets/extended-labs.js").read_text()
+        self.assertNotIn("fetch(",extended)
+        self.assertNotIn("XMLHttpRequest",extended)
+        self.assertIn("FALLBACK",extended)
+        self.assertIn("Lossy conversion warning",(ROOT/"assets/prompt-translation-core.js").read_text())
+        simulator=(ROOT/"assets/simulator-core.js").read_text()
+        self.assertNotIn("fetch(",simulator)
+        self.assertNotIn("XMLHttpRequest",simulator)
+        self.assertIn("fallback_used",simulator)
+        self.assertIn("MEAN SCORE",js)
+        self.assertIn("CAPABILITY ESTIMATES COMPUTED",js)
+    def test_examples_are_typed_as_commands_or_prose(self):
+        build()
+        command=(ROOT/"dist/projects/agent-simulator/index.html").read_text()
+        prose=(ROOT/"dist/projects/governance-playbook/index.html").read_text()
+        self.assertIn('<pre class="study-code"><code>python run_demo.py',command)
+        self.assertIn('<p class="study-example-text">',prose)
+        self.assertNotIn('<pre class="study-code"><code>Read the fictional',prose)
+    def test_source_anchors_are_reviewed_and_pinned(self):
+        build()
+        mapping=json.loads((ROOT/"data/source-revisions.json").read_text())["references"]
+        self.assertEqual(set(mapping),{p["repo"] for p in self.data["projects"]})
+        for slug,ref in mapping.items():
+            page=(ROOT/"dist/projects"/slug/"index.html").read_text()
+            self.assertIn("/blob/"+ref["commit"]+"/"+ref["reference_path"],page)
+            self.assertIn("REVIEWED SOURCE SNAPSHOT",page)
+    def test_program_workflow_assets_and_source_contract(self):
+        build()
+        html=(ROOT/"dist/projects/everything-program-management/index.html").read_text()
+        self.assertIn('assets/pmkit-core.js',html)
+        self.assertIn('src="../../assets/project-labs.js"',html)
+        source=(ROOT/"assets/project-labs.js").read_text()
+        self.assertIn("linked_decision_id",source)
+        self.assertIn("lab-export-memo",source)
+    def test_release_record_editor_exposes_source_evidence_fields(self):
+        build()
+        text=(ROOT/"assets/project-labs.js").read_text()
+        self.assertIn('lab-evidence',text)
+        self.assertIn('lab-limitation',text)
+        self.assertIn('fictional-release-decision.json',text)
+    def test_mcp_source_contract_and_page_import(self):
+        build()
+        html=(ROOT/"dist/projects/mcp-agent-risk-checklist/index.html").read_text()
+        self.assertIn('src="../../assets/mcp-review-core.js"',html)
+        self.assertIn('src="../../assets/extended-labs.js"',html)
+        js=(ROOT/"assets/mcp-review-core.js").read_text()
+        self.assertIn('MCP-FIC-001',js)
+        self.assertIn('Draft202012', (ROOT/".github/workflows/review.yml").read_text() + (ROOT/"scripts/mcp_reference_check.py").read_text())
+    def test_translator_bounded_source_interface(self):
+        build()
+        html=(ROOT/"dist/projects/prompt-harness-translator/index.html").read_text()
+        self.assertIn('src="../../assets/prompt-translation-core.js"',html)
+        js=(ROOT/"assets/prompt-translation-core.js").read_text()
+        self.assertIn("parseSource",js)
+        self.assertIn("frontmatter",js)
+        self.assertIn("Lossy conversion warning",js)
+    def test_rmf_source_anchored_assessment(self):
+        build()
+        html=(ROOT/"dist/projects/nist-rmf-guide/index.html").read_text()
+        self.assertIn('src="../../assets/rmf-evidence-core.js"',html)
+        core=(ROOT/"assets/rmf-evidence-core.js").read_text()
+        self.assertIn("No compliance grade",core)
+        self.assertIn("material blocker",core)
+    def test_prism_full_curated_catalog_is_built(self):
+        build()
+        html=(ROOT/"dist/projects/ai-prism/index.html").read_text()
+        self.assertIn('src="../../assets/prism-catalog.js"',html)
+        catalog=(ROOT/"assets/prism-catalog.js").read_text()
+        self.assertIn('"record_count":56',catalog)
+        self.assertIn('"unique_urls":51',catalog)
     def test_featured_areas_are_diverse(self):
         featured={p["repo"] for p in self.data["projects"] if p["featured"]}
         self.assertEqual(featured,{"lean-ai-ops","everything-program-management","automotive-llm-eval-harness","release-checklist"})
