@@ -139,7 +139,7 @@ class PortfolioChecks(unittest.TestCase):
         self.assertNotIn("fetch(",extended)
         self.assertNotIn("XMLHttpRequest",extended)
         self.assertIn("FALLBACK",extended)
-        self.assertIn("Lossy conversion warning",extended)
+        self.assertIn("Lossy conversion warning",(ROOT/"assets/prompt-translation-core.js").read_text())
         simulator=(ROOT/"assets/simulator-core.js").read_text()
         self.assertNotIn("fetch(",simulator)
         self.assertNotIn("XMLHttpRequest",simulator)
