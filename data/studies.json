@@ -410,20 +410,21 @@
       "orientation": "RISK MANAGEMENT / PRACTITIONER GUIDE",
       "summary": "An unofficial practitioner guide to using relevant NIST AI RMF references in scoped assessments, with explicit evidence states, decision consequences and review limitations.",
       "method": [
-        "Start with the official function, category, subcategory and framework version rather than an invented universal maturity score.",
-        "Separate documented practice from demonstrated operation and outcomes; preserve provenance, gaps and not-applicable rationale.",
-        "Link each material gap to a decision, owner, review trigger and next evidence, without claiming automatic compliance."
+        "Verify the official function, category/subcategory and source version for each selected internal proposition; never invent NIST identifiers.",
+        "Capture status, evidence type (design/operation/outcome), source, coverage, owner, date, limitations and invalidation triggers independently.",
+        "Tie material unresolved gaps to their decision consequence, disposition and owner; export draft structured records or a practitioner Markdown assessment."
       ],
       "artifacts": [
-        "Four-function Govern/Map/Measure/Manage assessment template",
-        "Fictional worked evidence and gap assessment",
+        "Practitioner template with twelve review propositions across all four RMF functions",
+        "Source-anchored fictional evidence worksheet with machine-readable import/export and Markdown report",
         "Guidance on evidence freshness and non-equivalence of cross-framework mappings"
       ],
       "example_label": "Build a bounded evidence worksheet",
       "example": "The browser worksheet organizes selected prompts and user-entered evidence states, then exports a draft review. Reference numbers must be verified against official NIST material.",
       "limits": [
         "Not an official NIST assessment, implementation profile, compliance test or certification.",
-        "The worksheet does not decide applicability or establish control operation; unresolved or missing evidence is disclosed, not converted into a single score."
+        "The worksheet does not decide applicability or establish control operation; unresolved or missing evidence is disclosed, not converted into a single score.",
+        "Browser records are user-supplied and evidence has not been independently authenticated; official NIST subcategory identifiers must be verified before use."
       ],
       "links": [
         [

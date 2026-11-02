@@ -87,9 +87,9 @@ def render_study(page, study, p, source):
         "mcp-agent-risk-checklist":("STRUCTURED SECURITY REVIEW","Review the authority, scope and failure scenarios",
             "Edit and compare the three published fictional findings, add or remove scenarios, import/export complete JSON review records, and inspect separately labeled structural and advisory checks.",
             "The browser mirrors the published review record shape and is verified against the pinned JSON Schema. It does not scan MCP servers, authenticate permissions, or infer risk severity from ordinal multiplication."),
-        "nist-rmf-guide":("EVIDENCE WORKSHEET","Map evidence without inventing a maturity score",
-            "Assign evidence states to Govern/Map/Measure/Manage propositions and record provenance or limitations in an exportable worksheet.",
-            "Unofficial practitioner question extract. Reference applicability, control effectiveness and compliance remain unassessed.")
+        "nist-rmf-guide":("EVIDENCE ASSESSMENT WORKSPACE","From official sources to scoped evidence records",
+            "Navigate twelve source-template propositions across Govern, Map, Measure, and Manage; record official references, evidence provenance, scope, material gaps and decisions, and export draft JSON or Markdown.",
+            "The questions are internal practitioner propositions, not official NIST subcategory text. User-entered evidence is not independently verified; no compliance, maturity, control-effectiveness or safety determination is made.")
     }
     mode,lab_title,lab_description,lab_boundary=lab_info[p["repo"]]
     live=(' <a class="lab-live-link" href="https://simaba.github.io/lean-ai-ops/" target="_blank" rel="noopener noreferrer">Explore the separate interactive DMAIC walkthrough ↗</a>' if p["repo"]=="lean-ai-ops" else "")

@@ -182,3 +182,14 @@ html[data-theme='dark']{--accent-text:#A5B0FF}
 .lab-mapping-row strong{font:600 10px/1.5 var(--font-mono);color:var(--muted);text-align:right}
 .lab-mapping-row strong[data-mapping='preserved']{color:var(--accent-text)}
 [data-project-lab="prompt-harness-translator"] .lab-main,[data-project-lab="prompt-harness-translator"] .lab-controls,[data-project-lab="prompt-harness-translator"] .lab-output{min-width:0;max-width:100%}
+
+/* Evidence-first NIST practitioner workspace, preserving source/template distinctions. */
+[data-project-lab="nist-rmf-guide"] #lab-import{display:block;box-sizing:border-box;width:100%;max-width:100%;min-width:0;overflow:hidden;font:500 12px/1.5 var(--font-sans)}
+[data-project-lab="nist-rmf-guide"] .lab-main,[data-project-lab="nist-rmf-guide"] .lab-controls,[data-project-lab="nist-rmf-guide"] .lab-output{min-width:0;max-width:100%}
+.lab-proposition{border-left:3px solid var(--accent);padding:12px 14px;margin:4px 0 20px;background:var(--paper);font:500 13px/1.6 var(--font-sans);color:var(--ink)}
+.lab-rmf-board{margin-top:18px}
+#lab-rmf-list{max-height:425px;overflow-y:auto}
+#lab-rmf-list .lab-ledger-row{grid-template-columns:minmax(0,1fr) auto;min-width:0;overflow-wrap:anywhere}
+#lab-rmf-list .lab-ledger-row strong{max-width:125px;white-space:normal;overflow-wrap:anywhere;text-align:right}
+.lab-rmf-consequence{border-top:1px solid var(--line);margin-top:20px;padding-top:14px}
+@media(max-width:590px){#lab-rmf-list .lab-ledger-row{gap:8px}#lab-rmf-list .lab-ledger-row strong{max-width:110px}}

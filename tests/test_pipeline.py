@@ -191,6 +191,13 @@ class PortfolioChecks(unittest.TestCase):
         self.assertIn("parseSource",js)
         self.assertIn("frontmatter",js)
         self.assertIn("Lossy conversion warning",js)
+    def test_rmf_source_anchored_assessment(self):
+        build()
+        html=(ROOT/"dist/projects/nist-rmf-guide/index.html").read_text()
+        self.assertIn('src="../../assets/rmf-evidence-core.js"',html)
+        core=(ROOT/"assets/rmf-evidence-core.js").read_text()
+        self.assertIn("No compliance grade",core)
+        self.assertIn("material blocker",core)
     def test_featured_areas_are_diverse(self):
         featured={p["repo"] for p in self.data["projects"] if p["featured"]}
         self.assertEqual(featured,{"lean-ai-ops","everything-program-management","automotive-llm-eval-harness","release-checklist"})

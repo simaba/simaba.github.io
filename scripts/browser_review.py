@@ -347,12 +347,57 @@ with sync_playwright() as playwright:
                         expect(detail.locator("#lab-import-status")).to_contain_text("Imported 3 findings")
                         assert detail.locator("#lab-count").inner_text()=="3"
                     elif slug=="nist-rmf-guide":
-                        assert detail.locator("#lab-gaps").inner_text()=="8/8"
-                        detail.locator("#lab-state0").select_option("not_applicable")
+                        assert detail.locator("#lab-gaps").inner_text()=="12/12"
+                        assert detail.locator("#lab-rmf-list button").count()==12
+                        detail.locator("#lab-state").select_option("not_applicable")
                         assert detail.locator("#lab-verdict").inner_text()=="EVIDENCE RECORD INCOMPLETE"
-                        detail.locator("#lab-evidence0").fill("Documented exclusion for the fictional scope")
-                        assert detail.locator("#lab-verdict").inner_text()=="DRAFT EVIDENCE MAP"
-                if width<=590:
+                        detail.locator("#lab-na").fill("The fictional system does not have any external tool permissions.")
+                        detail.locator("#lab-reference").fill("User-reviewed official reference")
+                        detail.locator("#lab-source-version").fill("NIST AI RMF 1.0; verify cited subcategory")
+                        assert detail.locator("#lab-verdict").inner_text()=="DRAFT EVIDENCE RECORD"
+                        detail.locator("#lab-state").select_option("demonstrated")
+                        assert detail.locator("#lab-export").is_disabled()
+                        detail.locator("#lab-evidence-type").select_option("operation")
+                        detail.locator("#lab-evidence").fill("Fictional drill record 001")
+                        detail.locator("#lab-evidence-owner").fill("Fictional reviewer")
+                        detail.locator("#lab-evidence-date").fill("2026-09-15")
+                        detail.locator("#lab-coverage").fill("Fictional staging sample only")
+                        assert detail.locator("#lab-export").is_enabled()
+                        detail.locator("#lab-outcome").select_option("proceed_with_conditions")
+                        detail.locator("#lab-disposition").select_option("blocker")
+                        detail.locator("#lab-state").select_option("partial")
+                        detail.locator("#lab-consequence").fill("Cannot authorize the pilot without scoped control evidence.")
+                        detail.locator("#lab-action-owner").fill("Fictional review owner")
+                        detail.locator("#lab-trigger").fill("Control must be independently verified")
+                        assert detail.locator("#lab-export").is_disabled()
+                        assert "material blocker" in detail.locator("#lab-findings").inner_text()
+                        detail.locator("#lab-outcome").select_option("defer")
+                        assert detail.locator("#lab-export").is_enabled()
+                        with detail.expect_download() as json_export:
+                            detail.locator("#lab-export").click()
+                        record=json.loads(json_export.value.path().read_text(encoding="utf-8"))
+                        assert len(record["items"])==12
+                        assert record["items"][0]["disposition"]=="blocker"
+                        assert record["items"][0]["status"]=="partial"
+                        assert record["items"][0]["source_reference"]=="User-reviewed official reference"
+                        with detail.expect_download() as md_export:
+                            detail.locator("#lab-markdown").click()
+                        rendered=md_export.value.path().read_text(encoding="utf-8")
+                        for heading in ("Govern review","Map review","Measure review","Manage review"):
+                            assert heading in rendered
+                        assert "material gaps" in rendered.lower()
+                        assert "maturity rating" in rendered.lower()
+                        detail.locator("#lab-function").select_option("Measure")
+                        assert detail.locator("#lab-rmf-list button").count()==3
+                        detail.locator("#lab-function").select_option("all")
+                        detail.locator("#lab-import").set_input_files({
+                            "name":"bad.json","mimeType":"application/json",
+                            "buffer":b'{"schema_version":1,"items":[]}'})
+                        expect(detail.locator("#lab-import-status")).to_contain_text("Import not accepted")
+                        assert detail.locator("#lab-rmf-list button").count()==12
+                        detail.locator("#lab-reset").click()
+                        assert detail.locator("#lab-gaps").inner_text()=="12/12"
+                                    if width<=590:
                     open_menu=detail.get_by_role("button",name="Open navigation")
                     open_menu.click()
                     assert detail.locator(".primary-nav").is_visible()

@@ -100,6 +100,16 @@ jobs:
             examples/sample_agent.md
           sparse-checkout-cone-mode: false
           persist-credentials: false
+      - name: Checkout pinned NIST practitioner evidence template
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7, Node 24
+        with:
+          repository: simaba/nist-rmf-guide
+          ref: 0776e82aec138d81aecf250cf7e98d50e2e1ef45
+          path: .source-reference/rmf
+          sparse-checkout: |
+            templates/nist-rmf-gap-assessment.md
+          sparse-checkout-cone-mode: false
+          persist-credentials: false
       - name: Verify structured content, generated website, privacy and editorial design
         env:
           AUTOMOTIVE_REFERENCE_CORE: .source-reference/automotive/src/automotive_llm_eval_harness/core.py
@@ -115,6 +125,7 @@ jobs:
           node --check assets/project-labs.js
           node --check assets/mcp-review-core.js
           node --check assets/prompt-translation-core.js
+          node --check assets/rmf-evidence-core.js
           node --check assets/extended-labs.js
           test -s dist/index.html
           test -f dist/.nojekyll
@@ -129,6 +140,7 @@ jobs:
           RELEASE_REFERENCE_ROOT: .source-reference/release
           MCP_REFERENCE_ROOT: .source-reference/mcp
           TRANSLATOR_REFERENCE_ROOT: .source-reference/translator
+          RMF_REFERENCE_ROOT: .source-reference/rmf
         run: |
           .venv/bin/python -m unittest discover -s tests -p test_translator_reference.py -v
           .venv/bin/python scripts/browser_review.py
