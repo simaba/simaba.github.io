@@ -158,3 +158,11 @@ html[data-theme='dark']{--accent-text:#A5B0FF}
 .lab-review-trace-row span{color:var(--muted)}
 .lab-review-trace-row strong{font-weight:500;color:var(--ink);overflow-wrap:anywhere}
 @media(max-width:590px){.lab-review-trace-row{grid-template-columns:1fr;gap:2px}}
+
+/* Distinct MCP finding inventory: multiple scoped failure scenarios. */
+.lab-review-notes{border-top:1px solid var(--line);padding-top:19px;margin-top:18px}
+.lab-review-notes .lab-eyebrow{margin:0 0 9px}
+#lab-mcp-list{max-height:350px;overflow-y:auto}
+#lab-mcp-list .lab-ledger-row{grid-template-columns:minmax(0,1fr) auto auto}
+#lab-mcp-list .lab-ledger-row span{overflow-wrap:anywhere}
+@media(max-width:590px){#lab-mcp-list .lab-ledger-row{grid-template-columns:minmax(0,1fr) auto}#lab-mcp-list .lab-ledger-row strong{grid-column:2}}

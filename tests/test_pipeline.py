@@ -175,6 +175,14 @@ class PortfolioChecks(unittest.TestCase):
         self.assertIn('lab-evidence',text)
         self.assertIn('lab-limitation',text)
         self.assertIn('fictional-release-decision.json',text)
+    def test_mcp_source_contract_and_page_import(self):
+        build()
+        html=(ROOT/"dist/projects/mcp-agent-risk-checklist/index.html").read_text()
+        self.assertIn('src="../../assets/mcp-review-core.js"',html)
+        self.assertIn('src="../../assets/extended-labs.js"',html)
+        js=(ROOT/"assets/mcp-review-core.js").read_text()
+        self.assertIn('MCP-FIC-001',js)
+        self.assertIn('Draft202012', (ROOT/".github/workflows/review.yml").read_text() + (ROOT/"scripts/mcp_reference_check.py").read_text())
     def test_featured_areas_are_diverse(self):
         featured={p["repo"] for p in self.data["projects"] if p["featured"]}
         self.assertEqual(featured,{"lean-ai-ops","everything-program-management","automotive-llm-eval-harness","release-checklist"})

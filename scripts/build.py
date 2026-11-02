@@ -84,9 +84,9 @@ def render_study(page, study, p, source):
         "prompt-harness-translator":("FORMAT CONVERSION","See what the target cannot carry",
             "Change the published synthetic sample's fields and render bounded Codex, Cursor or generic outputs with visible metadata-loss warnings.",
             "A constrained fixture editor, not the full YAML parser, full CLI or a claim of cross-harness behavioral equivalence."),
-        "mcp-agent-risk-checklist":("STRUCTURED SECURITY REVIEW","Inspect a risk finding, not a trust label",
-            "Edit one fictional MCP finding, check selected JSON-schema constraints and inspect likelihood-impact ordering without hiding owner or mitigation.",
-            "Does not scan MCP servers, enforce actual permissions or infer risk severity from ordinal multiplication."),
+        "mcp-agent-risk-checklist":("STRUCTURED SECURITY REVIEW","Review the authority, scope and failure scenarios",
+            "Edit and compare the three published fictional findings, add or remove scenarios, import/export complete JSON review records, and inspect separately labeled structural and advisory checks.",
+            "The browser mirrors the published review record shape and is verified against the pinned JSON Schema. It does not scan MCP servers, authenticate permissions, or infer risk severity from ordinal multiplication."),
         "nist-rmf-guide":("EVIDENCE WORKSHEET","Map evidence without inventing a maturity score",
             "Assign evidence states to Govern/Map/Measure/Manage propositions and record provenance or limitations in an exportable worksheet.",
             "Unofficial practitioner question extract. Reference applicability, control effectiveness and compliance remain unassessed.")

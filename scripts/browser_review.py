@@ -285,20 +285,45 @@ with sync_playwright() as playwright:
                         detail.locator("#lab-tools").fill("Read, Write")
                         assert detail.locator("#lab-download").is_enabled()
                     elif slug=="mcp-agent-risk-checklist":
-                        assert detail.locator("#lab-verdict").inner_text()=="FICTIONAL REVIEW STRUCTURED"
+                        assert detail.locator("#lab-verdict").inner_text()=="SCHEMA STRUCTURE VALID"
+                        assert detail.locator("#lab-count").inner_text()=="3"
+                        assert detail.locator("#lab-open").inner_text()=="2"
+                        assert detail.locator("#lab-high").inner_text()=="1"
+                        assert detail.locator("#lab-finding-select option").count()==3
+                        detail.locator("#lab-finding-select").select_option("1")
+                        assert detail.locator("#lab-area").input_value()=="prompt_injection"
                         detail.locator("#lab-likelihood").fill("7")
                         assert detail.locator("#lab-verdict").inner_text()=="REVIEW FIELDS INCOMPLETE"
                         assert detail.locator("#lab-download").is_disabled()
                         detail.locator("#lab-likelihood").fill("4")
-                        assert detail.locator("#lab-priority").inner_text()=="16"
+                        assert detail.locator("#lab-priority").inner_text()=="12"
+                        detail.locator("#lab-add").click()
+                        assert detail.locator("#lab-count").inner_text()=="4"
+                        detail.locator("#lab-remove").click()
+                        assert detail.locator("#lab-count").inner_text()=="3"
+                        detail.locator("#lab-reset").click()
+                        assert detail.locator("#lab-count").inner_text()=="3"
                         with detail.expect_download() as captured:
                             detail.locator("#lab-download").click()
-                        exported=json.loads(captured.value.path().read_text(encoding="utf-8"))
+                        downloaded=captured.value.path()
+                        exported=json.loads(downloaded.read_text(encoding="utf-8"))
                         assert set(exported)=={"review_id","system_name","scope","review_status","findings"}
-                        assert len(exported["findings"])==1
-                        assert exported["review_status"]=="draft"
-                        assert exported["findings"][0]["likelihood"]==4
-                        assert exported["findings"][0]["impact"]==4
+                        assert len(exported["findings"])==3
+                        assert exported["review_status"]=="approved_with_conditions"
+                        assert [f["id"] for f in exported["findings"]]==["F-001","F-002","F-003"]
+                        if label=="desktop":
+                            from mcp_reference_check import check_review
+                            check_review(downloaded)
+                        detail.locator("#lab-import").set_input_files({
+                            "name":"invalid.json","mimeType":"application/json",
+                            "buffer":b'{"review_id":"BROKEN","findings":[]}'})
+                        expect(detail.locator("#lab-import-status")).to_contain_text("Import not accepted")
+                        assert detail.locator("#lab-count").inner_text()=="3"
+                        detail.locator("#lab-import").set_input_files({
+                            "name":"review.json","mimeType":"application/json",
+                            "buffer":json.dumps(exported).encode("utf-8")})
+                        expect(detail.locator("#lab-import-status")).to_contain_text("Imported 3 findings")
+                        assert detail.locator("#lab-count").inner_text()=="3"
                     elif slug=="nist-rmf-guide":
                         assert detail.locator("#lab-gaps").inner_text()=="8/8"
                         detail.locator("#lab-state0").select_option("not_applicable")

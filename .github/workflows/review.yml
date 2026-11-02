@@ -77,6 +77,17 @@ jobs:
             src/airc/validator.py
           sparse-checkout-cone-mode: false
           persist-credentials: false
+      - name: Checkout pinned MCP Risk Checklist schema and sample
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7, Node 24
+        with:
+          repository: simaba/mcp-agent-risk-checklist
+          ref: 83a5abc45acf2184edfa1385e8895700d4c71b30
+          path: .source-reference/mcp
+          sparse-checkout: |
+            schemas/mcp-risk-review.schema.json
+            examples/fictional-mcp-risk-review.json
+          sparse-checkout-cone-mode: false
+          persist-credentials: false
       - name: Verify structured content, generated website, privacy and editorial design
         env:
           AUTOMOTIVE_REFERENCE_CORE: .source-reference/automotive/src/automotive_llm_eval_harness/core.py
@@ -90,6 +101,7 @@ jobs:
           node --check assets/pmkit-analysis.js
           node --check assets/simulator-core.js
           node --check assets/project-labs.js
+          node --check assets/mcp-review-core.js
           node --check assets/extended-labs.js
           test -s dist/index.html
           test -f dist/.nojekyll
@@ -102,6 +114,7 @@ jobs:
         env:
           PMKIT_REFERENCE_ROOT: .source-reference/pmkit
           RELEASE_REFERENCE_ROOT: .source-reference/release
+          MCP_REFERENCE_ROOT: .source-reference/mcp
         run: .venv/bin/python scripts/browser_review.py
       - name: Require review screenshots
         run: |

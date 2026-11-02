@@ -373,19 +373,20 @@
       "summary": "A bounded review toolkit for MCP integrations covering principal binding, action effect, data reach, untrusted content, containment, recovery and evidence ownership.",
       "method": [
         "Inventory tool effects, identities and data boundaries rather than treating a server name as a trust guarantee.",
-        "Edit likelihood, impact, risk level, mitigation and ownership; the complete browser export follows the repository's review-envelope structure.",
+        "Edit several independent findings, including tool authority, prompt injection and auditability; import/export complete records validated against the published JSON Schema.",
         "Make the decision scope explicit; structure validation checks the review record, not actual permissions or server vulnerability."
       ],
       "artifacts": [
         "Machine-readable MCP risk-review JSON schema",
-        "Fictional review example and source schema with one or more findings",
+        "The repository's complete three-finding fictional example, with source-identical IDs and a reusable JSON review envelope",
         "Authority, mitigation and scenario-based risk-scoring guidance"
       ],
       "example_label": "Validate the exported review record",
       "example": "python scripts/validate_examples.py\n# The browser export uses the same record structure, with one editable fictional finding.",
       "limits": [
-        "The browser only checks the selected fields of a fictional review record; it does not connect to or scan MCP servers.",
-        "Likelihood and impact are ordinal triage aids. A reviewer must independently substantiate the findings and control boundaries."
+        "The browser edits and structurally validates a complete fictional review; it does not connect to, execute or scan live MCP servers.",
+        "Likelihood and impact are ordinal triage aids. A reviewer must independently substantiate the findings and control boundaries.",
+        "Additional advisory warnings about findings, risk acceptance, and conflicting review statuses are a browser review aid, separate from the published structural schema."
       ],
       "links": [
         [
