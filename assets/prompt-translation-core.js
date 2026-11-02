@@ -169,8 +169,13 @@ function dumpYaml(input,indent=0){
      lines.push(prefix.trimEnd());
      lines.push(dumpYaml(value,childIndent).replace(/\n$/,""));
    }else if(typeof value==="string"&&value.includes("\n")){
-     lines.push(prefix+"|-");
-     lines.push(...value.split("\n").map(x=>" ".repeat(childIndent)+x));
+     // YAML's strip chomping would drop a trailing newline that Python
+     // safe_load retains for literal | blocks. Preserve that distinction.
+     const trailing=value.endsWith("\n");
+     lines.push(prefix+(trailing?"|":"|-"));
+     const parts=value.split("\n");
+     if(trailing)parts.pop();
+     lines.push(...parts.map(x=>" ".repeat(childIndent)+x));
    }else lines.push(prefix+yamlScalar(value));
  }
  return lines.join("\n")+"\n";
