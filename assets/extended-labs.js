@@ -485,27 +485,176 @@ const rows=[
 ];
 const states=[["unknown","Unknown"],["documented","Documented, not demonstrated"],["partial","Partially demonstrated"],["demonstrated","Demonstrated"],["absent","Not demonstrated"],["not_applicable","Not applicable"]];
 function nist(){
-shell("Create an evidence worksheet from representative prompts in the repository's Govern, Map, Measure and Manage template. These are internal questions, not official subcategory numbers.",
-field("lab-scope","Fictional system scope","Synthetic document-assistant pilot")+
-'<p class="lab-small">For each prompt record a status and a short evidence reference, limitation or not-applicable rationale.</p>'+
-'<div class="lab-worksheet">'+rows.map(([fn,text],i)=>'<div class="lab-worksheet-row"><p><small>'+fn.toUpperCase()+'</small>'+safe(text)+'</p>'+
-select("lab-state"+i,"Evidence state",states)+field("lab-evidence"+i,"Evidence / limitation / rationale","")+'</div>').join("")+'</div>'+
-'<div class="lab-actions">'+button("lab-download","Export draft worksheet")+button("lab-reset","Reset evidence states")+'</div>'+note,
-'<div class="lab-metrics">'+metric("lab-covered","DEMONSTRATED")+metric("lab-gaps","UNRESOLVED / UNKNOWN")+'</div>');
-function data(){return rows.map(([fn,question],i)=>({function:fn,proposition:question,state:v("lab-state"+i),evidence_or_limitation:v("lab-evidence"+i).trim()}));}
-function update(){
-const all=data(),unknown=all.filter(x=>x.state==="unknown"||x.state==="absent"||x.state==="documented"||x.state==="partial"),strong=all.filter(x=>x.state==="demonstrated"),errors=[];
-if(!v("lab-scope").trim())errors.push("A system scope is required.");
-all.forEach((x,i)=>{if(x.state==="not_applicable"&&!x.evidence_or_limitation)errors.push(rows[i][0]+" item "+(i+1)+": not applicable requires a scoped rationale.");if(x.state==="demonstrated"&&!x.evidence_or_limitation)errors.push(rows[i][0]+" item "+(i+1)+": demonstrated needs cited evidence.");});
-set("lab-covered",strong.length+"/"+all.length);set("lab-gaps",unknown.length+"/"+all.length);
-findings(errors.length?"fail":"pass",errors.length?"EVIDENCE RECORD INCOMPLETE":"DRAFT EVIDENCE MAP",errors.length?errors:[unknown.length+" propositions remain not demonstrated, partially supported, documented only or unknown.","Do not assign a maturity/compliance score. Verify official references and version before use."]);
-return {all,valid:!errors.length};}
-root.addEventListener("input",update);root.addEventListener("change",update);
-$("lab-reset").addEventListener("click",()=>{rows.forEach((_,i)=>{$("lab-state"+i).value="unknown";$("lab-evidence"+i).value="";});update();});
-$("lab-download").addEventListener("click",()=>{const d=update();if(d.valid)exportJSON({scope:v("lab-scope"),source:"Unofficial practitioner question extract; confirm official NIST references",items:d.all},"rmf-evidence-worksheet.json");else set("lab-export-status","Document the missing evidence or rationale before export.");});
-update();
+const engine=globalThis.PortfolioRMF;
+if(!engine)throw Error("Source-anchored RMF review module is unavailable");
+let record=engine.defaults(),selected=0,filter="all";
+const states=Object.entries(engine.statusLabels).map(([value,label])=>[value,label]);
+const dispositions=engine.dispositions.map(x=>[x,x.replaceAll("_"," ")]);
+const controls=
+'<p class="lab-eyebrow">01 / SCOPE AND DECISION</p>'+
+field("lab-scope","Fictional system / use case",record.scope.system)+
+field("lab-version","Version / environment",record.scope.version)+
+field("lab-populations","Users and affected populations",record.scope.populations)+
+field("lab-lifecycle","Lifecycle decision supported",record.scope.lifecycle_decision)+
+field("lab-assessor","Accountable assessment owner",record.scope.assessor)+
+field("lab-cutoff","Evidence cutoff",record.scope.evidence_cutoff,"date")+
+area("lab-exclusions","Explicit exclusions",record.scope.exclusions,2)+
+'<p class="lab-eyebrow lab-stage-title">02 / SELECT AN INTERNAL PROPOSITION</p>'+
+select("lab-function","Review function",[["all","All four functions"],...engine.functions.map(x=>[x,x])])+
+'<label class="lab-field"><span>Assessment proposition</span><select id="lab-item"></select></label>'+
+'<div class="lab-proposition" id="lab-proposition"></div>'+
+'<p class="lab-eyebrow lab-stage-title">03 / REFERENCE, EVIDENCE, AND CONSEQUENCE</p>'+
+select("lab-state","Recorded evidence state",states)+
+field("lab-reference","Verified official reference identifier (user-supplied)","")+
+field("lab-source-version","Official source version / date (user-supplied)","")+
+select("lab-evidence-type","What evidence demonstrates",[["unspecified","Not specified"],["design","Design"],["operation","Operation"],["outcome","Outcome"]])+
+area("lab-evidence","Evidence source / location","",2)+
+field("lab-evidence-owner","Evidence owner","")+
+field("lab-evidence-date","Evidence date","","date")+
+area("lab-coverage","Population, coverage and sampling boundary","",2)+
+area("lab-limitation","Limitations, material uncertainty and gaps","",2)+
+area("lab-na","Not-applicable scope rationale","",2)+
+area("lab-consequence","Decision consequence if unresolved","",2)+
+select("lab-disposition","Gap disposition",dispositions)+
+field("lab-action-owner","Next action owner","")+
+field("lab-action-due","Action due date","","date")+
+area("lab-trigger","Re-review, invalidation or stop trigger","",2)+
+'<p class="lab-eyebrow lab-stage-title">04 / OVERALL DRAFT CONCLUSION</p>'+
+select("lab-outcome","Proposed outcome",[
+["defer","Defer"],["hold","Hold"],["proceed_with_conditions","Proceed with conditions"],
+["proceed","Proceed"],["redesign","Redesign"],["other","Other"]])+
+area("lab-rationale","Reasoning for proposed outcome",record.conclusion.rationale,3)+
+area("lab-report-limits","Assessment-wide limitations",record.conclusion.limitations,2)+
+field("lab-next-review","Next review date",record.conclusion.next_review,"date")+
+'<div class="lab-actions">'+button("lab-reset","Restore fictional example")+
+button("lab-export","Export assessment JSON")+button("lab-markdown","Export review Markdown")+'</div>'+
+'<label class="lab-field lab-file-field" for="lab-import"><span>Import prior review JSON (maximum 64 KiB)</span></label>'+
+'<input id="lab-import" type="file" accept=".json,application/json" aria-describedby="lab-import-status">'+
+'<p class="lab-small" id="lab-import-status" role="status">No real system is reviewed; the browser does not retain or upload data.</p>'+note;
+shell("Work through the practitioner template's twelve internal propositions, organized by Govern, Map, Measure and Manage. These questions are not official NIST subcategory text. Evidence, population, provenance, limits, owner and decision consequence remain explicit; no maturity/compliance score is assigned.",
+controls,
+'<div class="lab-metrics lab-four">'+
+metric("lab-covered","DEMONSTRATED")+metric("lab-gaps","OPEN / UNKNOWN")+
+metric("lab-na-count","NOT APPLICABLE")+metric("lab-validated","RECORD STRUCTURE")+'</div>'+
+'<div class="lab-rmf-board"><p class="lab-eyebrow">EVIDENCE INVENTORY / SELECT TO INSPECT</p>'+
+'<div id="lab-rmf-list" class="lab-ledger" aria-label="Twelve internal assessment propositions"></div></div>'+
+'<div class="lab-rmf-consequence"><p class="lab-eyebrow">DECISION-RELEVANT GAPS</p>'+
+'<ul class="lab-findings" id="lab-gap-summary"></ul></div>'+
+'<p class="lab-small">A complete draft record is an organizational review aid, not proof of NIST implementation, effectiveness, regulatory compliance, or safety.</p>');
+const map={
+ "lab-state":"status","lab-reference":"source_reference","lab-source-version":"source_version",
+ "lab-evidence-type":"evidence_type","lab-evidence":"evidence_reference",
+ "lab-evidence-owner":"evidence_owner","lab-evidence-date":"evidence_date",
+ "lab-coverage":"coverage","lab-limitation":"limitation","lab-na":"not_applicable_rationale",
+ "lab-consequence":"decision_consequence","lab-disposition":"disposition",
+ "lab-action-owner":"action_owner","lab-action-due":"action_due","lab-trigger":"invalidation_trigger"
+};
+const scopes={"lab-scope":"system","lab-version":"version","lab-populations":"populations",
+ "lab-lifecycle":"lifecycle_decision","lab-assessor":"assessor",
+ "lab-cutoff":"evidence_cutoff","lab-exclusions":"exclusions"};
+const outcomes={"lab-outcome":"outcome","lab-rationale":"rationale",
+ "lab-report-limits":"limitations","lab-next-review":"next_review"};
+function save(){
+ for(const [id,key] of Object.entries(scopes))record.scope[key]=v(id);
+ for(const [id,key] of Object.entries(outcomes))record.conclusion[key]=v(id);
+ for(const [id,key] of Object.entries(map))record.items[selected][key]=v(id);
 }
-function multiagent(){
+function renderSelector(){
+ const items=$("lab-item");items.replaceChildren();
+ const visible=record.items.map((item,index)=>({item,index})).filter(x=>filter==="all"||x.item.function===filter);
+ if(!visible.some(x=>x.index===selected))selected=visible[0].index;
+ for(const {item,index} of visible){
+  const option=document.createElement("option");option.value=String(index);
+  option.textContent=item.id+" · "+item.function+" · "+item.proposition.slice(0,55);
+  items.append(option);
+ }
+ items.value=String(selected);
+}
+function display(){
+ renderSelector();
+ for(const [id,key] of Object.entries(scopes))$(id).value=record.scope[key];
+ for(const [id,key] of Object.entries(outcomes))$(id).value=record.conclusion[key];
+ for(const [id,key] of Object.entries(map))$(id).value=record.items[selected][key];
+ set("lab-proposition",record.items[selected].function.toUpperCase()+" / "+
+  record.items[selected].id+" — "+record.items[selected].proposition);
+ update();
+}
+function inventory(){
+ const board=$("lab-rmf-list");board.replaceChildren();
+ const filtered=record.items.map((item,index)=>({item,index})).filter(({item})=>filter==="all"||item.function===filter);
+ for(const {item,index} of filtered){
+  const button=document.createElement("button");button.type="button";
+  button.className="lab-ledger-row";button.setAttribute("aria-current",String(index===selected));
+  button.dataset.state=["unknown","absent"].includes(item.status)?"fail":"pass";
+  const name=document.createElement("span");name.textContent=item.id+" · "+item.function+" · "+item.proposition;
+  const status=document.createElement("strong");status.textContent=engine.statusLabels[item.status].toUpperCase();
+  button.append(name,status);
+  button.addEventListener("click",()=>{save();selected=index;display();$("lab-item").focus();});
+  board.append(button);
+ }
+}
+function update(){
+ save();
+ const result=engine.review(record);
+ set("lab-covered",(result.counts.demonstrated||0)+"/12");
+ set("lab-gaps",result.gaps.length+"/12");
+ set("lab-na-count",result.counts.not_applicable||0);
+ set("lab-validated",result.valid?"DRAFT VALID":"NEEDS WORK");
+ $("lab-export").disabled=!result.valid;
+ $("lab-markdown").disabled=!result.valid;
+ const notes=["Evidence states remain claims entered by the user, never independently verified."];
+ if(result.gaps.length)notes.unshift(result.gaps.length+" internal propositions are unresolved, partially demonstrated, or documented without operating proof.");
+ findings(result.valid?"pass":"fail",result.valid?"DRAFT EVIDENCE RECORD":"EVIDENCE RECORD INCOMPLETE",
+  result.errors.length?result.errors.slice(0,12):notes);
+ const summary=$("lab-gap-summary");summary.replaceChildren();
+ const gaps=result.gaps.filter(x=>x.disposition!=="unclassified");
+ if(!gaps.length){
+  const li=document.createElement("li");
+  li.textContent=result.gaps.length+" unresolved propositions; no gap dispositions assigned yet.";
+  summary.append(li);
+ }else for(const item of gaps){
+  const li=document.createElement("li");li.textContent=item.id+" · "+item.disposition.replaceAll("_"," ")+
+   " · "+(item.decision_consequence||"Decision consequence still missing");summary.append(li);
+ }
+ inventory();
+ return result;
+}
+function download(content,filename,mime){
+ const file=new Blob([content],{type:mime}),uri=URL.createObjectURL(file),anchor=document.createElement("a");
+ anchor.href=uri;anchor.download=filename;anchor.click();setTimeout(()=>URL.revokeObjectURL(uri),1000);
+ set("lab-import-status","Prepared "+filename+" locally. Nothing was uploaded.");
+}
+$("lab-item").addEventListener("change",e=>{save();selected=Number(e.target.value);display();});
+$("lab-function").addEventListener("change",e=>{save();filter=e.target.value;display();});
+root.addEventListener("input",e=>{
+ if(e.target.id==="lab-import"||e.target.id==="lab-item"||e.target.id==="lab-function")return;
+ update();
+});
+root.addEventListener("change",e=>{
+ if(e.target.id==="lab-import"||e.target.id==="lab-item"||e.target.id==="lab-function")return;
+ update();
+});
+$("lab-reset").addEventListener("click",()=>{record=engine.defaults();selected=0;filter="all";
+ $("lab-function").value="all";display();set("lab-import-status","Restored fictional example; local inputs were reset.");});
+$("lab-export").addEventListener("click",()=>{
+ const res=update();if(res.valid)download(JSON.stringify(record,null,2)+"\n","fictional-rmf-evidence-record.json","application/json");
+});
+$("lab-markdown").addEventListener("click",()=>{
+ const res=update();if(res.valid)download(engine.markdown(record,res),"fictional-rmf-evidence-assessment.md","text/markdown");
+});
+$("lab-import").addEventListener("change",async e=>{
+ const file=e.target.files?.[0];if(!file)return;
+ try{
+  if(file.size>65536)throw Error("Import exceeds the 64 KiB limit.");
+  const parsed=JSON.parse(await file.text()),errors=engine.shapeErrors(parsed);
+  if(errors.length)throw Error(errors.slice(0,3).join(" "));
+  record=engine.clone(parsed);selected=0;filter="all";$("lab-function").value="all";display();
+  set("lab-import-status","Imported twelve reviewed propositions locally. Check evidence status and provenance.");
+ }catch(error){set("lab-import-status","Import not accepted: "+String(error.message||error)+". Existing review preserved.");}
+ finally{e.target.value="";}
+});
+display();
+}function multiagent(){
 shell("Test the fictional authority envelope in docs/authority-and-containment.md: a catalog correction drafter may read public records and create drafts, but may not publish, delete or access patron history.",
 select("lab-action","Proposed capability",[["read","Read public catalog"],["create_draft","Create bounded correction draft"],["publish","Publish correction"],["delete","Delete record"]])+
 select("lab-data","Requested data",[["public","Public catalog records"],["patron","Patron history"]])+
