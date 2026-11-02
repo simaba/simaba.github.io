@@ -171,3 +171,14 @@ html[data-theme='dark']{--accent-text:#A5B0FF}
 [data-project-lab="mcp-agent-risk-checklist"] #lab-import{display:block;box-sizing:border-box;width:100%;max-width:100%;min-width:0;overflow:hidden;font:500 12px/1.5 var(--font-sans)}
 [data-project-lab="mcp-agent-risk-checklist"] .lab-main,[data-project-lab="mcp-agent-risk-checklist"] .lab-controls,[data-project-lab="mcp-agent-risk-checklist"] .lab-output,[data-project-lab="mcp-agent-risk-checklist"] .lab-field,[data-project-lab="mcp-agent-risk-checklist"] .lab-dataset{min-width:0;max-width:100%}
 [data-project-lab="mcp-agent-risk-checklist"] .lab-ledger-row{min-width:0;max-width:100%;overflow-wrap:anywhere}
+
+/* Prompt translator: explicit native-versus-review-only field mapping. */
+[data-project-lab="prompt-harness-translator"] #lab-import{display:block;box-sizing:border-box;max-width:100%;width:100%;min-width:0;overflow:hidden;padding:6px 0;font:500 12px/1.5 var(--font-sans)}
+.lab-file-field{margin:24px 0 8px}
+.lab-mapping-matrix{padding:16px 0 19px;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.lab-mapping{display:grid;gap:0}
+.lab-mapping-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 0;border-bottom:1px solid var(--line)}
+.lab-mapping-row code{font:500 12px/1.5 var(--font-mono);color:var(--ink);overflow-wrap:anywhere}
+.lab-mapping-row strong{font:600 10px/1.5 var(--font-mono);color:var(--muted);text-align:right}
+.lab-mapping-row strong[data-mapping='preserved']{color:var(--accent-text)}
+[data-project-lab="prompt-harness-translator"] .lab-main,[data-project-lab="prompt-harness-translator"] .lab-controls,[data-project-lab="prompt-harness-translator"] .lab-output{min-width:0;max-width:100%}

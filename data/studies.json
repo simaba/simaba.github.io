@@ -336,20 +336,21 @@
       "orientation": "FORMATS / WORKING TRANSLATOR CLI",
       "summary": "A Python Markdown/YAML prompt-asset translator rendering bounded Codex, Cursor and generic representations while explicitly retaining metadata that a target does not natively apply.",
       "method": [
-        "Parse frontmatter into name, description, instructions and source metadata; reject unsupported or malformed inputs.",
+        "Parse Markdown YAML frontmatter and typed nested metadata, including supported sequences and multiline scalar blocks; reject unsupported source constructs visibly.",
         "Generate distinct target layouts rather than falsely treating harness capabilities as interchangeable.",
         "Preserve unmapped metadata and place an explicit lossy-conversion warning into generated outputs."
       ],
       "artifacts": [
         "Python translator CLI and format-specific renderers",
-        "Public-safe sample Markdown/YAML prompt asset",
+        "Published public-safe Markdown/YAML source sample and an additional nested metadata test fixture",
         "Tests for nested metadata, invalid frontmatter and lossy target conversion"
       ],
       "example_label": "Try the real CLI",
       "example": "python -m pip install -e .\nprompt-harness translate examples/sample_agent.md --target cursor",
       "limits": [
-        "The browser editor reproduces output for a bounded editable fixture; it does not parse arbitrary YAML or cover all metadata types.",
-        "Successful translation does not prove equivalent tool permissions, model behavior or enforcement across runtimes."
+        "The browser supports a documented strict YAML subset with local import, typed metadata, nesting and block scalars, but does not accept every syntax supported by the original Python CLI.",
+        "Successful translation does not prove equivalent tool permissions, model behavior or enforcement across runtimes.",
+        "YAML tags, aliases, merges, exotic scalars and some complex sequences are intentionally rejected in the browser; the original CLI provides broader YAML support."
       ],
       "links": [
         [

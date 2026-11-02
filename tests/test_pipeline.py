@@ -183,6 +183,14 @@ class PortfolioChecks(unittest.TestCase):
         js=(ROOT/"assets/mcp-review-core.js").read_text()
         self.assertIn('MCP-FIC-001',js)
         self.assertIn('Draft202012', (ROOT/".github/workflows/review.yml").read_text() + (ROOT/"scripts/mcp_reference_check.py").read_text())
+    def test_translator_bounded_source_interface(self):
+        build()
+        html=(ROOT/"dist/projects/prompt-harness-translator/index.html").read_text()
+        self.assertIn('src="../../assets/prompt-translation-core.js"',html)
+        js=(ROOT/"assets/prompt-translation-core.js").read_text()
+        self.assertIn("parseSource",js)
+        self.assertIn("frontmatter",js)
+        self.assertIn("Lossy conversion warning",js)
     def test_featured_areas_are_diverse(self):
         featured={p["repo"] for p in self.data["projects"] if p["featured"]}
         self.assertEqual(featured,{"lean-ai-ops","everything-program-management","automotive-llm-eval-harness","release-checklist"})

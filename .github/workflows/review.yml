@@ -88,6 +88,18 @@ jobs:
             examples/fictional-mcp-risk-review.json
           sparse-checkout-cone-mode: false
           persist-credentials: false
+      - name: Checkout pinned Prompt Harness Translator reference and fixtures
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7, Node 24
+        with:
+          repository: simaba/prompt-harness-translator
+          ref: 6a431004c06de1abca4dc47c5f6476ef4f00bf8e
+          path: .source-reference/translator
+          sparse-checkout: |
+            src/prompt_harness_translator/__init__.py
+            src/prompt_harness_translator/core.py
+            examples/sample_agent.md
+          sparse-checkout-cone-mode: false
+          persist-credentials: false
       - name: Verify structured content, generated website, privacy and editorial design
         env:
           AUTOMOTIVE_REFERENCE_CORE: .source-reference/automotive/src/automotive_llm_eval_harness/core.py
@@ -102,6 +114,7 @@ jobs:
           node --check assets/simulator-core.js
           node --check assets/project-labs.js
           node --check assets/mcp-review-core.js
+          node --check assets/prompt-translation-core.js
           node --check assets/extended-labs.js
           test -s dist/index.html
           test -f dist/.nojekyll
@@ -115,7 +128,10 @@ jobs:
           PMKIT_REFERENCE_ROOT: .source-reference/pmkit
           RELEASE_REFERENCE_ROOT: .source-reference/release
           MCP_REFERENCE_ROOT: .source-reference/mcp
-        run: .venv/bin/python scripts/browser_review.py
+          TRANSLATOR_REFERENCE_ROOT: .source-reference/translator
+        run: |
+          .venv/bin/python -m unittest discover -s tests -p test_translator_reference.py -v
+          .venv/bin/python scripts/browser_review.py
       - name: Require review screenshots
         run: |
           for name in desktop tablet mobile small-mobile; do

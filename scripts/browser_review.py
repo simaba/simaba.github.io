@@ -276,14 +276,34 @@ with sync_playwright() as playwright:
                         detail.locator("#lab-query").fill("")
                     elif slug=="prompt-harness-translator":
                         assert "Lossy conversion warning" in detail.locator("#lab-preview").inner_text()
+                        assert detail.locator("#lab-loss").inner_text()=="2 FIELDS"
+                        assert detail.locator(".lab-mapping-row").count()==4
                         detail.locator("#lab-target").select_option("cursor")
                         assert "source_metadata" in detail.locator("#lab-preview").inner_text()
+                        assert detail.locator("#lab-loss").inner_text()=="3 FIELDS"
                         detail.locator("#lab-target").select_option("generic")
                         assert detail.locator("#lab-loss").inner_text()=="NONE"
-                        detail.locator("#lab-tools").fill(" , ")
+                        detail.locator("#lab-nested").click()
+                        detail.locator("#lab-target").select_option("cursor")
+                        assert "source_metadata" in detail.locator("#lab-preview").inner_text()
+                        assert "governance" in detail.locator("#lab-preview").inner_text()
+                        with detail.expect_download() as saved:
+                            detail.locator("#lab-download").click()
+                        document=saved.value.path().read_text(encoding="utf-8")
+                        import yaml
+                        parsed=yaml.safe_load(document)
+                        assert parsed["source_metadata"]["tools"]["read"]["enabled"] is True
+                        assert parsed["source_metadata"]["tools"]["write"]["enabled"] is False
+                        assert parsed["source_metadata"]["tags"]==["governance","evaluation"]
+                        detail.locator("#lab-source").fill("---\nname: [broken\n---\nDo work.")
                         assert detail.locator("#lab-download").is_disabled()
-                        detail.locator("#lab-tools").fill("Read, Write")
+                        assert detail.locator("#lab-verdict").inner_text()=="SOURCE INPUT UNSUPPORTED OR INVALID"
+                        detail.locator("#lab-reset").click()
                         assert detail.locator("#lab-download").is_enabled()
+                        detail.locator("#lab-import").set_input_files({
+                           "name":"invalid.md","mimeType":"text/plain","buffer":b"not frontmatter"})
+                        expect(detail.locator("#lab-import-status")).to_contain_text("Import not accepted")
+                        assert "executive-summary" in detail.locator("#lab-source").input_value()
                     elif slug=="mcp-agent-risk-checklist":
                         assert detail.locator("#lab-verdict").inner_text()=="SCHEMA STRUCTURE VALID"
                         assert detail.locator("#lab-count").inner_text()=="3"
