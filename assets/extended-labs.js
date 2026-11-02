@@ -288,6 +288,7 @@ metric("lab-selected","READING SET")+'</div>'+
 '<div class="lab-prism-reading"><p class="lab-eyebrow">SELECTED SOURCE SET / INSPECTION</p>'+
 '<div id="lab-reading-list" class="lab-reading-list"></div></div>'+
 '<div class="lab-prism-resource-pane"><p class="lab-eyebrow">CATALOG / ORIGINAL SOURCE LINKS</p>'+
+'<p class="lab-small">Scroll within the catalog to inspect the full set of matching source entries.</p>'+
 '<div id="lab-resources" class="lab-resource-list"></div></div>');
 const find=id=>all.find(x=>x.id===id);
 function renderReading(){
@@ -595,8 +596,8 @@ select("lab-function","Review function",[["all","All four functions"],...engine.
 '<div class="lab-proposition" id="lab-proposition"></div>'+
 '<p class="lab-eyebrow lab-stage-title">03 / REFERENCE, EVIDENCE, AND CONSEQUENCE</p>'+
 select("lab-state","Recorded evidence state",states)+
-field("lab-reference","Verified official reference identifier (user-supplied)","")+
-field("lab-source-version","Official source version / date (user-supplied)","")+
+field("lab-reference","Official source reference (user-supplied, unverified)","")+
+field("lab-source-version","Official source version / date (unverified input)","")+
 select("lab-evidence-type","What evidence demonstrates",[["unspecified","Not specified"],["design","Design"],["operation","Operation"],["outcome","Outcome"]])+
 area("lab-evidence","Evidence source / location","",2)+
 field("lab-evidence-owner","Evidence owner","")+

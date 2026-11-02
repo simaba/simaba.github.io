@@ -314,7 +314,7 @@
         "Contribution and source-review guidance in the public repository"
       ],
       "example_label": "Explore selected public sources",
-      "example": "Search the representative, repo-derived browser index by publisher or topic. Open the publisher's page to verify its current version and applicability.",
+      "example": "Search the complete pinned AI Prism resource catalog by section, publisher host, or topic. Select sources to export a reviewable reading set; independently verify current versions and applicability.",
       "limits": [
         "A curated snapshot rather than live research. No automatic URL, publisher, description or content-freshness checks are performed.",
         "Links can change after publication; do not assume legal or standards materials are current without checking the source.",

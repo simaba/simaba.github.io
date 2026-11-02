@@ -113,8 +113,11 @@ function review(doc){
   }
   if(item.source_reference&&!item.source_version.trim())
    notes.push(prefix+": recorded reference has no version; official source applicability remains unverified.");
-  if(item.evidence_date&&validDate(item.evidence_date)&&item.evidence_date>doc.scope.evidence_cutoff)
-   notes.push(prefix+": evidence postdates the recorded cutoff; reassess the evidence boundary.");
+  if(item.evidence_date&&validDate(item.evidence_date)&&item.evidence_date>doc.scope.evidence_cutoff){
+   if(item.status==="demonstrated")
+    errors.push(prefix+": demonstrated evidence postdates the assessment cutoff and cannot support the recorded status.");
+   else notes.push(prefix+": evidence postdates the recorded cutoff; reassess the evidence boundary.");
+  }
  }
  const counts=Object.fromEntries(Object.keys(statusLabels).map(s=>[s,doc.items.filter(x=>x.status===s).length]));
  if(["proceed","proceed_with_conditions"].includes(doc.conclusion.outcome)&&gaps.some(x=>x.disposition==="blocker"))

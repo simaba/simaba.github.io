@@ -157,6 +157,8 @@ jobs:
           PRISM_REFERENCE_ROOT: .source-reference/prism
         run: |
           .venv/bin/python -m unittest discover -s tests -p test_translator_reference.py -v
+          .venv/bin/python -m unittest discover -s tests -p test_rmf_source.py -v
+          .venv/bin/python -m unittest discover -s tests -p test_prism_source.py -v
           .venv/bin/python scripts/browser_review.py
       - name: Require review screenshots
         run: |
