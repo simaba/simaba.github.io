@@ -167,42 +167,94 @@ $("lab-scenario").value="retry_then_success";
 reload();
 }
 function translator(){
-const initial={name:"executive-summary",description:"Creates concise leadership-ready summaries.",tools:"Read, Write",model:"reasoning",instructions:"Produce a crisp executive summary with a recommendation, risks, and next steps."};
-shell("Try the translator's documented sample fields. Target representations are generated locally; unlike the Python utility this editor does not parse arbitrary YAML.",
-select("lab-target","Output target",[["codex","Codex"],["cursor","Cursor"],["generic","Generic YAML"]])+
-field("lab-name","Asset name",initial.name)+field("lab-description","Description",initial.description)+
-field("lab-tools","Source tools (comma separated)",initial.tools)+field("lab-model","Source model",initial.model)+
-area("lab-instructions","Instructions",initial.instructions,5)+
-'<div class="lab-actions">'+button("lab-reset","Restore sample")+button("lab-download","Download target")+'</div>'+note,
-'<div class="lab-metrics">'+metric("lab-loss","METADATA MAPPING")+metric("lab-target-name","TARGET")+'</div><pre class="lab-preview"><code id="lab-preview"></code></pre>');
-const yaml=s=>JSON.stringify(s);
-let output="",valid=false;
-function evaluate(){
-const name=v("lab-name").trim(),description=v("lab-description").trim(),instructions=v("lab-instructions").trim(),tools=v("lab-tools").split(",").map(x=>x.trim()).filter(Boolean),model=v("lab-model").trim(),target=v("lab-target");
-const errors=[];
-if(!name)errors.push("Asset name is required.");
-if(!instructions)errors.push("Instructions are required.");
-if(v("lab-tools").length>0&&!tools.length)errors.push("Supply a tool name or leave tools blank.");
-const sourceMeta={name,description,...(tools.length?{tools}:{}),...(model?{model}:{})};
-const unknown=target==="codex"?["model","tools"]:target==="cursor"?["description","model","tools"]:[];
-const preserved=unknown.filter(x=>Object.hasOwn(sourceMeta,x));
-const warn=preserved.length?"> **Lossy conversion warning:** this target does not natively apply all source metadata. Preserved for review: "+preserved.slice().sort().join(", ")+".\n\n":"";
-const extra=preserved.map(x=>x+": "+(Array.isArray(sourceMeta[x])?"["+sourceMeta[x].map(yaml).join(", ")+"]":yaml(sourceMeta[x]))).join("\n");
-if(target==="codex"){
-output="# "+name+"\n\n"+warn+description+"\n\n## Instructions\n\n"+instructions+"\n"+(extra?"\n## Unmapped source metadata\n\n\`\`\`yaml\n"+extra+"\n\`\`\`\n":"");
-}else if(target==="cursor"){
-output="name: "+yaml(name)+"\nrule: "+yaml(instructions)+"\n"+(extra?"conversion_warning: "+yaml("Lossy conversion: review source_metadata before use; preserved, not enforced.")+"\nsource_metadata:\n"+extra.split("\n").map(x=>"  "+x).join("\n")+"\n":"");
-}else output=Object.entries({...sourceMeta,instructions}).map(([key,value])=>key+": "+(Array.isArray(value)?"["+value.map(yaml).join(", ")+"]":yaml(value))).join("\n")+"\n";
-valid=errors.length===0;
-$("lab-download").disabled=!valid;
-set("lab-preview",valid?output:"Correct the input to produce an artifact.");
-set("lab-loss",preserved.length?preserved.join(", "):"NONE");set("lab-target-name",target.toUpperCase());
-findings(errors.length?"fail":"pass",errors.length?"SOURCE INPUT INCOMPLETE":preserved.length?"CONVERSION WITH REVIEW WARNINGS":"TARGET REPRESENTATION READY",errors.length?errors:preserved.length?["Preserved fields are not silently treated as native target configuration: "+preserved.join(", ")+".","Translation does not establish behavioral or permission equivalence."]:["All source fields are present in the bounded generic representation."]);
+const engine=globalThis.PortfolioPromptTranslation;
+if(!engine)throw new Error("Prompt translation core is missing.");
+const sample=['---','name: executive-summary','description: Creates concise leadership-ready summaries.',
+  'tools: ["Read", "Write"]','model: reasoning','---','',
+  'Produce a crisp executive summary with a recommendation, risks, and next steps.',''].join("\n");
+shell("Paste or import a Markdown prompt asset with YAML frontmatter. The browser supports a deliberately bounded source subset, including nested mappings, lists, and multiline scalar values. The Python CLI is the reference for other valid YAML constructs.",
+select("lab-target","Output target",[["codex","Codex / Markdown"],["cursor","Cursor / YAML"],["generic","Generic / preservation YAML"]])+
+area("lab-source","Source Markdown with YAML frontmatter",sample,16)+
+'<div class="lab-actions">'+button("lab-reset","Restore published sample")+
+button("lab-nested","Load nested example")+button("lab-download","Download conversion")+'</div>'+
+'<label class="lab-field lab-file-field" for="lab-import"><span>Import local Markdown file (maximum 64 KiB)</span></label>'+
+'<input id="lab-import" type="file" accept=".md,.markdown,.txt,text/markdown,text/plain" aria-describedby="lab-import-status">'+
+'<p id="lab-import-status" class="lab-small" role="status">All parsing and rendering occurs locally. Do not paste private prompts or credentials into a public demo.</p>'+note,
+'<div class="lab-metrics">'+metric("lab-loss","REVIEW-ONLY FIELDS")+metric("lab-target-name","TARGET")+'</div>'+
+'<div class="lab-mapping-matrix"><p class="lab-eyebrow">FIELD MAPPING / ENFORCED ≠ PRESERVED</p>'+
+'<div id="lab-mapping" class="lab-mapping" aria-label="Source field target mapping"></div></div>'+
+'<div class="lab-document-preview"><p class="lab-eyebrow">TARGET OUTPUT / LOCAL PREVIEW</p>'+
+'<pre class="lab-preview"><code id="lab-preview"></code></pre></div>');
+const nested=['---','name: reviewer','description: |','  Review changes carefully:',
+  '  preserve safety constraints.','tools:','  read:','    enabled: true',
+  '  write:','    enabled: false','tags:','  - governance','  - evaluation',
+  '---','','Provide a concise review.',''].join("\n");
+let conversion=null;
+function setMapping(parsed,target,lost){
+const result=$("lab-mapping");result.replaceChildren();
+for(const key of Object.keys(parsed.metadata)){
+  const row=document.createElement("div");row.className="lab-mapping-row";
+  const name=document.createElement("code");name.textContent=key;
+  const state=document.createElement("strong");
+  const isLoss=lost.includes(key);
+  state.textContent=isLoss?"PRESERVED FOR REVIEW":"DIRECT FIELD";
+  state.dataset.mapping=isLoss?"preserved":"direct";
+  row.append(name,state);result.append(row);
 }
-root.addEventListener("input",evaluate);root.addEventListener("change",evaluate);
-$("lab-reset").addEventListener("click",()=>{for(const [key,value] of Object.entries(initial))$("lab-"+key).value=value;$("lab-target").value="codex";evaluate();});
-$("lab-download").addEventListener("click",()=>{if(!valid)return;const blob=new Blob([output],{type:"text/plain"}),url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download="translated-"+v("lab-target")+(v("lab-target")==="codex"?".md":".yaml");a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);set("lab-export-status","Prepared locally for inspection.");});
-$("lab-target").value="codex";evaluate();
+if(!Object.keys(parsed.metadata).length){
+  const empty=document.createElement("p");empty.className="lab-small";
+  empty.textContent="No frontmatter keys supplied. Implicit defaults will be used.";result.append(empty);
+}
+}
+function evaluate(){
+const target=v("lab-target");
+try{
+const parsed=engine.parseSource(v("lab-source"));
+conversion=engine.convert(parsed,target);
+set("lab-loss",conversion.lost.length?conversion.lost.length+" FIELDS":"NONE");
+set("lab-target-name",target.toUpperCase());
+set("lab-preview",conversion.output);
+setMapping(parsed,target,conversion.lost);
+$("lab-download").disabled=false;
+findings("pass",conversion.lost.length?"CONVERSION REQUIRES REVIEW":"PRESERVATION REPRESENTATION READY",
+conversion.lost.length?[
+"Unmapped source metadata remains available for human review: "+conversion.lost.join(", ")+".",
+"Preserved values are not active permissions or runtime configuration. Manual target verification is required."]:
+["All source metadata fields are retained in the selected bounded output representation.",
+"Syntax preservation cannot establish equivalent runtime behavior, tools, or policy enforcement."]);
+}catch(e){
+conversion=null;$("lab-download").disabled=true;
+set("lab-loss","INVALID");set("lab-target-name",target.toUpperCase());
+set("lab-preview","Correct the source to produce an output.");
+$("lab-mapping").replaceChildren();
+findings("fail","SOURCE INPUT UNSUPPORTED OR INVALID",[
+String(e.message||e),
+"This browser deliberately rejects YAML outside its supported subset. Use the linked Python CLI for additional YAML constructs."]);
+}
+}
+$("lab-reset").addEventListener("click",()=>{$("lab-source").value=sample;$("lab-target").value="codex";evaluate();});
+$("lab-nested").addEventListener("click",()=>{$("lab-source").value=nested;evaluate();});
+$("lab-download").addEventListener("click",()=>{
+if(!conversion)return;
+const file=new Blob([conversion.output],{type:"text/plain;charset=utf-8"}),url=URL.createObjectURL(file);
+const link=document.createElement("a");link.href=url;
+link.download="translated-"+conversion.target+(conversion.target==="codex"?".md":".yaml");link.click();
+setTimeout(()=>URL.revokeObjectURL(url),1000);
+set("lab-import-status","Prepared "+link.download+" locally for review. Nothing uploaded.");
+});
+$("lab-import").addEventListener("change",async event=>{
+ const file=event.target.files?.[0];if(!file)return;
+ try{
+   if(file.size>65536)throw new Error("File exceeds the 64 KiB source limit.");
+   const content=await file.text();engine.parseSource(content);
+   $("lab-source").value=content;evaluate();
+   set("lab-import-status","Imported "+file.name+" locally. Check target warnings before use.");
+ }catch(e){set("lab-import-status","Import not accepted: "+String(e.message||e)+". Existing source preserved.");}
+ finally{event.target.value="";}
+});
+root.addEventListener("input",event=>{if(event.target.id==="lab-import")return;evaluate();});
+root.addEventListener("change",event=>{if(event.target.id==="lab-import")return;evaluate();});
+evaluate();
 }
 const sources=[
 ["Official frameworks","NIST AI RMF","NIST","https://airc.nist.gov/home","Primary","Four-function AI risk management framework and supporting resources"],
