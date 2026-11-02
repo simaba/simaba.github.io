@@ -256,45 +256,135 @@ root.addEventListener("input",event=>{if(event.target.id==="lab-import")return;e
 root.addEventListener("change",event=>{if(event.target.id==="lab-import")return;evaluate();});
 evaluate();
 }
-const sources=[
-["Official frameworks","NIST AI RMF","NIST","https://airc.nist.gov/home","Primary","Four-function AI risk management framework and supporting resources"],
-["Official frameworks","EU AI Act","European Union","https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32024R1689","Primary","Official EU legislative text; verify applicability and effective dates"],
-["Official frameworks","ISO/IEC 42001","ISO","https://www.iso.org/standard/81230.html","Primary","International AI management-system standard listing"],
-["Official frameworks","OECD AI Principles","OECD","https://oecd.ai/en/ai-principles","Primary","International trustworthy-AI principles"],
-["Risk and security","MITRE ATLAS","MITRE","https://atlas.mitre.org/","Primary","Adversarial tactics and techniques involving AI systems"],
-["Risk and security","OWASP Top 10 for LLMs","OWASP","https://genai.owasp.org/llm-top-10/","Primary","GenAI application security risks and mitigations"],
-["Evaluation","HELM","Stanford CRFM","https://crfm.stanford.edu/helm/","Primary","Language-model evaluation across scenarios and measures"],
-["Evaluation","LM Evaluation Harness","EleutherAI","https://github.com/EleutherAI/lm-evaluation-harness","Primary","Open-source language-model evaluation infrastructure"],
-["Evaluation","Evidently AI","Evidently","https://github.com/evidentlyai/evidently","Primary","Open-source model evaluation and monitoring tools"],
-["Evaluation","Microsoft PyRIT","Microsoft","https://github.com/Azure/PyRIT","Primary","Python-based generative-AI red-teaming toolkit"],
-["Incident references","AI Incident Database","AIID","https://incidentdatabase.ai/","Primary","Reports and indexing of AI incidents"],
-["Incident references","AI Vulnerability Database","AVID","https://avidml.org/","Primary","AI-specific failure and vulnerability taxonomy"],
-["Research","Model Cards for Model Reporting","Mitchell et al.","https://arxiv.org/abs/1810.03993","Original paper","Foundational model-card documentation proposal"],
-["Research","Datasheets for Datasets","Gebru et al.","https://arxiv.org/abs/1803.09010","Original paper","Dataset provenance and accountability documentation"],
-["Governance guidance","Google PAIR Guidebook","Google","https://pair.withgoogle.com/guidebook/","Primary","Human-centered AI design and deployment reference"],
-["Governance guidance","EU AI Act Summary","Secondary interpretation","https://artificialintelligenceact.eu/","Secondary","Explanatory summary; verify against official legal text"]
-];
 function prism(){
-shell("Filter a selected extract of the public AI Prism resource list. These are source entries, not live-checked URLs or verified current regulatory guidance.",
-field("lab-query","Search title, publisher or subject","")+
-select("lab-topic","Topic",[["all","All"],...Array.from(new Set(sources.map(x=>x[0]))).map(x=>[x,x])])+
-tick("lab-primary","Exclude secondary interpretations",false),
-'<div class="lab-metrics">'+metric("lab-results","MATCHING SOURCES")+metric("lab-publishers","PUBLISHERS")+'</div><div class="lab-resource-list" id="lab-resources"></div>');
+const catalog=globalThis.PortfolioPrismCatalog;
+if(!catalog||catalog.record_count!==catalog.items.length)throw Error("Pinned AI Prism catalog unavailable");
+const all=catalog.items;
+const sections=[...new Set(all.map(x=>x.category))];
+const domain=x=>{try{return new URL(x.url).hostname.replace(/^www\./,"")}catch{return "unknown"}};
+const urls=new Map();for(const x of all)urls.set(x.url,(urls.get(x.url)||0)+1);
+let chosen=new Set(),visible=[],showAll=true;
+const intro="Explore the full curated repository snapshot. Entries reflect the recorded README, including intentional cross-category repeats. Link accessibility, source currency and regulatory interpretation have not been reverified by this browser.";
+const controls=
+'<p class="lab-eyebrow">01 / SOURCE FACETS</p>'+
+field("lab-query","Search titles, description, section or URL","")+
+select("lab-topic","Repository section",[["all","All sections"],...sections.map(x=>[x,x])])+
+select("lab-host","Source host",[["all","Any host"],
+ ...[...new Set(all.map(domain))].sort().map(x=>[x,x])])+
+tick("lab-unique","Show each URL once (collapse cross-category repeats)",false)+
+'<div class="lab-actions">'+button("lab-reset","Clear filters")+
+button("lab-export","Export reading set · JSON")+
+button("lab-export-md","Export reading set · Markdown")+'</div>'+
+'<p class="lab-small" id="lab-export-status" role="status">Reading-set choices are kept only in this browser page, until refreshed.</p>'+
+'<div class="lab-prism-provenance"><p class="lab-eyebrow">SOURCE AND FRESHNESS BOUNDARY</p>'+
+'<p>Curated <strong>README snapshot</strong> at '+catalog.source_commit.slice(0,12)+
+'. The repository maintains a separate manual <a href="https://github.com/simaba/ai-prism/blob/'+catalog.source_commit+
+'/REVIEW_STATUS.md" target="_blank" rel="noopener noreferrer">section-level review ledger</a>. '+
+'Review dates apply to their recorded scope, not to every link on this page. The browser performs no live link checks.</p></div>';
+shell(intro,controls,
+'<div class="lab-metrics lab-four">'+metric("lab-results","VISIBLE ENTRIES")+
+metric("lab-total","CURATED ENTRIES")+metric("lab-unique-count","UNIQUE URLS")+
+metric("lab-selected","READING SET")+'</div>'+
+'<div class="lab-prism-reading"><p class="lab-eyebrow">SELECTED SOURCE SET / INSPECTION</p>'+
+'<div id="lab-reading-list" class="lab-reading-list"></div></div>'+
+'<div class="lab-prism-resource-pane"><p class="lab-eyebrow">CATALOG / ORIGINAL SOURCE LINKS</p>'+
+'<div id="lab-resources" class="lab-resource-list"></div></div>');
+const find=id=>all.find(x=>x.id===id);
+function renderReading(){
+ const list=$("lab-reading-list");list.replaceChildren();
+ const selections=[...chosen].map(find).filter(Boolean);
+ if(!selections.length){
+  const p=document.createElement("p");p.className="lab-small";
+  p.textContent="Select individual resources below to create a reviewable reading set. Nothing is permanently saved.";
+  list.append(p);return;
+ }
+ for(const item of selections){
+  const row=document.createElement("div");row.className="lab-prism-reading-row";
+  const name=document.createElement("a");name.href=item.url;name.target="_blank";name.rel="noopener noreferrer";
+  name.textContent=item.title+" ↗";
+  const remove=document.createElement("button");remove.type="button";remove.className="lab-mini-button";
+  remove.textContent="Remove";remove.setAttribute("aria-label","Remove "+item.title+" from reading set");
+  remove.addEventListener("click",()=>{chosen.delete(item.id);update()});
+  row.append(name,remove);list.append(row);
+ }
+}
+function setEntry(item){
+ const card=document.createElement("article");card.className="lab-prism-entry";
+ const category=document.createElement("small");category.className="lab-prism-category";
+ category.textContent=item.category+(item.subsection?" / "+item.subsection:"")+" · "+domain(item);
+ const link=document.createElement("a");link.href=item.url;link.target="_blank";
+ link.rel="noopener noreferrer";link.className="lab-prism-title";
+ link.textContent=item.title+" ↗";
+ const description=document.createElement("p");description.textContent=item.description;
+ const actions=document.createElement("div");actions.className="lab-prism-actions";
+ const flag=document.createElement("button");flag.type="button";flag.className="lab-mini-button";
+ flag.textContent=chosen.has(item.id)?"In reading set ✓":"Add to reading set";
+ flag.setAttribute("aria-pressed",String(chosen.has(item.id)));
+ flag.addEventListener("click",()=>{
+   if(chosen.has(item.id))chosen.delete(item.id);
+   else if(chosen.size<20)chosen.add(item.id);
+   else {set("lab-export-status","The reading set is limited to 20 selected entries.");return;}
+   update();
+ });
+ actions.append(flag);
+ if(urls.get(item.url)>1){
+  const duplicate=document.createElement("span");duplicate.className="lab-prism-repeated";
+  duplicate.textContent="Cross-listed "+urls.get(item.url)+"× in README";
+  actions.append(duplicate);
+ }
+ card.append(category,link,description,actions);
+ return card;
+}
 function update(){
-const query=v("lab-query").trim().toLowerCase(),topic=v("lab-topic"),primary=check("lab-primary");
-const filtered=sources.filter(s=>(topic==="all"||s[0]===topic)&&(!primary||s[4]!=="Secondary")&&(!query||s.join(" ").toLowerCase().includes(query)));
-const list=$("lab-resources");list.replaceChildren();
-for(const s of filtered){
-const a=document.createElement("a");a.href=s[3];a.target="_blank";a.rel="noopener noreferrer";a.className="lab-resource";
-const k=document.createElement("small");k.textContent=s[0]+" / "+s[2]+" / "+s[4];
-const strong=document.createElement("strong");strong.textContent=s[1]+" ↗";
-const summary=document.createElement("span");summary.textContent=s[5];a.append(k,strong,summary);list.append(a);
+ const query=v("lab-query").trim().toLowerCase(),topic=v("lab-topic"),host=v("lab-host");
+ const unique=check("lab-unique");
+ const match=all.filter(x=>(topic==="all"||x.category===topic)&&
+   (host==="all"||domain(x)===host)&&
+   (!query||[x.title,x.description,x.category,x.subsection,x.url].join(" ").toLowerCase().includes(query)));
+ const used=new Set();
+ visible=match.filter(x=>{if(!unique)return true;if(used.has(x.url))return false;used.add(x.url);return true;});
+ set("lab-results",visible.length);set("lab-total",all.length);
+ set("lab-unique-count",catalog.unique_urls);set("lab-selected",chosen.size);
+ renderReading();
+ const list=$("lab-resources");list.replaceChildren();
+ for(const item of visible)list.append(setEntry(item));
+ if(!visible.length){
+  const empty=document.createElement("p");empty.className="lab-small";
+  empty.textContent="No source matches; broaden your search or reset the filters.";list.append(empty);
+ }
+ findings("pass",visible.length?"SOURCE CATALOG FILTERED":"NO SOURCES MATCH",
+  ["Showing source snapshot entries and publisher links, without inventing live availability or editorial review status.",
+   "Cross-category duplicates remain visible unless explicitly collapsed; manual content review dates are not per-URL verification."]);
 }
-set("lab-results",filtered.length);set("lab-publishers",new Set(filtered.map(s=>s[2])).size);
-findings("pass",filtered.length?"CURATED REFERENCES FOUND":"NO MATCHES",
-filtered.length?["These are links curated in AI Prism, not links whose accessibility or currency has just been checked.","Open the primary publisher's source to confirm current scope, version and applicability."]:["Change the search or topic. No sources were fabricated to fill the result."]);
+function exportSet(type){
+ const selected=[...chosen].map(find).filter(Boolean);
+ if(!selected.length){set("lab-export-status","Select at least one source to export.");return;}
+ if(type==="json")exportJSON({schema_version:1,source_commit:catalog.source_commit,
+   review_status:"Not independently revalidated by this portfolio browser",resources:selected},
+  "ai-prism-reading-set.json");
+ else{
+  const lines=["# AI Prism reading set","",
+   "Curated README snapshot: "+catalog.source_commit,
+   "No live link or editorial freshness verification was performed.",""];
+  for(const x of selected){
+   lines.push("## "+x.title,"","- Section: "+x.category+(x.subsection?" / "+x.subsection:""),
+     "- Link: "+x.url,"- Description (source README): "+x.description,"");
+  }
+  const blob=new Blob([lines.join("\n")],{type:"text/markdown;charset=utf-8"});
+  const uri=URL.createObjectURL(blob),a=document.createElement("a");
+  a.href=uri;a.download="ai-prism-reading-set.md";a.click();
+  setTimeout(()=>URL.revokeObjectURL(uri),1000);
+ }
+ set("lab-export-status","Prepared "+selected.length+" selected source(s) locally; no upload.");
 }
-root.addEventListener("input",update);root.addEventListener("change",update);update();
+$("lab-export").addEventListener("click",()=>exportSet("json"));
+$("lab-export-md").addEventListener("click",()=>exportSet("markdown"));
+$("lab-reset").addEventListener("click",()=>{
+ $("lab-query").value="";$("lab-topic").value="all";$("lab-host").value="all";
+ $("lab-unique").checked=false;update();set("lab-export-status","Filters cleared; reading set retained.");
+});
+root.addEventListener("input",update);root.addEventListener("change",update);
+update();
 }
 function mcp(){
 const engine=globalThis.PortfolioMCPReview;
