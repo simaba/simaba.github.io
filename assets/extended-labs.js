@@ -245,56 +245,181 @@ filtered.length?["These are links curated in AI Prism, not links whose accessibi
 root.addEventListener("input",update);root.addEventListener("change",update);update();
 }
 function mcp(){
-const defaults={area:"permissions",likelihood:"3",impact:"4",level:"high",status:"mitigating",owner:"Fictional Platform Owner",mitigation:"Use a dedicated least-privilege identity limited to the synthetic collection and document a revocation path."};
-shell("Edit one finding from a fictional MCP review and export a complete record matching the source repository's published JSON structure. It checks record fields, not real servers or security controls.",
-field("lab-system","Fictional system name","Fictional Read-Only Knowledge Helper")+
-area("lab-scope","Reviewed scope","Synthetic document collection; read-only search; no external network or write tools.",3)+
-select("lab-review-status","Review status",[["draft","Draft"],["in_review","In review"],["approved_with_conditions","Approved with conditions"],["blocked","Blocked"]])+
-'<div class="lab-fieldset"><p class="lab-eyebrow">EDIT THE FINDING / F-001</p>'+
-select("lab-area","Finding area",[["permissions","Permissions"],["tool_scope","Tool scope"],["data_exposure","Data exposure"],["prompt_injection","Prompt injection"],["auditability","Auditability"],["failure_modes","Failure modes"],["human_oversight","Human oversight"]])+
-'<div class="lab-split">'+field("lab-likelihood","Likelihood (1–5)","3","number")+field("lab-impact","Impact (1–5)","4","number")+'</div>'+
-select("lab-level","Reviewer-assigned risk level",[["low","Low"],["medium","Medium"],["high","High"],["critical","Critical"]])+
-select("lab-status","Finding status",[["open","Open"],["mitigating","Mitigating"],["accepted","Accepted"],["blocked","Blocked"]])+
-field("lab-owner","Finding owner",defaults.owner)+
-area("lab-mitigation","Stated mitigation",defaults.mitigation)+
-'</div><div class="lab-actions">'+button("lab-reset","Restore fictional review")+button("lab-download","Export schema-shaped review")+'</div>'+note,
-'<div class="lab-metrics">'+metric("lab-priority","ORDINAL PRODUCT")+metric("lab-valid","STRUCTURE CHECK")+'</div>');
-function get(){
-const finding={id:"F-001",area:v("lab-area"),finding:"A broad service identity may exceed the intended synthetic collection and tool scope.",
-likelihood:Number(v("lab-likelihood")),impact:Number(v("lab-impact")),risk_level:v("lab-level"),mitigation:v("lab-mitigation").trim(),owner:v("lab-owner").trim(),status:v("lab-status")};
-return {review_id:"MCP-FIC-001",system_name:v("lab-system").trim(),scope:v("lab-scope").trim(),review_status:v("lab-review-status"),findings:[finding]};
+const engine=globalThis.PortfolioMCPReview;
+if(!engine)throw new Error("MCP source contract unavailable");
+let record=engine.clone(engine.example),selected=0;
+const options=(arr)=>arr.map(x=>[x,x.replaceAll("_"," ")]);
+const controls=
+'<p class="lab-eyebrow">01 / REVIEW ENVELOPE</p>'+
+field("lab-review-id","Review identifier",record.review_id)+
+field("lab-system","Fictional system name",record.system_name)+
+area("lab-scope","Effective data and tool scope",record.scope,4)+
+select("lab-review-status","Declared review status",options(engine.statuses))+
+'<p class="lab-eyebrow lab-stage-title">02 / SELECT AND EDIT FINDING</p>'+
+select("lab-finding-select","Finding",record.findings.map(f=>[f.id,f.id+" · "+f.area.replaceAll("_"," ")]))+
+'<div class="lab-actions">'+button("lab-add","Add finding")+button("lab-remove","Remove selected finding")+'</div>'+
+field("lab-finding-id","Finding ID","F-001")+
+select("lab-area","Authority or failure area",options(engine.areas))+
+area("lab-finding","Concrete failure scenario","",3)+
+'<div class="lab-split">'+field("lab-likelihood","Likelihood (1–5)","3","number")+
+field("lab-impact","Impact (1–5)","4","number")+'</div>'+
+select("lab-level","Reviewer-assigned risk level",options(engine.levels))+
+select("lab-status","Finding treatment state",options(engine.findingStatuses))+
+field("lab-owner","Accountable finding owner","")+
+area("lab-mitigation","Proposed mitigation and testable control","",4)+
+'<p class="lab-eyebrow lab-stage-title">03 / LOCAL FILES</p>'+
+'<label class="lab-field" for="lab-import"><span>Import review JSON (maximum 50 findings / 128 KiB)</span></label>'+
+'<input id="lab-import" type="file" accept=".json,application/json" aria-describedby="lab-import-status">'+
+'<p class="lab-small" role="status" id="lab-import-status">Example fields are entirely fictional; no remote MCP server is contacted.</p>'+
+'<div class="lab-actions">'+button("lab-reset","Restore published example")+button("lab-download","Export complete review JSON")+'</div>'+note;
+shell("Inspect the three published fictional scenarios together: identity permissions, prompt injection and auditability. Edit, add and remove findings, assess selected schema constraints, and compare scope/status consistency without treating a risk label as proof of safety.",controls,
+'<div class="lab-metrics lab-four">'+metric("lab-count","FINDINGS")+metric("lab-open","OPEN / BLOCKED")+
+metric("lab-high","HIGH / CRITICAL")+metric("lab-valid","SOURCE SCHEMA")+'</div>'+
+'<div class="lab-metrics">'+metric("lab-priority","SELECTED ORDINAL PRODUCT")+
+metric("lab-level-display","REVIEWER RISK LEVEL")+'</div>'+
+'<div class="lab-dataset"><p class="lab-eyebrow">RISK INVENTORY / SELECT FOR REVIEW</p>'+
+'<div id="lab-mcp-list" class="lab-ledger" aria-label="Review findings by effect and status"></div></div>'+
+'<div class="lab-review-notes"><p class="lab-eyebrow">ADVISORY REVIEW OBSERVATIONS / NOT SOURCE SCHEMA</p>'+
+'<ul id="lab-advisory" class="lab-findings"></ul></div>');
+const ids=["lab-finding-id","lab-area","lab-finding","lab-likelihood","lab-impact","lab-level","lab-status","lab-owner","lab-mitigation"];
+const elementToKey={"lab-finding-id":"id","lab-area":"area","lab-finding":"finding",
+ "lab-likelihood":"likelihood","lab-impact":"impact","lab-level":"risk_level",
+ "lab-status":"status","lab-owner":"owner","lab-mitigation":"mitigation"};
+function display(){
+ const f=record.findings[selected],optionsEl=$("lab-finding-select");
+ optionsEl.replaceChildren();
+ record.findings.forEach((item,index)=>{
+  const option=document.createElement("option");
+  option.value=String(index);
+  option.textContent=item.id+" · "+item.area.replaceAll("_"," ");
+  optionsEl.append(option);
+ });
+ optionsEl.value=String(selected);
+ for(const id of ids){const key=elementToKey[id];$(id).value=f[key];}
+ $("lab-review-id").value=record.review_id;
+ $("lab-system").value=record.system_name;
+ $("lab-scope").value=record.scope;
+ $("lab-review-status").value=record.review_status;
+ update();
+}
+function snapshot(){
+ record.review_id=v("lab-review-id");
+ record.system_name=v("lab-system");
+ record.scope=v("lab-scope");
+ record.review_status=v("lab-review-status");
+ const f=record.findings[selected];
+ for(const id of ids){
+  const key=elementToKey[id];
+  f[key]=["likelihood","impact"].includes(key)?
+   (v(id)===""?null:Number(v(id))):v(id);
+ }
+}
+function inventory(){
+ const list=$("lab-mcp-list");list.replaceChildren();
+ record.findings.forEach((f,index)=>{
+  const item=document.createElement("button");item.type="button";
+  item.className="lab-ledger-row";
+  item.setAttribute("aria-current",index===selected?"true":"false");
+  item.dataset.state=f.status==="blocked"?"fail":"pass";
+  const name=document.createElement("span");name.textContent=f.id+" · "+f.area.replaceAll("_"," ");
+  const ordinal=document.createElement("code");
+  ordinal.textContent=Number.isInteger(f.likelihood)&&Number.isInteger(f.impact)?
+   String(f.likelihood*f.impact):"—";
+  const status=document.createElement("strong");status.textContent=f.status.toUpperCase();
+  item.append(name,ordinal,status);
+  item.addEventListener("click",()=>{selected=index;display();$("lab-finding-select").focus();});
+  list.append(item);
+ });
 }
 function update(){
-const obj=get(),f=obj.findings[0],errors=[];
-if(!obj.system_name)errors.push("System name is required by the review schema.");
-if(!obj.scope)errors.push("A bounded review scope is required.");
-for(const k of ["likelihood","impact"])if(!Number.isInteger(f[k])||f[k]<1||f[k]>5)errors.push(k+" must be an integer from 1 to 5.");
-if(!f.owner)errors.push("An accountable finding owner is required.");
-if(!f.mitigation)errors.push("A stated mitigation is required.");
-set("lab-priority",Number.isInteger(f.likelihood)&&Number.isInteger(f.impact)&&f.likelihood>=1&&f.likelihood<=5&&f.impact>=1&&f.impact<=5?f.likelihood*f.impact:"—");
-set("lab-valid",errors.length?"INVALID":"SCHEMA SHAPE OK");
-findings(errors.length?"fail":"pass",errors.length?"REVIEW FIELDS INCOMPLETE":"FICTIONAL REVIEW STRUCTURED",
-errors.length?errors:[
-"The export contains the schema's full review envelope with one editable fictional finding.",
-"Likelihood × impact is only an ordinal prioritization aid; risk_level remains a separate reviewer judgment.",
-"Schema-shaped data is not evidence that any control, mitigation or server was tested."
-]);
-$("lab-download").disabled=errors.length>0;
-return {document:obj,valid:!errors.length};
+ snapshot();
+ const checked=engine.review(record);
+ const f=record.findings[selected];
+ set("lab-count",record.findings.length);
+ set("lab-open",checked.open_count||record.findings.filter(x=>["open","blocked"].includes(x.status)).length);
+ set("lab-high",checked.high_count||record.findings.filter(x=>["high","critical"].includes(x.risk_level)).length);
+ set("lab-valid",checked.schema_valid?"VALID":"INVALID");
+ set("lab-priority",Number.isInteger(f.likelihood)&&Number.isInteger(f.impact)&&f.likelihood>=1&&f.likelihood<=5&&f.impact>=1&&f.impact<=5?
+  f.likelihood*f.impact:"—");
+ set("lab-level-display",f.risk_level.toUpperCase());
+ const duplicate=checked.advisory.filter(x=>x.startsWith("Duplicate finding ID"));
+ $("lab-download").disabled=!checked.schema_valid||duplicate.length>0||record.findings.length>50;
+ $("lab-remove").disabled=record.findings.length===1;
+ const notes=$("lab-advisory");notes.replaceChildren();
+ for(const message of checked.advisory){
+  const li=document.createElement("li");li.textContent=message;notes.append(li);
+ }
+ if(!checked.advisory.length){
+  const li=document.createElement("li");
+  li.textContent="No cross-record advisory conflicts found. This does not establish control effectiveness.";notes.append(li);
+ }
+ findings(checked.schema_valid?"pass":"fail",
+  checked.schema_valid?"SCHEMA STRUCTURE VALID":"REVIEW FIELDS INCOMPLETE",
+  checked.schema_valid?
+  ["All required fields and enums match the selected published JSON Schema.",
+   "Risk level is a separate reviewer judgment. Likelihood × impact is only an ordinal sorting aid.",
+   "Actual identity permissions, logging, attack paths and recovery mechanisms have not been tested."]:
+   checked.structural.slice(0,12));
+ inventory();
+ return checked;
 }
-root.addEventListener("input",update);root.addEventListener("change",update);
+function add(){
+ snapshot();
+ if(record.findings.length>=50){set("lab-import-status","Maximum 50 findings in this browser exercise.");return;}
+ const taken=new Set(record.findings.map(f=>f.id));let i=1,newId;
+ do{newId="F-"+String(i++).padStart(3,"0");}while(taken.has(newId));
+ record.findings.push({id:newId,area:"tool_scope",
+  finding:"Fictional tool action requires a bounded effect and authority review.",
+  likelihood:2,impact:3,risk_level:"medium",
+  mitigation:"Identify the principal, actual tool effect, and an enforceable stop/revocation control.",
+  owner:"Fictional Review Owner",status:"open"});
+ selected=record.findings.length-1;display();
+ set("lab-import-status","Added a new fictional finding. Replace the placeholder with evidence-backed review text.");
+}
+function remove(){
+ if(record.findings.length<2)return;
+ record.findings.splice(selected,1);selected=Math.min(selected,record.findings.length-1);
+ display();
+}
+async function importReview(event){
+ const file=event.target.files?.[0];if(!file)return;
+ try{
+  if(file.size>128*1024)throw new Error("The file exceeds the 128 KiB input limit.");
+  const input=JSON.parse(await file.text());
+  const violations=engine.validate(input);
+  if(violations.length)throw new Error(violations.slice(0,4).join(" "));
+  if(input.findings.length>50)throw new Error("Maximum 50 findings.");
+  const ids=new Set(input.findings.map(x=>x.id));
+  if(ids.size!==input.findings.length)throw new Error("Finding identifiers must be unique.");
+  record=engine.clone(input);selected=0;display();
+  set("lab-import-status","Imported "+record.findings.length+" findings locally. Source-schema fields preserved.");
+ }catch(error){
+  set("lab-import-status","Import not accepted: "+String(error.message||error)+". Existing review preserved.");
+ }finally{event.target.value="";}
+}
+root.addEventListener("input",e=>{
+ if(e.target.tagName==="INPUT"&&e.target.type==="file")return;
+ if(e.target.id==="lab-finding-select")return;
+ update();
+});
+root.addEventListener("change",e=>{
+ if(e.target.id==="lab-finding-select"){selected=Number(e.target.value);display();return;}
+ if(e.target.id==="lab-import")return;
+ update();
+});
+$("lab-add").addEventListener("click",add);
+$("lab-remove").addEventListener("click",remove);
 $("lab-reset").addEventListener("click",()=>{
-for(const [key,value] of Object.entries(defaults))$("lab-"+key).value=value;
-$("lab-system").value="Fictional Read-Only Knowledge Helper";
-$("lab-scope").value="Synthetic document collection; read-only search; no external network or write tools.";
-$("lab-review-status").value="draft";update();
+ record=engine.clone(engine.example);selected=0;display();
+ set("lab-import-status","Restored the original three fictional findings.");
 });
+$("lab-import").addEventListener("change",importReview);
 $("lab-download").addEventListener("click",()=>{
-const result=update();
-if(result.valid)exportJSON(result.document,"fictional-mcp-risk-review.json");
-else set("lab-export-status","Correct the record before exporting.");
+ const result=update();
+ if(result.schema_valid&&record.findings.length<=50&&new Set(record.findings.map(x=>x.id)).size===record.findings.length)
+  exportJSON(record,"fictional-mcp-risk-review.json");
 });
-$("lab-review-status").value="draft";update();
+display();
 }
 const rows=[
 ["Govern","Are the decision and residual-risk owners current and authorized?"],
